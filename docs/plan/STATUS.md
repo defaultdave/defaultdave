@@ -2,7 +2,7 @@
 
 Current state only. History is in `DECISIONS.md` and `delta-log.md`. Kept under 25 KB by `scripts/pm.sh check`.
 
-Updated 2026-11-06 by portfolio-pm (Opus 5.5). GitHub repo: `defaultdave/defaultdave`, public; issues #1 to #21 open, one per ticket. Project board: not created. Domain: not bought. Plan: 21 units; owner time 72 h, 2.4 weeks at 30 h/wk, accepted as a measurement.
+Updated 2026-11-06 by portfolio-pm (Opus 5.5). GitHub repo: `defaultdave/defaultdave`, public; issues #1 to #21 open, one per ticket. Project board: [#20](https://github.com/users/defaultdave/projects/20), all 21 issues added; Route and Milestone fields not set up yet. Domain: not bought. Plan: 21 units; owner time 72 h, 2.4 weeks at 30 h/wk, accepted as a measurement.
 
 MILESTONE: 0 Designed (exit: one token source of truth signed off from the Figma file and the Claude Design artifact)
 
@@ -36,13 +36,12 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 
 ## Blocked on Dave
 
-1. Create the GitHub Project and give the PM its number (unblocks `scripts/pm.sh board`).
-2. Walk `docs/plan/preflight.md`: Vercel project, domain, both GitHub Apps (Keystatic, `defaultdave-agents`), repo settings (unblocks every build unit).
-3. Accept or amend `docs/adr/0001-agent-workflow-and-merge-rule.md`: one tier, approval window on, four agent checks (unblocks `merge-desk`).
-4. Decide: which music host and release list (unblocks `content-music`).
-5. Decide: can ResortPass be named, or anonymized as in the CrUX article (unblocks publishing `content-work`).
-6. Headshot and bio, or text-only About (unblocks `content-home-about`).
-7. List of published pieces with URLs (unblocks `content-writing`).
+1. Walk `docs/plan/preflight.md`: Vercel project, domain, both GitHub Apps (Keystatic, `defaultdave-agents`), repo settings (unblocks every build unit).
+2. Accept or amend `docs/adr/0001-agent-workflow-and-merge-rule.md`: one tier, approval window on, four agent checks (unblocks `merge-desk`).
+3. Decide: which music host and release list (unblocks `content-music`).
+4. Decide: can ResortPass be named, or anonymized as in the CrUX article (unblocks publishing `content-work`).
+5. Headshot and bio, or text-only About (unblocks `content-home-about`).
+6. List of published pieces with URLs (unblocks `content-writing`).
 
 ## Next
 
@@ -50,12 +49,12 @@ Start the `design` unit (the session card, or `/portfolio-pm start design`) and 
 
 ## Next chat
 
-**Before you start:** commit and push the bookkeeping; `gh project create --owner defaultdave --title davidfleming.me` and note its number.
+**Before you start:** commit and push the bookkeeping.
 
 **Run:** `/portfolio-pm` in a new chat in `~/Workspace/defaultdave` (terminal: `claude --agent portfolio-pm`).
 
 **Model and effort:** Sonnet, medium. The planning chat ran on Fable; the PM does not need it. Switch to Opus only for a design call or a re-estimate.
 
-**Prompt:** Read `docs/plan/STATUS.md`, `docs/plan/plan-report.md` (Critical path and Execution model), and `docs/plan/tickets/01-preflight.md` to `03-keystatic-spike.md`. Give the start report. Then: the issues exist (#1 to #21, in the Units table); if the project exists, run `scripts/pm.sh board <number>` and add the items, else print the project command. Then dry-run `preflight.md` with Dave row by row. Don't commit; print the command.
+**Prompt:** Read `docs/plan/STATUS.md`, `docs/plan/plan-report.md` (Critical path and Execution model), and `docs/plan/tickets/01-preflight.md` to `03-keystatic-spike.md`. Give the start report. Then: issues #1 to #21 and project #20 exist. Then dry-run `preflight.md` with Dave row by row. Don't commit; print the command.
 
 **Swarm later:** the five `page-*` units go out as one `/senior docs/plan/tickets/<nn>-<id>.md` session each, in their own worktrees, only after `scaffold`, `merge-desk` and `cms` are merged, the design is signed off, the ruleset requires the CI and agent checks, the merge-desk dry run has passed, and `preflight.md` is fully ticked. Each session pushes and opens its PR through `scripts/merge-desk/agent-git.ts` as the App; reviewers post verdicts with `post-check.ts`.
