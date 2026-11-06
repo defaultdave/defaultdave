@@ -191,7 +191,7 @@ Mapped one-to-one to units in `docs/plan/plan.json`.
 | # | Question | Who answers | Blocks |
 |---|---|---|---|
 | 1 | Does Keystatic GitHub mode run cleanly on the Next.js release current at setup? | `keystatic-spike` | `cms` |
-| 2 | Which host do the music embeds come from, and are there release notes? | Dave | `content-music` |
+| 2 | Which host do the music embeds come from, and are there release notes? Host: Bandcamp (2026-11-06); release list and notes still open | Dave | `content-music` |
 | 3 | Can ResortPass be named, or does it stay anonymized as in the CrUX article? | Dave | `content-work` |
 | 4 | Headshot and bio ready, or text-only About at launch? | Dave | `content-home-about` |
 | 5 | Is `/feed.xml` in or cut? | Dave at the range review | `feed` |
