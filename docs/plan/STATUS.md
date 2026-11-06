@@ -2,7 +2,7 @@
 
 Current state only. History is in `DECISIONS.md` and `delta-log.md`. Kept under 25 KB by `scripts/pm.sh check`.
 
-Updated 2026-11-06 by the planning session (Claude Code, Fable 5.1). GitHub repo: not created. Project board: not created. Domain: not bought. Plan: 21 units; owner time 72 h, 2.4 weeks at 30 h/wk, accepted as a measurement.
+Updated 2026-11-06 by portfolio-pm (Opus 5.5). Plan committed locally (`a9cbbcf`). GitHub repo: not created, no remote. Project board: not created. Domain: not bought. Plan: 21 units; owner time 72 h, 2.4 weeks at 30 h/wk, accepted as a measurement.
 
 MILESTONE: 0 Designed (exit: one token source of truth signed off from the Figma file and the Claude Design artifact)
 
@@ -36,9 +36,9 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 
 ## Blocked on Dave
 
-1. Commit the plan, create the GitHub repo and push (unblocks issues and the board).
+1. Create the GitHub repo `defaultdave/defaultdave` (private) and push `main` (unblocks issues and the board).
 2. Create the GitHub Project and give the PM its number (unblocks `scripts/pm.sh board`).
-3. Walk `docs/plan/preflight.md`: Vercel project, domain, both GitHub Apps (Keystatic, `defaultdave-agents`), repo settings (unblocks every build unit).
+3. Walk `docs/plan/preflight.md` (rows for the repo and repo settings are superseded by the 2026-11-06 private-repo decision): Vercel project, domain, both GitHub Apps (Keystatic, `defaultdave-agents`), repo settings (unblocks every build unit).
 4. Accept or amend `docs/adr/0001-agent-workflow-and-merge-rule.md`: one tier, approval window on, four agent checks (unblocks `merge-desk`).
 5. Decide: which music host and release list (unblocks `content-music`).
 6. Decide: can ResortPass be named, or anonymized as in the CrUX article (unblocks publishing `content-work`).
@@ -51,7 +51,7 @@ Start the `design` unit (the session card, or `/portfolio-pm start design`) and 
 
 ## Next chat
 
-**Before you start:** commit the plan (command below); create the repo and push; optionally create the GitHub Project.
+**Before you start:** `gh repo create defaultdave/defaultdave --private --source . --remote origin --push`; optionally `gh project create --owner defaultdave --title davidfleming.me`.
 
 **Run:** `/portfolio-pm` in a new chat in `~/Workspace/defaultdave` (terminal: `claude --agent portfolio-pm`).
 
