@@ -88,13 +88,32 @@
       "route": "human-led"
     },
     {
+      "id": "merge-desk",
+      "title": "Agent identity and merge desk: GitHub App, rulesets with required checks, agent-git, post-check, scope-manifest, revert",
+      "capability": "Setup",
+      "kind": "build",
+      "depends_on": [
+        "preflight",
+        "scaffold"
+      ],
+      "complexity": 2,
+      "uncertainty": 2,
+      "estimate": {
+        "o": 0.5,
+        "m": 1,
+        "p": 2
+      },
+      "notes": "Added 2026-11-06: Dave wants the portfolio run like any project, on the Ramble model. Ported from ramble/scripts/merge-desk with the integration tier removed (one tier, main only). Human-led: Dave creates the App and the rulesets, /senior ports the scripts. Every agent fan-out unit depends on it."
+    },
+    {
       "id": "shell",
       "title": "Layout, nav, footer, tokens, primitives, metadata defaults, a11y skeleton",
       "capability": "Site shell",
       "kind": "build",
       "depends_on": [
         "scaffold",
-        "design"
+        "design",
+        "merge-desk"
       ],
       "complexity": 2,
       "uncertainty": 1,
@@ -133,7 +152,8 @@
       "depends_on": [
         "shell",
         "cms",
-        "design"
+        "design",
+        "merge-desk"
       ],
       "complexity": 1,
       "uncertainty": 1,
@@ -152,7 +172,8 @@
       "depends_on": [
         "shell",
         "cms",
-        "design"
+        "design",
+        "merge-desk"
       ],
       "complexity": 2,
       "uncertainty": 1,
@@ -173,7 +194,8 @@
       "depends_on": [
         "shell",
         "cms",
-        "design"
+        "design",
+        "merge-desk"
       ],
       "complexity": 2,
       "uncertainty": 1,
@@ -194,7 +216,8 @@
       "depends_on": [
         "shell",
         "cms",
-        "design"
+        "design",
+        "merge-desk"
       ],
       "complexity": 2,
       "uncertainty": 1,
@@ -215,7 +238,8 @@
       "depends_on": [
         "shell",
         "cms",
-        "design"
+        "design",
+        "merge-desk"
       ],
       "complexity": 1,
       "uncertainty": 1,
@@ -308,7 +332,8 @@
         "page-work",
         "page-writing",
         "page-music",
-        "page-about"
+        "page-about",
+        "merge-desk"
       ],
       "complexity": 1,
       "uncertainty": 1,
@@ -327,7 +352,8 @@
       "capability": "Launch readiness",
       "kind": "build",
       "depends_on": [
-        "page-writing"
+        "page-writing",
+        "merge-desk"
       ],
       "complexity": 1,
       "uncertainty": 1,

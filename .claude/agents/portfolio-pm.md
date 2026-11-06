@@ -45,15 +45,15 @@ Dave works one item at a time. One next action, not a menu.
 
 ## Sequencing
 
-Routes come from `plan-report.md`. Gates before any agent unit starts (the launch check in the plan skill): the repo has build, lint, typecheck and test scripts and CI runs them (the `scaffold` unit); `preflight.md` is fully ticked; the ticket has acceptance criteria, scope globs and no open question.
+Routes come from `plan-report.md`. Gates before any agent unit starts (the launch check in the plan skill): the repo has build, lint, typecheck and test scripts and CI runs them (`scaffold`); the `main` ruleset requires them plus the agent checks and the merge-desk dry run has passed (`merge-desk`); `preflight.md` is fully ticked; the ticket has acceptance criteria, scope globs and no open question. From then on agent sessions push and open PRs through `scripts/merge-desk/agent-git.ts` and reviewers post verdicts with `post-check.ts`, never with Dave's login. The setup reference is `~/.claude/skills/plan-project/references/project-setup.md`.
 
 | Route | Units | How it runs |
 |---|---|---|
 | human only | preflight, design, keystatic-spike, content-* | Dave, with you or a session helping; `scripts/track.sh start <unit>` for his outside time |
-| human-led | scaffold, cms, qa-pass, launch, tail | Dave in a `/senior <ticket>` session; he decides, it types |
+| human-led | scaffold, merge-desk, cms, qa-pass, launch, tail | Dave in a `/senior <ticket>` session; he decides, it types |
 | agent fan-out | shell, page-home, page-work, page-writing, page-music, page-about, seo-perf, feed | one `/senior docs/plan/tickets/<nn>-<id>.md` session per ticket, each in its own worktree, started when its dependencies have a merged PR; review with `/review-pr <pr-url>` or `/review-swarm`, verdicts to `.team-verdicts/` |
 
-Run order: preflight, design, keystatic-spike in parallel; scaffold; cms and shell in parallel; the five pages as a swarm once shell and cms are merged and the design is signed off; content units whenever Dave has the hours; seo-perf and feed; qa-pass; launch; tail. The first milestone needs preflight, design, keystatic-spike, scaffold, shell, cms, page-home, page-work and content-work.
+Run order: preflight, design, keystatic-spike in parallel; scaffold; merge-desk (Dave accepts `docs/adr/0001-agent-workflow-and-merge-rule.md` first); cms and shell in parallel; the five pages as a swarm once shell and cms are merged and the design is signed off; content units whenever Dave has the hours; seo-perf and feed; qa-pass; launch; tail. The first milestone needs preflight, design, keystatic-spike, scaffold, shell, cms, page-home, page-work and content-work.
 
 Every build prompt carries the ticket's scope manifest. Model tiering: Sonnet for implementation and QA, Haiku for narrow checks, Opus only for a design call or an estimate in its own chat.
 

@@ -1,6 +1,6 @@
 # Music releases list with click-to-load embed facade
 
-Plan unit `page-music` · Route: agent fan-out · Depends on: `shell`, `cms`, `design` · Expected 2.0 rounds (1 / 2 / 3), 45 owner minutes, about 1.0 elapsed days
+Plan unit `page-music` · Route: agent fan-out · Depends on: `shell`, `cms`, `design`, `merge-desk` · Expected 2.0 rounds (1 / 2 / 3), 45 owner minutes, about 1.0 elapsed days
 
 ## Outcome
 

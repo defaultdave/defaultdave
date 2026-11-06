@@ -1,6 +1,6 @@
 # About page from the about singleton
 
-Plan unit `page-about` · Route: agent fan-out · Depends on: `shell`, `cms`, `design` · Expected 1.2 rounds (1 / 1 / 2), 15 owner minutes, about 0.6 elapsed days
+Plan unit `page-about` · Route: agent fan-out · Depends on: `shell`, `cms`, `design`, `merge-desk` · Expected 1.2 rounds (1 / 1 / 2), 15 owner minutes, about 0.6 elapsed days
 
 ## Outcome
 

@@ -10,6 +10,7 @@ Recorded 2026-11-06, before the first commit. These rows stay as written; a revi
 | `design` | human only | 0.75 | 1.5 | 2.5 | days |  | 1.5 |
 | `keystatic-spike` | human only | 0.25 | 0.5 | 1 | days |  | 0.5 |
 | `scaffold` | human-led | 0.25 | 0.5 | 1 | days |  | 0.5 |
+| `merge-desk` | human-led | 0.5 | 1 | 2 | days |  | 1.1 |
 | `shell` | agent fan-out | 1 | 2 | 4 | rounds | 60 | 1.1 |
 | `cms` | human-led | 0.5 | 1 | 2 | days |  | 1.1 |
 | `page-home` | agent fan-out | 1 | 1 | 2 | rounds | 20 | 0.6 |
@@ -27,11 +28,11 @@ Recorded 2026-11-06, before the first commit. These rows stay as written; a revi
 | `launch` | human-led | 0.25 | 0.5 | 1 | days |  | 0.5 |
 | `tail` | human-led | 0.25 | 0.5 | 1 | days |  | 0.5 |
 
-- Critical path: `design -> shell -> page-work -> seo-perf -> qa-pass -> launch -> tail`
-- Range on the path: 1.5 to 1.9 weeks (expected 1.7; 8.6 days)
-- Staffing chosen: 1 engineer + agent fan-out, 2.2 weeks
-- Owner time: 62 hours at 30 hours a week, 2.1 weeks, against a floor of 1.7 weeks and an appetite of 2 weeks (2 hours over; `feed` is the first cut). Dave's call on 2026-11-06: do not worry horribly about the timing estimate; measure reality.
-- First milestone (Home, Work, ResortPass case study live): floor 0.9 weeks, owner time 1.2 weeks (about 36 hours)
+- Critical path: `preflight -> scaffold -> merge-desk -> shell -> page-work -> seo-perf -> qa-pass -> launch -> tail`
+- Range on the path: 1.7 to 2.2 weeks (expected 1.9; 9.7 days)
+- Staffing chosen: 1 engineer + agent fan-out
+- Owner time: 72 hours at 30 hours a week, 2.4 weeks, against a floor of 1.9 weeks and an appetite of 2 weeks. Dave's call on 2026-11-06: do not worry horribly about the timing estimate; measure reality. The 21st unit, `merge-desk`, was added the same day at his request (run it like any project).
+- First milestone (Home, Work, ResortPass case study live): floor 1.2 weeks, owner time 1.6 weeks (about 48 hours)
 - Assumed: 0.5 days a round; 30 owner hours a week; join buffer 0.5 days; no days-estimated agent units, so no review fraction
 - Route overrides: `scaffold` pinned human-led (foundation); `shell`, `page-work`, `page-writing`, `seo-perf` pinned agent fan-out (uncertainty 1; on the path only as the longest of parallel siblings)
 - Reference class: Ramble, 36 units at 0.55 actual days per unit predicts 10.9 serial days; this plan's serial total is 20.1, 1.84 times that. Ramble's actuals closed at 29% of likely; if that holds here, the build units finish early and the writing and design units set the date.
@@ -96,4 +97,4 @@ Written when the tail unit closes.
 - Measured: days a round, owner minutes per agent-built unit, owner hours a week:
 - Measures that missed their target, and what changed because of it:
 - Change to make to the next plan:
-- Reference-class entry for the next plan: `{ "name": "davidfleming.me portfolio", "units": 20, "days": <actual serial days> }`
+- Reference-class entry for the next plan: `{ "name": "davidfleming.me portfolio", "units": 21, "days": <actual serial days> }`

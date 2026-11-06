@@ -11,7 +11,8 @@ A Next.js app that builds, lints, typechecks and tests green in CI on every PR, 
 - [ ] pnpm create next-app on the current stable release; App Router, TypeScript, src/ layout; packageManager and engines pinned
 - [ ] tsconfig strict with exactOptionalPropertyTypes; typescript-eslint strict-type-checked; Prettier; Knip; React Compiler on; next typegen on
 - [ ] Vitest with one passing example test in src/lib; Playwright with one smoke test hitting / and asserting a single h1, run with --trace off
-- [ ] GitHub Actions workflow runs build, lint, typecheck, test on pull_request and push to main; all four are the required checks
+- [ ] GitHub Actions per `~/.claude/skills/plan-project/references/project-setup.md` section C: `ci.yml` with a gate matrix (format:check, lint, typecheck, test, build, knip) and an `e2e` job (Playwright smoke with axe, --trace off); `codeql.yml`, `gitleaks.yml`, `osv-scanner.yml` with an empty `osv-scanner.toml`, `dependabot.yml`; third-party actions pinned by SHA, minimum `permissions:`, `persist-credentials: false`
+- [ ] `.nvmrc` with the Node major; Dave adds the CI job names to the `main` ruleset once this merges (merge-desk)
 - [ ] Vercel project linked to the repo; a PR gets a preview URL comment
 - [ ] README.md states the stack, the scripts, and how to run Keystatic locally (placeholder until cms)
 - [ ] Quality gates pass: build, lint, typecheck, test

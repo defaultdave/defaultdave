@@ -1,6 +1,6 @@
 # Articles and Musings lists and post template with canonical handling
 
-Plan unit `page-writing` · Route: agent fan-out · Depends on: `shell`, `cms`, `design` · Expected 2.2 rounds (1 / 2 / 4), 45 owner minutes, about 1.1 elapsed days
+Plan unit `page-writing` · Route: agent fan-out · Depends on: `shell`, `cms`, `design`, `merge-desk` · Expected 2.2 rounds (1 / 2 / 4), 45 owner minutes, about 1.1 elapsed days
 
 ## Outcome
 

@@ -1,6 +1,6 @@
 # Work list and case-study template with metrics and figures
 
-Plan unit `page-work` · Route: agent fan-out · Depends on: `shell`, `cms`, `design` · Expected 2.2 rounds (1 / 2 / 4), 60 owner minutes, about 1.1 elapsed days
+Plan unit `page-work` · Route: agent fan-out · Depends on: `shell`, `cms`, `design`, `merge-desk` · Expected 2.2 rounds (1 / 2 / 4), 60 owner minutes, about 1.1 elapsed days
 
 ## Outcome
 

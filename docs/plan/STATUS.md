@@ -2,7 +2,7 @@
 
 Current state only. History is in `DECISIONS.md` and `delta-log.md`. Kept under 25 KB by `scripts/pm.sh check`.
 
-Updated 2026-11-06 by the planning session (Claude Code, Fable 5.1). GitHub repo: not created. Project board: not created. Domain: not bought.
+Updated 2026-11-06 by the planning session (Claude Code, Fable 5.1). GitHub repo: not created. Project board: not created. Domain: not bought. Plan: 21 units; owner time 72 h, 2.4 weeks at 30 h/wk, accepted as a measurement.
 
 MILESTONE: 0 Designed (exit: one token source of truth signed off from the Figma file and the Claude Design artifact)
 
@@ -15,8 +15,9 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 | `preflight` | todo | human only | | | | Dave | walk `preflight.md` after the dry run; buy davidfleming.me; create the Keystatic GitHub App |
 | `design` | todo | human only | | | | Dave | session card proposed 2026-11-06: Figma file + Claude Design artifact, compared |
 | `keystatic-spike` | todo | human only | | | | Dave | session card proposed 2026-11-06 |
-| `scaffold` | todo | human-led | | | | | after preflight |
-| `shell` | todo | agent fan-out | | | | | after scaffold and design sign-off |
+| `scaffold` | todo | human-led | | | | | after preflight; carries the CI and security workflows |
+| `merge-desk` | todo | human-led | | | | Dave + /senior | GitHub App, ruleset, merge-desk scripts ported from Ramble; ADR 0001 to accept first; merges by bypass |
+| `shell` | todo | agent fan-out | | | | | after scaffold, merge-desk and design sign-off |
 | `cms` | todo | human-led | | | | | after scaffold and the spike |
 | `page-home` | todo | agent fan-out | | | | | swarm, after shell + cms |
 | `page-work` | todo | agent fan-out | | | | | swarm |
@@ -37,11 +38,12 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 
 1. Commit the plan, create the GitHub repo and push (unblocks issues and the board).
 2. Create the GitHub Project and give the PM its number (unblocks `scripts/pm.sh board`).
-3. Walk `docs/plan/preflight.md`: Vercel project, domain, GitHub App, branch protection (unblocks every build unit).
-4. Decide: which music host and release list (unblocks `content-music`).
-5. Decide: can ResortPass be named, or anonymized as in the CrUX article (unblocks publishing `content-work`).
-6. Headshot and bio, or text-only About (unblocks `content-home-about`).
-7. List of published pieces with URLs (unblocks `content-writing`).
+3. Walk `docs/plan/preflight.md`: Vercel project, domain, both GitHub Apps (Keystatic, `defaultdave-agents`), repo settings (unblocks every build unit).
+4. Accept or amend `docs/adr/0001-agent-workflow-and-merge-rule.md`: one tier, approval window on, four agent checks (unblocks `merge-desk`).
+5. Decide: which music host and release list (unblocks `content-music`).
+6. Decide: can ResortPass be named, or anonymized as in the CrUX article (unblocks publishing `content-work`).
+7. Headshot and bio, or text-only About (unblocks `content-home-about`).
+8. List of published pieces with URLs (unblocks `content-writing`).
 
 ## Next
 
@@ -57,4 +59,4 @@ Start the `design` unit (the session card, or `/portfolio-pm start design`) and 
 
 **Prompt:** Read `docs/plan/STATUS.md`, `docs/plan/plan-report.md` (Critical path and Execution model), and `docs/plan/tickets/01-preflight.md` to `03-keystatic-spike.md`. Give the start report. Then: if the repo and project exist, run `scripts/pm.sh issues` and create the issues, record their numbers in the Units table, and print the `scripts/pm.sh board` lines; otherwise print the repo and project commands. Then dry-run `preflight.md` with Dave row by row. Don't commit; print the command.
 
-**Swarm later:** the five `page-*` units go out as one `/senior docs/plan/tickets/<nn>-<id>.md` session each, in their own worktrees, only after `scaffold` and `cms` are merged, the design is signed off, CI runs the four gates, and `preflight.md` is fully ticked.
+**Swarm later:** the five `page-*` units go out as one `/senior docs/plan/tickets/<nn>-<id>.md` session each, in their own worktrees, only after `scaffold`, `merge-desk` and `cms` are merged, the design is signed off, the ruleset requires the CI and agent checks, the merge-desk dry run has passed, and `preflight.md` is fully ticked. Each session pushes and opens its PR through `scripts/merge-desk/agent-git.ts` as the App; reviewers post verdicts with `post-check.ts`.

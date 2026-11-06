@@ -1,6 +1,6 @@
 # RSS feed for Articles and Musings (would-like; first to cut)
 
-Plan unit `feed` · Route: agent fan-out · Depends on: `page-writing` · Expected 1.2 rounds (1 / 1 / 2), 15 owner minutes, about 0.6 elapsed days
+Plan unit `feed` · Route: agent fan-out · Depends on: `page-writing`, `merge-desk` · Expected 1.2 rounds (1 / 1 / 2), 15 owner minutes, about 0.6 elapsed days
 
 ## Outcome
 

@@ -16,7 +16,7 @@ Recruiters and hiring managers who follow the link from your resume or LinkedIn 
 | About | Read who Dave is and reach him by mail, LinkedIn or GitHub |
 | Editing | Dave edits every section at `/keystatic` from any browser, signed in with GitHub; each save commits and redeploys. Or edits the MDX locally with Claude Code |
 | Design | One design settled before code, in two renderings compared: a Figma file and an interactive Claude Design artifact; one token source of truth signed off |
-| Quality | Lighthouse 95 or better on every page, WCAG 2.2 AA, previews on every PR, four quality gates in CI |
+| Quality | Lighthouse 95 or better on every page, WCAG 2.2 AA, previews on every PR, CI gates plus agent review checks required on `main`, agents acting as a GitHub App (ADR 0001) |
 
 ## What is not included
 
@@ -31,7 +31,7 @@ Anything on this list is a phase-2 issue, filed in the tail unit.
 
 ## How long
 
-> Critical path is design, shell, page-work, seo-perf, qa-pass, launch, tail: about 1.7 weeks of calendar time, range 1.5 to 1.9. Preflight, the Keystatic spike, scaffold, cms, three of the five pages, the four writing units and the RSS feed are off it. One engineer with no agents is 4.0 weeks serial. The floor is 1.7 weeks; more people add nothing. At 30 hours a week, Dave's own time is 2.1 weeks, so Dave's hours set the date, not the graph. The first walkable milestone, Home, the Work list and the ResortPass case study live at davidfleming.me, has a floor of 0.9 weeks and needs about 36 hours of Dave's time.
+> Critical path is preflight, scaffold, merge-desk, shell, page-work, seo-perf, qa-pass, launch, tail: about 1.9 weeks of calendar time, range 1.7 to 2.2. The design, the Keystatic spike, cms, three of the five pages, the four writing units and the RSS feed are off it. One engineer with no agents is about 4.4 weeks serial. The floor is 1.9 weeks; more people add nothing. At 30 hours a week, Dave's own time is 2.4 weeks, so Dave's hours set the date, not the graph. The first walkable milestone, Home, the Work list and the ResortPass case study live at davidfleming.me, has a floor of 1.2 weeks and needs about 48 hours of Dave's time.
 
 The range is built from a three-point estimate on every unit and checked against Ramble (36 units with recorded actuals, which closed at 29% of their likely estimates). This plan's serial total is 1.8 times what Ramble's per-unit rate predicts, which is expected: Ramble's units were agent-built, and most of this plan's hours are Dave designing and writing. The timing is a measurement to take, not a promise to keep: outside work is logged with scripts/track.sh, inside work from transcript timestamps. It is re-estimated at each milestone below and should narrow as the work runs.
 

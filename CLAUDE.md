@@ -7,5 +7,6 @@ Personal portfolio site. Next.js App Router on Vercel, Keystatic git-based CMS a
 - **Tickets:** `docs/plan/tickets/<nn>-<id>.md`, one per plan unit, each with a scope manifest. Implement with `/senior <ticket path>`.
 - **Standards:** `.claude/standards/stack-decisions.md` settles the per-project rules; `~/.claude/standards/react-nextjs.md` and `architecture.md` are the full sets.
 - **Time:** `scripts/track.sh start <unit>` / `stop` / `sum` for work outside Claude.
+- **Agents and GitHub:** agents push, open PRs, post checks and queue auto-merge only through `scripts/merge-desk/` as the `defaultdave-agents` App, never with Dave's login (ADR 0001, from the `merge-desk` unit on). Dave owns the App, rulesets, secrets, bypass merges and workflow files.
 - **Secrets:** never in chat, tickets or the repo. Keystatic and Vercel values go from the console to the Vercel env store and `.env`.
 - **Content rules:** ResortPass anonymized and NDA-safe unless `DECISIONS.md` says otherwise; nothing from the Multi Media LLC loop; no em dashes or "not just X, it's Y" in published copy.

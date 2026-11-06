@@ -1,6 +1,6 @@
 # Sitemap, robots, OG images, per-page metadata, Speed Insights, bundle analyzer, Lighthouse 95
 
-Plan unit `seo-perf` · Route: agent fan-out · Depends on: `page-home`, `page-work`, `page-writing`, `page-music`, `page-about` · Expected 2.0 rounds (1 / 2 / 3), 30 owner minutes, about 1.0 elapsed days
+Plan unit `seo-perf` · Route: agent fan-out · Depends on: `page-home`, `page-work`, `page-writing`, `page-music`, `page-about`, `merge-desk` · Expected 2.0 rounds (1 / 2 / 3), 30 owner minutes, about 1.0 elapsed days
 
 ## Outcome
 
