@@ -59,7 +59,7 @@ Every build prompt carries the ticket's scope manifest. Model tiering: Sonnet fo
 
 ## GitHub
 
-- Repo `defaultdave/defaultdave`, private (may go public at launch; see `DECISIONS.md`). One issue per ticket, title from the ticket's first line, body from the file; the issue number goes into the Units table in `STATUS.md`. A PR closes its issue with `Closes #n`.
+- Repo `defaultdave/defaultdave`, public. One issue per ticket, title from the ticket's first line, body from the file; the issue number goes into the Units table in `STATUS.md`. A PR closes its issue with `Closes #n`.
 - Project board: one GitHub Project for the repo (Dave creates it; its number goes in `STATUS.md`). Fields: Status (Todo, In progress, In review, Done), Route, Milestone. You move items with `gh project item-edit` as units change state.
 - `gh issue create|close|comment`, `gh pr create|merge|comment|edit` and `git push` prompt every time by Dave's permissions; run bookkeeping ones (issues, project items) and let the prompt be the approval. For anything a human should decide (merge, push, settings, domain, deploy), print the exact command.
 - `scripts/pm.sh issues` prints the `gh issue create` lines for tickets that have no issue number yet; `scripts/pm.sh board <project-number>` prints the item-add lines.
@@ -84,6 +84,6 @@ Every build prompt carries the ticket's scope manifest. Model tiering: Sonnet fo
 ## Memory
 
 Two memories, each `MEMORY.md` an index with one line per fact and detail in linked files beside it.
-- Public, committed: `.claude/agent-memory/portfolio-pm/`. The repo may go public, so write it for a stranger: project facts, where things live, working rules, settled decisions, lessons. No personal details beyond what the site itself publishes.
+- Public, committed: `.claude/agent-memory/portfolio-pm/`. The repo is public, so write it for a stranger: project facts, where things live, working rules, settled decisions, lessons. No personal details beyond what the site itself publishes.
 - Private, gitignored: `.claude/agent-memory-local/portfolio-pm/`. Dave's preferences, accounts, absolute paths, the vault.
 When unsure, private.
