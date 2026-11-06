@@ -1,0 +1,392 @@
+{
+  "project": "davidfleming.me portfolio site",
+  "recorded": "2026-11-06",
+  "appetite_weeks": 2,
+  "first_milestone": {
+    "title": "Home, the Work list and the ResortPass case study live at davidfleming.me",
+    "units": [
+      "page-home",
+      "page-work",
+      "content-work"
+    ]
+  },
+  "assumptions": {
+    "join_buffer": 0.5,
+    "round_days": 0.5,
+    "owner_hours_per_week": 30,
+    "focus_hours_per_day": 6,
+    "calibrated": null
+  },
+  "reference_class": [
+    {
+      "name": "Ramble demo marketplace, Oct 20 to Nov 4 2026: the 36 units with a recorded actual (summed likely estimate 68.75 days)",
+      "units": 36,
+      "days": 19.65
+    }
+  ],
+  "units": [
+    {
+      "id": "preflight",
+      "title": "Accounts, domain, GitHub App, Hobby caps and secrets, from preflight.md",
+      "capability": "Setup",
+      "kind": "preflight",
+      "complexity": 1,
+      "uncertainty": 2,
+      "estimate": {
+        "o": 0.25,
+        "m": 0.5,
+        "p": 1
+      },
+      "notes": "Dave walks preflight.md after the agent dry-runs it. Hobby caps: 100 deploys a day, 100 GB bandwidth a month, 6,000 build minutes a month, 1 concurrent build."
+    },
+    {
+      "id": "design",
+      "title": "Design: a Figma file and a Claude Design artifact of the same tokens, components and six layouts, compared",
+      "capability": "Design",
+      "kind": "build",
+      "depends_on": [],
+      "complexity": 2,
+      "uncertainty": 2,
+      "human_only": true,
+      "estimate": {
+        "o": 0.75,
+        "m": 1.5,
+        "p": 2.5
+      },
+      "notes": "Added 2026-11-06 at Dave's request after the range review. Two renderings of one design: a Figma file driven through the Figma MCP, and an interactive Claude Design artifact Dave can try options in. Dave compares, picks or merges, and signs off one source of truth for tokens. Shell and every page depend on it. Timing is measured, not promised: Dave logs start and stop times in docs/plan/time-log.csv."
+    },
+    {
+      "id": "keystatic-spike",
+      "title": "Prove Keystatic GitHub mode on the current Next.js App Router release",
+      "capability": "CMS",
+      "kind": "spike",
+      "complexity": 1,
+      "uncertainty": 3,
+      "estimate": {
+        "o": 0.25,
+        "m": 0.5,
+        "p": 1
+      },
+      "notes": "Runs beside preflight; needs the GitHub App from preflight only for the GitHub-mode half, so start with local mode."
+    },
+    {
+      "id": "scaffold",
+      "title": "Next.js app with strict TS, lint, format, Knip, Vitest, Playwright smoke, CI and Vercel link",
+      "capability": "Setup",
+      "kind": "build",
+      "depends_on": [
+        "preflight"
+      ],
+      "complexity": 2,
+      "uncertainty": 1,
+      "estimate": {
+        "o": 0.25,
+        "m": 0.5,
+        "p": 1
+      },
+      "notes": "Human-led: Dave decides, /senior types. Estimate is Dave's attention, not elapsed typing. Pinned human-led although off the path once the design unit became the longest opener: the toolchain and CI are the foundation every agent unit builds on.",
+      "route": "human-led"
+    },
+    {
+      "id": "shell",
+      "title": "Layout, nav, footer, tokens, primitives, metadata defaults, a11y skeleton",
+      "capability": "Site shell",
+      "kind": "build",
+      "depends_on": [
+        "scaffold",
+        "design"
+      ],
+      "complexity": 2,
+      "uncertainty": 1,
+      "rounds": {
+        "o": 1,
+        "m": 2,
+        "p": 4
+      },
+      "owner_minutes": 60,
+      "notes": "Agent fan-out. Round one delivers tokens.css and the primitives matching the Figma file; Dave checks them against the design before the layout is built. Design calls were made in figma-design. Routed to agent fan-out although on the path: uncertainty 1, and the design is already settled in Figma.",
+      "route": "agent fan-out"
+    },
+    {
+      "id": "cms",
+      "title": "Keystatic config, collections and singletons, typed content layer, MDX pipeline",
+      "capability": "CMS",
+      "kind": "build",
+      "depends_on": [
+        "scaffold",
+        "keystatic-spike"
+      ],
+      "complexity": 2,
+      "uncertainty": 2,
+      "estimate": {
+        "o": 0.5,
+        "m": 1,
+        "p": 2
+      },
+      "notes": "Human-led on the path. Keystatic schema and content-layer types are the architecture of the site."
+    },
+    {
+      "id": "page-home",
+      "title": "Home page from the home singleton and featured work",
+      "capability": "Pages",
+      "kind": "build",
+      "depends_on": [
+        "shell",
+        "cms",
+        "design"
+      ],
+      "complexity": 1,
+      "uncertainty": 1,
+      "rounds": {
+        "o": 1,
+        "m": 1,
+        "p": 2
+      },
+      "owner_minutes": 20
+    },
+    {
+      "id": "page-work",
+      "title": "Work list and case-study template with metrics and figures",
+      "capability": "Pages",
+      "kind": "build",
+      "depends_on": [
+        "shell",
+        "cms",
+        "design"
+      ],
+      "complexity": 2,
+      "uncertainty": 1,
+      "rounds": {
+        "o": 1,
+        "m": 2,
+        "p": 4
+      },
+      "owner_minutes": 60,
+      "notes": "Uncertainty 1 and well-trodden; on the path only as the longest of five sibling pages. Routed to agent fan-out.",
+      "route": "agent fan-out"
+    },
+    {
+      "id": "page-writing",
+      "title": "Articles and Musings lists and post template with canonical handling",
+      "capability": "Pages",
+      "kind": "build",
+      "depends_on": [
+        "shell",
+        "cms",
+        "design"
+      ],
+      "complexity": 2,
+      "uncertainty": 1,
+      "rounds": {
+        "o": 1,
+        "m": 2,
+        "p": 4
+      },
+      "owner_minutes": 45,
+      "notes": "Same as page-work: sibling page, routed to agent fan-out.",
+      "route": "agent fan-out"
+    },
+    {
+      "id": "page-music",
+      "title": "Music releases list with click-to-load embed facade",
+      "capability": "Pages",
+      "kind": "build",
+      "depends_on": [
+        "shell",
+        "cms",
+        "design"
+      ],
+      "complexity": 2,
+      "uncertainty": 1,
+      "rounds": {
+        "o": 1,
+        "m": 2,
+        "p": 3
+      },
+      "owner_minutes": 45,
+      "notes": "Same as page-work: sibling page, routed to agent fan-out. Embed facade is the one non-trivial component.",
+      "route": "agent fan-out"
+    },
+    {
+      "id": "page-about",
+      "title": "About page from the about singleton",
+      "capability": "Pages",
+      "kind": "build",
+      "depends_on": [
+        "shell",
+        "cms",
+        "design"
+      ],
+      "complexity": 1,
+      "uncertainty": 1,
+      "rounds": {
+        "o": 1,
+        "m": 1,
+        "p": 2
+      },
+      "owner_minutes": 15
+    },
+    {
+      "id": "content-work",
+      "title": "ResortPass case study, anonymized; cards for gallery perf, vig, side projects",
+      "capability": "Content",
+      "kind": "build",
+      "depends_on": [
+        "cms"
+      ],
+      "complexity": 1,
+      "uncertainty": 2,
+      "human_only": true,
+      "estimate": {
+        "o": 0.5,
+        "m": 1,
+        "p": 2
+      },
+      "notes": "Dave's writing. Drafted from the vault retrospectives and the Checkout Project note, Dave edits for voice and NDA. Human only: product intent and NDA judgement."
+    },
+    {
+      "id": "content-writing",
+      "title": "Tuscany Rule port, CrUX article final pass, published pieces with canonical URLs",
+      "capability": "Content",
+      "kind": "build",
+      "depends_on": [
+        "cms"
+      ],
+      "complexity": 1,
+      "uncertainty": 1,
+      "human_only": true,
+      "estimate": {
+        "o": 0.25,
+        "m": 0.5,
+        "p": 1
+      },
+      "notes": "Tuscany Rule and the CrUX draft exist; this is porting, a final pass, and a list of URLs."
+    },
+    {
+      "id": "content-music",
+      "title": "Release list with embed links and notes",
+      "capability": "Content",
+      "kind": "build",
+      "depends_on": [
+        "cms"
+      ],
+      "complexity": 1,
+      "uncertainty": 2,
+      "human_only": true,
+      "estimate": {
+        "o": 0.25,
+        "m": 0.5,
+        "p": 1
+      },
+      "notes": "Dave's. Uncertainty 2: embed host not yet chosen."
+    },
+    {
+      "id": "content-home-about",
+      "title": "Positioning paragraph, bio, headshot, contact links",
+      "capability": "Content",
+      "kind": "build",
+      "depends_on": [
+        "cms"
+      ],
+      "complexity": 1,
+      "uncertainty": 1,
+      "human_only": true,
+      "estimate": {
+        "o": 0.1,
+        "m": 0.25,
+        "p": 0.5
+      },
+      "notes": "One paragraph, one bio, links."
+    },
+    {
+      "id": "seo-perf",
+      "title": "Sitemap, robots, OG images, per-page metadata, Speed Insights, bundle analyzer, Lighthouse 95",
+      "capability": "Launch readiness",
+      "kind": "build",
+      "depends_on": [
+        "page-home",
+        "page-work",
+        "page-writing",
+        "page-music",
+        "page-about"
+      ],
+      "complexity": 1,
+      "uncertainty": 1,
+      "rounds": {
+        "o": 1,
+        "m": 2,
+        "p": 3
+      },
+      "owner_minutes": 30,
+      "notes": "Mechanical once pages exist; routed to agent fan-out though it sits on the path.",
+      "route": "agent fan-out"
+    },
+    {
+      "id": "feed",
+      "title": "RSS feed for Articles and Musings (would-like; first to cut)",
+      "capability": "Launch readiness",
+      "kind": "build",
+      "depends_on": [
+        "page-writing"
+      ],
+      "complexity": 1,
+      "uncertainty": 1,
+      "rounds": {
+        "o": 1,
+        "m": 1,
+        "p": 2
+      },
+      "owner_minutes": 15
+    },
+    {
+      "id": "qa-pass",
+      "title": "Cross-page QA: axe, Lighthouse CI, Playwright smoke, content proofread",
+      "kind": "qa",
+      "depends_on": [
+        "seo-perf",
+        "feed",
+        "content-work",
+        "content-writing",
+        "content-music",
+        "content-home-about"
+      ],
+      "complexity": 1,
+      "uncertainty": 2,
+      "estimate": {
+        "o": 0.5,
+        "m": 0.75,
+        "p": 1.5
+      }
+    },
+    {
+      "id": "launch",
+      "title": "Domain live on production, link into resume and LinkedIn, analytics verified",
+      "kind": "launch",
+      "depends_on": [
+        "qa-pass"
+      ],
+      "complexity": 1,
+      "uncertainty": 1,
+      "estimate": {
+        "o": 0.25,
+        "m": 0.5,
+        "p": 1
+      }
+    },
+    {
+      "id": "tail",
+      "title": "Remove placeholders and scaffolding, enforce CSP, file would-likes as issues, delta read-back",
+      "kind": "tail",
+      "depends_on": [
+        "launch"
+      ],
+      "complexity": 1,
+      "uncertainty": 1,
+      "estimate": {
+        "o": 0.25,
+        "m": 0.5,
+        "p": 1
+      }
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+.time-log-open
+.claude/agent-memory-local/
+.env
+.env.*
+!.env.example
+node_modules/
+.next/
