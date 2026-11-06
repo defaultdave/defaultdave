@@ -10,7 +10,7 @@ The plan routes eight units to agent fan-out and the rest to Dave. Dave wants th
 
 ## Decision
 
-1. **Identity.** Agents act as the `defaultdave-agents` GitHub App through `scripts/merge-desk/agent-git.ts` and `post-check.ts`. Never Dave's `gh` login. The App has Checks, Commit statuses, Contents, Pull requests and Issues; no Administration, Workflows, Secrets.
+1. **Identity.** Agents act as the `defaultdave-agents` GitHub App (one App shared across Dave's projects, tokens restricted to this repo when minted) through `scripts/merge-desk/agent-git.ts` and `post-check.ts`. Never Dave's `gh` login. The App has Checks, Commit statuses, Contents, Pull requests and Issues; no Administration, Workflows, Secrets.
 2. **One tier.** Every unit PRs into `main`. This site has no money, auth or data paths, so no `integration` branch and no weekly promotion.
 3. **Required checks on `main`:** the CI jobs (format:check, lint, typecheck, test, build, knip, e2e), `scope-manifest` (title names a plan unit, branch matches, protected paths untouched), and four agent checks posted by the App: `review-agent`, `qa-agent`, `spec-compliance`, `a11y-audit`. `architecture-audit` and `perf-check` run but are advisory.
 4. **Approval window on at the start.** The ruleset requires one approval, dismissed on push; agents request Dave's review and queue auto-merge, so his approval merges. Dave closes the window with `approval-window.sh off` once the first few merges have shown the checks hold; after that the checks alone merge and agents request him only for escalations.

@@ -8,7 +8,8 @@ Agents push unit branches, open PRs, post review verdicts as check runs and queu
 
 ## Acceptance criteria
 
-- [ ] Dave has created the `defaultdave-agents` App (Checks, Commit statuses, Contents, Pull requests, Issues read and write; nothing else), installed it on `defaultdave/defaultdave` only, and recorded the ids in `~/.config/defaultdave-agents/app.conf` with the key at `app-key.pem` mode 600 (preflight rows)
+- [ ] The shared `defaultdave-agents` App (Ramble's `ramble-agents-defaultdave`, renamed; App ID unchanged) has Checks, Commit statuses, Contents, Pull requests and Issues read and write and nothing else, `defaultdave/defaultdave` is added to its installation, and `~/.config/defaultdave-agents/app.conf` holds its ids with `APP_KEY` pointing at the existing key (mode 600) (preflight rows)
+- [ ] `app-token.ts` reads `~/.config/defaultdave-agents/app.conf` and mints installation tokens restricted to `defaultdave/defaultdave` (the `repositories` field in the token request), with a test that asserts the restriction; the App is shared across projects, so an unrestricted token could write to them
 - [ ] `scripts/merge-desk/app-token.ts`, `agent-git.ts`, `post-check.ts`, `scope-check.ts`, `revert.sh`, `approval-window.sh` ported from `ramble/scripts/merge-desk/` with one tier (base `main` only; no `integration`, no sync or promotion rules), `REPO` and `REVIEWER` set, `CHECK_NAMES` = review-agent, qa-agent, spec-compliance, a11y-audit, branch pattern `unit/<id>-*`, `pm/*`, `revert/*`
 - [ ] `scope-check.ts` reads unit ids from `docs/plan/plan.json`; protected paths are `.github/`, `.claude/`, `CLAUDE.md`, `scripts/merge-desk/`, `docs/adr/`, `docs/plan/` except the bookkeeping files `docs/plan/STATUS.md`, `docs/plan/DECISIONS.md`, `docs/plan/delta-log.md`, `docs/plan/time-log.csv`
 - [ ] Unit tests ported and green: token minting against a mocked endpoint, every scope-check rule, every refusal in agent-git
@@ -25,6 +26,7 @@ Agents push unit branches, open PRs, post review verdicts as check runs and queu
 SCOPE MANIFEST:
   IN SCOPE:
     - Port the six merge-desk scripts with tests, one tier
+    - app-token mints tokens restricted to defaultdave/defaultdave, from ~/.config/defaultdave-agents/app.conf
     - scope-check reads plan.json; protected and bookkeeping paths as listed
     - scope-manifest workflow
     - settings.local.json allow list (Dave applies)

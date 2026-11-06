@@ -12,6 +12,7 @@ Dave can edit every collection and singleton at /keystatic (local mode in develo
 - [ ] src/content/ exposes getHome, getAbout, listWork, getWork, listPosts, getPost, listReleases with the documented sorting; nothing outside src/content imports @keystatic/core/reader
 - [ ] MDX pipeline renders body fields with registered components (Callout, Metric, Figure) and raw HTML disabled
 - [ ] A malformed entry fails the build with the file path in the error (one test with a fixture tree proves it)
+- [ ] The GitHub App for Keystatic exists (moved from preflight, 2026-11-06); its three secrets are in the Vercel env store (Production, Preview) and local .env, and nowhere else
 - [ ] /keystatic edits an entry in local mode; on a preview deployment, GitHub mode commits an edit through the App
 - [ ] /keystatic and /api/keystatic are excluded from robots and sitemap (placeholder until seo-perf, documented)
 - [ ] One seed entry per collection so the pages can render
@@ -26,6 +27,7 @@ SCOPE MANIFEST:
     - src/content/ exposes getHome, getAbout, listWork, getWork, listPosts, getPost, listReleases with the documented sorting; nothing outside src/content imports @keystatic/core/reader
     - MDX pipeline renders body fields with registered components (Callout, Metric, Figure) and raw HTML disabled
     - A malformed entry fails the build with the file path in the error (one test with a fixture tree proves it)
+    - The GitHub App for Keystatic exists (moved from preflight, 2026-11-06); its three secrets are in the Vercel env store (Production, Preview) and local .env, and nowhere else
     - /keystatic edits an entry in local mode; on a preview deployment, GitHub mode commits an edit through the App
     - /keystatic and /api/keystatic are excluded from robots and sitemap (placeholder until seo-perf, documented)
     - One seed entry per collection so the pages can render

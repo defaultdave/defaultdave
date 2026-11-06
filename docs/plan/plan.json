@@ -37,7 +37,7 @@
         "m": 0.5,
         "p": 1
       },
-      "notes": "Dave walks preflight.md after the agent dry-runs it. Hobby caps: 100 deploys a day, 100 GB bandwidth a month, 6,000 build minutes a month, 1 concurrent build."
+      "notes": "Dave walks preflight.md after the agent dry-runs it. Hobby caps: 100 deploys a day, 100 GB bandwidth a month, 6,000 build minutes a month, 1 concurrent build. Re-estimate 2026-11-06: split after the dry run; only the rows doable before scaffold stay (repo settings, defaultdave-agents App, domain purchase, Hobby caps, music host). Keystatic App to cms; Vercel project, Lighthouse CI and local or preview rows to scaffold; ruleset and agent access to merge-desk; analytics to seo-perf. Estimate unchanged."
     },
     {
       "id": "design",
@@ -103,7 +103,7 @@
         "m": 1,
         "p": 2
       },
-      "notes": "Added 2026-11-06: Dave wants the portfolio run like any project, on the Ramble model. Ported from ramble/scripts/merge-desk with the integration tier removed (one tier, main only). Human-led: Dave creates the App and the rulesets, /senior ports the scripts. Every agent fan-out unit depends on it."
+      "notes": "Added 2026-11-06: Dave wants the portfolio run like any project, on the Ramble model. Ported from ramble/scripts/merge-desk with the integration tier removed (one tier, main only). Human-led: Dave creates the App and the rulesets, /senior ports the scripts. Every agent fan-out unit depends on it. Re-estimate 2026-11-06: uses the shared defaultdave-agents App (Ramble's, renamed) instead of a new one; new criterion: tokens restricted to this repo. Estimate unchanged."
     },
     {
       "id": "shell",
@@ -142,7 +142,7 @@
         "m": 1,
         "p": 2
       },
-      "notes": "Human-led on the path. Keystatic schema and content-layer types are the architecture of the site."
+      "notes": "Human-led on the path. Keystatic schema and content-layer types are the architecture of the site. Re-estimate 2026-11-06: owns the Keystatic GitHub App and its secrets, moved from preflight."
     },
     {
       "id": "page-home",

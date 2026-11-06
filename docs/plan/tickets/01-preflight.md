@@ -8,22 +8,22 @@ Every account, plan tier, cap, secret and repository rule the build needs exists
 
 ## Acceptance criteria
 
-- [ ] Every row in docs/plan/preflight.md is ticked, with the dry-run row filled first
-- [ ] davidfleming.me is bought through Vercel and attached to the project (or the fallback domain is, and brief.md and stack-decisions.md are updated)
-- [ ] The GitHub App for Keystatic exists; its three secrets are in the Vercel env store (Production, Preview) and local .env, and nowhere else
-- [ ] main is protected with the four required checks named; Dave is the only merger
-- [ ] Each Hobby cap has a stated workaround in the runbook
+- [ ] Every row in docs/plan/preflight.md that can be done before `scaffold` is ticked, with the dry-run row filled first; the rest say which unit they moved to (re-estimate 2026-11-06)
+- [ ] davidfleming.me is bought through Vercel (or the fallback domain is, and brief.md and stack-decisions.md are updated); attaching it to the project moves to `scaffold`
+- [ ] Repo settings from project-setup.md section A are applied: squash only, delete branch on merge, auto-merge on, secret scanning, push protection, private vulnerability reporting, Dependabot alerts
+- [ ] The shared `defaultdave-agents` App (Ramble's `ramble-agents-defaultdave`, renamed; App ID unchanged) has Checks, Commit statuses, Contents, Pull requests and Issues read and write and nothing else, `defaultdave/defaultdave` is added to its installation, and `~/.config/defaultdave-agents/app.conf` holds its ids with `APP_KEY` pointing at the existing key (mode 600)
+- [ ] Each Hobby cap is verified on vercel.com/pricing at walk time and has a stated workaround in the runbook; the music host row names the host
 
 ## Scope
 
 ```
 SCOPE MANIFEST:
   IN SCOPE:
-    - Every row in docs/plan/preflight.md is ticked, with the dry-run row filled first
-    - davidfleming.me is bought through Vercel and attached to the project (or the fallback domain is, and brief.md and stack-decisions.md are updated)
-    - The GitHub App for Keystatic exists; its three secrets are in the Vercel env store (Production, Preview) and local .env, and nowhere else
-    - main is protected with the four required checks named; Dave is the only merger
-    - Each Hobby cap has a stated workaround in the runbook
+    - Every row in docs/plan/preflight.md that can be done before `scaffold` is ticked, with the dry-run row filled first; the rest say which unit they moved to (re-estimate 2026-11-06)
+    - davidfleming.me is bought through Vercel (or the fallback domain is, and brief.md and stack-decisions.md are updated); attaching it to the project moves to `scaffold`
+    - Repo settings from project-setup.md section A are applied: squash only, delete branch on merge, auto-merge on, secret scanning, push protection, private vulnerability reporting, Dependabot alerts
+    - The shared `defaultdave-agents` App (Ramble's `ramble-agents-defaultdave`, renamed; App ID unchanged) has Checks, Commit statuses, Contents, Pull requests and Issues read and write and nothing else, `defaultdave/defaultdave` is added to its installation, and `~/.config/defaultdave-agents/app.conf` holds its ids with `APP_KEY` pointing at the existing key (mode 600)
+    - Each Hobby cap is verified on vercel.com/pricing at walk time and has a stated workaround in the runbook; the music host row names the host
   OUT OF SCOPE:
     - scaffold (no code is written here)
     - Any content
