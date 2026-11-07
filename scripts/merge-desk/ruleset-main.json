@@ -35,7 +35,7 @@
           { "context": "e2e", "integration_id": 15368 },
           { "context": "analyze", "integration_id": 15368 },
           { "context": "scan", "integration_id": 15368 },
-          { "context": "scan-pr", "integration_id": 15368 },
+          { "context": "scan-pr / osv-scan", "integration_id": 15368 },
           { "context": "scope-manifest", "integration_id": 15368 },
           { "context": "review-agent", "integration_id": "APP_ID" },
           { "context": "qa-agent", "integration_id": "APP_ID" },
