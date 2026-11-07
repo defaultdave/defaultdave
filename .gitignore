@@ -6,3 +6,16 @@
 node_modules/
 .next/
 .claude/worktrees/
+
+# next.js
+/out/
+next-env.d.ts
+*.tsbuildinfo
+
+# testing
+/coverage
+/playwright-report/
+/test-results/
+
+# vercel
+.vercel
