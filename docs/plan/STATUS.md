@@ -15,7 +15,7 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 | `preflight` | done | human only | | #1 | | | closed 2026-11-06; music host Bandcamp |
 | `design` | done | human only | | #2 | | | signed off 2026-11-06 on the artifact (v21); Figma dropped |
 | `keystatic-spike` | todo | human only | | #3 | | Dave | session card proposed 2026-11-06 |
-| `scaffold` | done | human-led | 2 | #4 | #22 | | merged 2026-11-06 (348b25e); production deploy green; Dave attaches `davidfleming.me` in Vercel; OSV advisory on `minimatch` open |
+| `scaffold` | done | human-led | 2 | #4 | #22 | | merged 2026-11-06 (348b25e); production deploy green; Dave attaches `davidfleming.me` in Vercel; `minimatch` advisory ignored until 2027-01-06 (branch `osv-ignore-minimatch`) |
 | `merge-desk` | todo | human-led | | #5 | | Dave + /senior | GitHub App, ruleset, merge-desk scripts ported from Ramble; ADR 0001 to accept first; merges by bypass |
 | `shell` | todo | agent fan-out | | #6 | | | after scaffold and merge-desk; builds to the artifact, now carries Storybook |
 | `cms` | todo | human-led | | #7 | | | after scaffold and the spike; now also creates the Keystatic GitHub App |
@@ -36,7 +36,7 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 
 ## Blocked on Dave
 
-1. OSV advisory CVE-2026-118764 in `minimatch` 10.2.6 (dev only, through typescript-eslint; no 10.x fix): ignore it in `osv-scanner.toml` with a reason and a review date, or override to 11 (unblocks a green OSV scan on `main`).
+1. Push branch `osv-ignore-minimatch` and merge its PR: ignores the `minimatch` advisory until 2027-01-06 (unblocks a green OSV scan on `main`).
 2. Attach `davidfleming.me` in the Vercel project's Domains.
 3. Accept or amend `docs/adr/0001-agent-workflow-and-merge-rule.md`: one tier, approval window on, four agent checks (unblocks `merge-desk`).
 4. Decide: which Bandcamp releases, and any release notes (unblocks `content-music`).
@@ -46,7 +46,7 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 
 ## Next
 
-Dave settles the OSV advisory (item 1) and attaches the domain (item 2), then accepts or amends ADR 0001 (item 3) so `merge-desk` (#5) can start as a `senior` subagent from the PM chat. `keystatic-spike` (#3) can run beside it.
+Dave merges the OSV ignore (item 1) and attaches the domain (item 2), then accepts or amends ADR 0001 (item 3) so `merge-desk` (#5) can start as a `senior` subagent from the PM chat. `keystatic-spike` (#3) can run beside it.
 
 ## Next chat
 
