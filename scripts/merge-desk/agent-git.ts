@@ -7,7 +7,9 @@
 //   node scripts/merge-desk/agent-git.ts issue-body <issue number> <body-file>   (replaces the body)
 //   node scripts/merge-desk/agent-git.ts pr-body <pr number or branch> <body-file>   (replaces the body)
 import { spawnSync } from "node:child_process";
-import { statSync } from "node:fs";
+import { lstatSync, readFileSync, realpathSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { relative, isAbsolute } from "node:path";
 // @ts-expect-error TS5097: Node needs the .ts extension, and the root tsconfig does not allow it
 import { mintToken } from "./app-token.ts";
 
@@ -29,6 +31,8 @@ export interface Deps {
   token: () => Promise<string>;
   run: (command: string[], env: Record<string, string>) => RunResult;
   currentBranch: () => string;
+  /** `git rev-parse --show-toplevel` of the cwd. */
+  repoRoot: () => string;
 }
 
 /** Only unit/…, pm/… and revert/pr-<n> branches may be pushed; main never. */
@@ -108,6 +112,7 @@ export async function pr(
   assertBase(base);
   const head = deps.currentBranch();
   assertPushable(head);
+  assertBodyFile(bodyFile, deps);
   const command = [
     "gh",
     "pr",
@@ -187,15 +192,45 @@ function assertIssueNumber(issue: string): void {
     throw new Refused(`refused: ${issue} is not a positive issue number`);
 }
 
-function assertBodyFile(bodyFile: string): void {
-  let size = 0;
+function isInside(root: string, file: string): boolean {
+  const rel = relative(root, file);
+  return rel !== "" && !rel.startsWith("..") && !isAbsolute(rel);
+}
+
+function realOrNull(path: string): string | null {
   try {
-    const stat = statSync(bodyFile);
-    size = stat.isFile() ? stat.size : 0;
+    return realpathSync(path);
   } catch {
-    size = 0;
+    return null;
   }
-  if (size === 0) throw new Refused(`refused: ${bodyFile} is missing or empty`);
+}
+
+/**
+ * A body file is public text. This command is pre-allowed and sandbox-excluded, so it must not be a way
+ * to post an arbitrary file: no symlinks, only files inside the repo or the temp dir, no private keys.
+ */
+export function assertBodyFile(bodyFile: string, deps: Deps): void {
+  let info;
+  try {
+    info = lstatSync(bodyFile);
+  } catch {
+    throw new Refused("refused: body file is missing");
+  }
+  if (info.isSymbolicLink())
+    throw new Refused("refused: body file is a symbolic link");
+  if (!info.isFile() || info.size === 0)
+    throw new Refused("refused: body file is not a non-empty regular file");
+  const real = realpathSync(bodyFile);
+  const roots = [deps.repoRoot(), tmpdir(), process.env.TMPDIR ?? ""]
+    .filter(Boolean)
+    .map(realOrNull)
+    .filter((root): root is string => root !== null);
+  if (!roots.some((root) => isInside(root, real)))
+    throw new Refused(
+      "refused: body file is outside the repo and the temp directory",
+    );
+  if (readFileSync(real, "utf8").includes("PRIVATE KEY"))
+    throw new Refused("refused: body file contains a private key marker");
 }
 
 /** Posts a comment on an issue as the App. */
@@ -205,7 +240,7 @@ export async function issueComment(
   deps: Deps,
 ): Promise<void> {
   assertIssueNumber(issue);
-  assertBodyFile(bodyFile);
+  assertBodyFile(bodyFile, deps);
   must(
     deps.run(
       [
@@ -231,7 +266,7 @@ export async function issueBody(
   deps: Deps,
 ): Promise<void> {
   assertIssueNumber(issue);
-  assertBodyFile(bodyFile);
+  assertBodyFile(bodyFile, deps);
   must(
     deps.run(
       ["gh", "issue", "edit", issue, "--repo", REPO, "--body-file", bodyFile],
@@ -248,7 +283,7 @@ export async function prBody(
   deps: Deps,
 ): Promise<void> {
   assertTarget(target);
-  assertBodyFile(bodyFile);
+  assertBodyFile(bodyFile, deps);
   must(
     deps.run(
       ["gh", "pr", "edit", target, "--repo", REPO, "--body-file", bodyFile],
@@ -279,6 +314,8 @@ function realDeps(): Deps {
     },
     currentBranch: () =>
       spawn(["git", "branch", "--show-current"], {}).stdout.trim(),
+    repoRoot: () =>
+      spawn(["git", "rev-parse", "--show-toplevel"], {}).stdout.trim(),
   };
 }
 

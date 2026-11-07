@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
@@ -16,6 +16,19 @@ import {
   type RunResult,
 } from "./agent-git";
 
+const dir = mkdtempSync(join(tmpdir(), "agent-git-"));
+const body = join(dir, "body.md");
+const empty = join(dir, "empty.md");
+const keyed = join(dir, "keyed.md");
+const link = join(dir, "link.md");
+writeFileSync(body, "hello\n");
+writeFileSync(empty, "");
+writeFileSync(keyed, "x\n-----BEGIN OPENSSH PRIVATE KEY-----\n");
+symlinkSync(body, link);
+afterAll(() => {
+  rmSync(dir, { recursive: true, force: true });
+});
+
 const VIEW_OK = '{"headRefName":"unit/merge-desk","baseRefName":"main"}';
 const HTTPS = "https://github.com/defaultdave/defaultdave.git\n";
 
@@ -26,6 +39,7 @@ function fakeDeps(
   const deps: Deps = {
     token: () => Promise.resolve("ghs_fake"),
     currentBranch: () => options.branch ?? "unit/merge-desk",
+    repoRoot: () => process.cwd(),
     run: (command, env): RunResult => {
       calls.push({ command, env });
       if (command[1] === "remote")
@@ -125,7 +139,7 @@ describe("push", () => {
 describe("pr", () => {
   it("opens from the current branch into main", async () => {
     const { deps, calls } = fakeDeps();
-    await pr("main", "merge-desk: scripts", "/tmp/body.md", deps);
+    await pr("main", "merge-desk: scripts", body, deps);
     expect(calls[0]?.command).toEqual([
       "gh",
       "pr",
@@ -139,20 +153,20 @@ describe("pr", () => {
       "--title",
       "merge-desk: scripts",
       "--body-file",
-      "/tmp/body.md",
+      body,
     ]);
     expect(calls[0]?.env.GH_TOKEN).toBe("ghs_fake");
   });
 
   it.each(["integration", "release", ""])("refuses base %p", async (base) => {
     const { deps, calls } = fakeDeps();
-    await expect(pr(base, "t", "b", deps)).rejects.toBeInstanceOf(Refused);
+    await expect(pr(base, "t", body, deps)).rejects.toBeInstanceOf(Refused);
     expect(calls).toHaveLength(0);
   });
 
   it.each(["main", "feature/x"])("refuses a head of %s", async (branch) => {
     const { deps, calls } = fakeDeps({ branch });
-    await expect(pr("main", "t", "b", deps)).rejects.toBeInstanceOf(Refused);
+    await expect(pr("main", "t", body, deps)).rejects.toBeInstanceOf(Refused);
     expect(calls).toHaveLength(0);
   });
 });
@@ -229,15 +243,6 @@ describe("review", () => {
 });
 
 describe("issue and PR body writes", () => {
-  const dir = mkdtempSync(join(tmpdir(), "agent-git-"));
-  const body = join(dir, "body.md");
-  const empty = join(dir, "empty.md");
-  writeFileSync(body, "hello\n");
-  writeFileSync(empty, "");
-  afterAll(() => {
-    rmSync(dir, { recursive: true, force: true });
-  });
-
   const writers = [
     {
       name: "issueComment",
@@ -301,6 +306,9 @@ describe("issue and PR body writes", () => {
     ["a missing file", join(dir, "nope.md")],
     ["an empty file", empty],
     ["a directory", dir],
+    ["a symbolic link", link],
+    ["a file outside the repo and tmpdir", "/etc/hosts"],
+    ["a file containing a private key marker", keyed],
   ])("refuses %s as the body file", async (_label, file) => {
     const { deps, calls } = fakeDeps();
     await expect(issueComment("12", file, deps)).rejects.toBeInstanceOf(
@@ -308,7 +316,33 @@ describe("issue and PR body writes", () => {
     );
     await expect(issueBody("12", file, deps)).rejects.toBeInstanceOf(Refused);
     await expect(prBody("42", file, deps)).rejects.toBeInstanceOf(Refused);
+    await expect(pr("main", "t", file, deps)).rejects.toBeInstanceOf(Refused);
     expect(calls).toHaveLength(0);
+  });
+
+  it("accepts a file inside the repo root", async () => {
+    const { deps, calls } = fakeDeps();
+    await issueComment("12", join(process.cwd(), "package.json"), deps);
+    expect(calls).toHaveLength(1);
+  });
+
+  it("refuses a repo file when the repo root is elsewhere", async () => {
+    const { deps, calls } = fakeDeps();
+    deps.repoRoot = () => dir;
+    await expect(
+      issueComment("12", join(process.cwd(), "package.json"), deps),
+    ).rejects.toBeInstanceOf(Refused);
+    expect(calls).toHaveLength(0);
+  });
+
+  it("states the reason, not the file contents", async () => {
+    const { deps } = fakeDeps();
+    const error = await issueComment("12", keyed, deps).catch(
+      (e: unknown) => e,
+    );
+    expect((error as Error).message).toBe(
+      "refused: body file contains a private key marker",
+    );
   });
 
   it.each(writers)(
