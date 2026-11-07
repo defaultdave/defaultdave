@@ -55,7 +55,7 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 
 **Before you start:** merge the `merge-desk` follow-up PR; commit this bookkeeping (branch `claude/portfolio-pm-automation-abe358`).
 
-**Run:** `/portfolio-pm` in `~/Workspace/defaultdave` (terminal: `claude --agent portfolio-pm`).
+**Run:** `/pm` in `~/Workspace/defaultdave` (terminal: `claude --agent pm`).
 
 **Model and effort:** Sonnet, medium.
 

@@ -21,7 +21,7 @@ export const BOOKKEEPING_FILES = [
   "docs/plan/plan-report.md",
 ];
 /** The PM's public memory: any file under this folder is bookkeeping. */
-export const BOOKKEEPING_PREFIXES = [".claude/agent-memory/portfolio-pm/"];
+export const BOOKKEEPING_PREFIXES = [".claude/agent-memory/pm/"];
 /** Calibration and Re-estimates edit these; each must come with a delta-log.md row. */
 export const NEEDS_DELTA_LOG = [
   "docs/plan/plan.json",

@@ -1,4 +1,4 @@
-# portfolio-pm memory (public)
+# pm memory (public)
 
 One line per fact; detail in linked files beside this one. Written for a reader who has never seen the project.
 

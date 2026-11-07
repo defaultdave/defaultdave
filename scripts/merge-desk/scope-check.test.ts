@@ -189,8 +189,8 @@ describe("bookkeeping PRs", () => {
         "docs/plan/DECISIONS.md",
         "docs/plan/delta-log.md",
         "docs/plan/time-log.csv",
-        ".claude/agent-memory/portfolio-pm/notes.md",
-        ".claude/agent-memory/portfolio-pm/deep/sub.md",
+        ".claude/agent-memory/pm/notes.md",
+        ".claude/agent-memory/pm/deep/sub.md",
       ],
     });
     expect(verdict).toMatchObject({ ok: true, kind: "bookkeeping" });
@@ -222,9 +222,9 @@ describe("bookkeeping PRs", () => {
     "docs/plan/proposal.md",
     "docs/plan/preflight.md",
     "docs/adr/0001-agent-workflow-and-merge-rule.md",
-    ".claude/agents/portfolio-pm.md",
+    ".claude/agents/pm.md",
     ".claude/agent-memory/other-agent/x.md",
-    ".claude/agent-memory/portfolio-pm-x/x.md",
+    ".claude/agent-memory/pm-x/x.md",
     ".claude/settings.json",
     ".github/workflows/ci.yml",
     "CLAUDE.md",
