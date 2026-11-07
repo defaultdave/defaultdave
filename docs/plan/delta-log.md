@@ -54,6 +54,7 @@ One row as each unit closes. Rounds come from the unit's check runs or verdict f
 |---|---|---|---|---|---|---|---|---|
 | `preflight` | 2026-11-06 | 2026-11-06 | 0.1 | 0.5 | n/a (human only) | 33 (5 outside from `track.sh`, the timer row corrected to Dave's estimate; 28 inside from message timestamps) | -0.4 | The dry run moved every row that needs code or a running app to `scaffold`, `cms`, `merge-desk` and `seo-perf`; what was left was console clicks and three decisions |
 | `design` | 2026-11-06 | 2026-11-06 | 0.2 | 1.5 | n/a (human only) | 59 (inside, from Dave's message timestamps in the design session; no `track.sh` row) | -1.3 | Figma dropped after the first rounds, so one rendering instead of two; seven option rounds on the artifact in one sitting |
+| `scaffold` | 2026-11-06 | 2026-11-06 | 0.2 | 0.5 | 2 CI runs on PR #22 (the first blocked by a `.gitignore` conflict with `main`; then 9 of 10 green, OSV failing on a missing base lockfile) | 24 (inside, from Dave's message timestamps; no `track.sh` row) | -0.3 | A `senior` subagent built it in one pass (6 min agent time); Dave's minutes were the push, PR, Vercel import and merge |
 
 ## Calibration
 

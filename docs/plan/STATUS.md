@@ -2,7 +2,7 @@
 
 Current state only. History is in `DECISIONS.md` and `delta-log.md`. Kept under 25 KB by `scripts/pm.sh check`.
 
-Updated 2026-11-06 by portfolio-pm (Opus 5.5). GitHub repo: `defaultdave/defaultdave`, public; issues #1 to #21 are the tickets (no local copies; DECISIONS 2026-11-06), #1 and #2 closed. Project board: [#20](https://github.com/users/defaultdave/projects/20), all 21 issues added; Route and Milestone fields not set up yet. Domain: `davidfleming.me` bought, attached at `scaffold`. Plan: 21 units; owner time 72 h, 2.4 weeks at 30 h/wk, accepted as a measurement.
+Updated 2026-11-06 by portfolio-pm (Opus 5.5). GitHub repo: `defaultdave/defaultdave`, public; issues #1 to #21 are the tickets (no local copies; DECISIONS 2026-11-06), #1, #2 and #4 closed. Project board: [#20](https://github.com/users/defaultdave/projects/20), all 21 issues added; Route and Milestone fields not set up yet. Domain: `davidfleming.me` bought; Vercel project `defaultdave` live, domain not attached yet. Plan: 21 units; owner time 72 h, 2.4 weeks at 30 h/wk, accepted as a measurement.
 
 MILESTONE: 1 Walkable (exit: Home, the Work list and the ResortPass case study live at davidfleming.me). 0 Designed reached 2026-11-06
 
@@ -15,7 +15,7 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 | `preflight` | done | human only | | #1 | | | closed 2026-11-06; music host Bandcamp |
 | `design` | done | human only | | #2 | | | signed off 2026-11-06 on the artifact (v21); Figma dropped |
 | `keystatic-spike` | todo | human only | | #3 | | Dave | session card proposed 2026-11-06 |
-| `scaffold` | in progress | human-led | | #4 | | senior subagent | branch `senior/4-scaffold` in `.claude/worktrees/scaffold`; attaches `davidfleming.me`; carries the CI and security workflows |
+| `scaffold` | done | human-led | 2 | #4 | #22 | | merged 2026-11-06 (348b25e); production deploy green; Dave attaches `davidfleming.me` in Vercel; OSV advisory on `minimatch` open |
 | `merge-desk` | todo | human-led | | #5 | | Dave + /senior | GitHub App, ruleset, merge-desk scripts ported from Ramble; ADR 0001 to accept first; merges by bypass |
 | `shell` | todo | agent fan-out | | #6 | | | after scaffold and merge-desk; builds to the artifact, now carries Storybook |
 | `cms` | todo | human-led | | #7 | | | after scaffold and the spike; now also creates the Keystatic GitHub App |
@@ -24,10 +24,10 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 | `page-writing` | todo | agent fan-out | | #10 | | | swarm |
 | `page-music` | todo | agent fan-out | | #11 | | | swarm |
 | `page-about` | todo | agent fan-out | | #12 | | | swarm |
-| `content-work` | todo | human only | | #13 | | Dave | needs decision 3 |
-| `content-writing` | todo | human only | | #14 | | Dave | needs decision 5 |
-| `content-music` | todo | human only | | #15 | | Dave | needs decision 2 |
-| `content-home-about` | todo | human only | | #16 | | Dave | needs decision 4 |
+| `content-work` | todo | human only | | #13 | | Dave | needs decision 5 |
+| `content-writing` | todo | human only | | #14 | | Dave | needs decision 7 |
+| `content-music` | todo | human only | | #15 | | Dave | needs decision 4 |
+| `content-home-about` | todo | human only | | #16 | | Dave | needs decision 6 |
 | `seo-perf` | todo | agent fan-out | | #17 | | | after the five pages |
 | `feed` | todo | agent fan-out | | #18 | | | first to cut if the appetite bites |
 | `qa-pass` | todo | human-led | | #19 | | | |
@@ -36,15 +36,17 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 
 ## Blocked on Dave
 
-1. Accept or amend `docs/adr/0001-agent-workflow-and-merge-rule.md`: one tier, approval window on, four agent checks (unblocks `merge-desk`).
-2. Decide: which Bandcamp releases, and any release notes (unblocks `content-music`).
-3. Decide: can ResortPass be named, or anonymized as in the CrUX article (unblocks publishing `content-work`).
-4. Headshot and bio, or text-only About (unblocks `content-home-about`).
-5. List of published pieces with URLs (unblocks `content-writing`).
+1. OSV advisory CVE-2026-118764 in `minimatch` 10.2.6 (dev only, through typescript-eslint; no 10.x fix): ignore it in `osv-scanner.toml` with a reason and a review date, or override to 11 (unblocks a green OSV scan on `main`).
+2. Attach `davidfleming.me` in the Vercel project's Domains.
+3. Accept or amend `docs/adr/0001-agent-workflow-and-merge-rule.md`: one tier, approval window on, four agent checks (unblocks `merge-desk`).
+4. Decide: which Bandcamp releases, and any release notes (unblocks `content-music`).
+5. Decide: can ResortPass be named, or anonymized as in the CrUX article (unblocks publishing `content-work`).
+6. Headshot and bio, or text-only About (unblocks `content-home-about`).
+7. List of published pieces with URLs (unblocks `content-writing`).
 
 ## Next
 
-Start `scaffold` (#4) with `/senior #4`: Dave decides, the session types; it attaches `davidfleming.me` to the new Vercel project. `keystatic-spike` (#3) can run beside it.
+Dave settles the OSV advisory (item 1) and attaches the domain (item 2), then accepts or amends ADR 0001 (item 3) so `merge-desk` (#5) can start as a `senior` subagent from the PM chat. `keystatic-spike` (#3) can run beside it.
 
 ## Next chat
 
