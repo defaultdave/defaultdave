@@ -16,7 +16,7 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 | `design` | done | human only | | #2 | | | signed off 2026-11-06 on the artifact (v21); Figma dropped |
 | `keystatic-spike` | todo | human only | | #3 | | Dave | session card proposed 2026-11-06 |
 | `scaffold` | done | human-led | 2 | #4 | #22 | | merged 2026-11-06 (348b25e); production deploy green; Dave attaches `davidfleming.me` in Vercel; `minimatch` advisory ignored until 2027-01-06 (#23); Node 26 merged (#24) |
-| `merge-desk` | in progress | human-led | | #5 | #25 | Dave | PR #25 merged by bypass (cd32061); #5 reopened for the console criteria; OSV check fixed to `scan-pr / osv-scan` (1ddd499); auto-merge on; ruleset 26745949 created and read back; settings applied; dry run started (`push main` refused); rest of the dry run next |
+| `merge-desk` | in progress | human-led | | #5 | #25 | Dave | PR #25 merged by bypass (cd32061); #5 reopened for the console criteria; OSV check is `scan-pr / osv-scan` (fixed in `ruleset-main.json`, uncommitted); auto-merge, ruleset, settings and dry run next |
 | `shell` | todo | agent fan-out | | #6 | | | after scaffold and merge-desk; builds to the artifact, now carries Storybook |
 | `cms` | todo | human-led | | #7 | | | after scaffold and the spike; now also creates the Keystatic GitHub App |
 | `page-home` | todo | agent fan-out | | #8 | | | swarm, after shell + cms |
@@ -37,7 +37,7 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 ## Blocked on Dave
 
 1. Attach `davidfleming.me` in the Vercel project's Domains.
-2. `merge-desk`: the rest of the dry run (README steps 1 to 4 done; `push main` refused) (unblocks `shell` and every fan-out unit).
+2. `merge-desk`: commit and push the `ruleset-main.json` fix, then `scripts/merge-desk/README.md` steps 1, 3 and 4 (step 2 settled) and the dry run (unblocks `shell` and every fan-out unit).
 3. Decide: which Bandcamp releases, and any release notes (unblocks `content-music`).
 4. Decide: can ResortPass be named, or anonymized as in the CrUX article (unblocks publishing `content-work`).
 5. Headshot and bio, or text-only About (unblocks `content-home-about`).
@@ -45,16 +45,16 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 
 ## Next
 
-Dave runs the merge-desk console steps (item 2), finishing the dry run. Dave attaches the domain (item 1) meanwhile. `keystatic-spike` (#3) can run beside it.
+Dave runs the merge-desk console steps (item 2), starting with README step 1 (auto-merge). Dave attaches the domain (item 1) meanwhile. `keystatic-spike` (#3) can run beside it.
 
 ## Next chat
 
-**Before you start:** commit and push the bookkeeping to `main`.
+**Before you start:** commit and push the `ruleset-main.json` fix and the bookkeeping to `main`.
 
 **Run:** `/portfolio-pm` in `~/Workspace/defaultdave` (terminal: `claude --agent portfolio-pm`).
 
 **Model and effort:** Sonnet, medium.
 
-**Prompt:** `merge-desk` (#5) is merged (PR #25, cd32061); #5 is reopened for its console criteria. Auto-merge is on and ruleset 26745949 is live. Walk Dave through `scripts/merge-desk/README.md` step 4 (`settings.local.json`), read it back, tick #5's remaining criteria, and run the dry run from criterion 9 with him, recording it in `DECISIONS.md`. Don't commit.
+**Prompt:** `merge-desk` (#5) is merged (PR #25, cd32061); #5 is reopened for its console criteria. Walk Dave through `scripts/merge-desk/README.md` steps 1, 3 and 4 one at a time (auto-merge setting, then the ruleset with the App id from the fixed JSON, whose OSV context is `scan-pr / osv-scan`, then `settings.local.json`), read each back, tick #5's remaining criteria, and run the dry run from criterion 9 with him, recording it in `DECISIONS.md`. Don't commit.
 
 **Swarm (standing call, DECISIONS 2026-11-06: start it the moment the gates hold, no ask):** the five `page-*` units go out as one `senior` subagent each, in their own worktrees, only after `scaffold`, `merge-desk` and `cms` are merged, the design is signed off, the ruleset requires the CI and agent checks, and the merge-desk dry run has passed. Each pushes and opens its PR through `scripts/merge-desk/agent-git.ts` as the App; reviewers post verdicts with `post-check.ts`.
