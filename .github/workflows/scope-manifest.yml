@@ -1,0 +1,40 @@
+name: scope-manifest
+
+# pull_request_target runs the workflow and the script from the base branch, so a PR cannot change the check
+# that judges it. The job reads PR metadata (title, branch names, the list of changed files) and never runs,
+# installs or builds anything from the PR. ADR 0001 rules 3, 6 and 8.
+on:
+  pull_request_target:
+    types: [opened, edited, synchronize, reopened]
+    branches: [main]
+
+concurrency:
+  group: scope-manifest-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  scope-manifest:
+    name: scope-manifest
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      # Checks out the base branch (the default for this event). The token stays so the next step can fetch the PR ref.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Fetch the PR head (metadata only; nothing from it runs)
+        run: git fetch origin "pull/${{ github.event.pull_request.number }}/head:pr-head"
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+      - name: Check the PR against the merge rule
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          BASE_REF: ${{ github.base_ref }}
+          HEAD_REF: ${{ github.head_ref }}
+          PR_HEAD: pr-head
+        run: node scripts/merge-desk/scope-check.ts
