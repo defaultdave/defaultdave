@@ -15,7 +15,7 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 | `preflight` | done | human only | | #1 | | | closed 2026-11-06; music host Bandcamp |
 | `design` | done | human only | | #2 | | | signed off 2026-11-06 on the artifact (v21); Figma dropped |
 | `keystatic-spike` | todo | human only | | #3 | | Dave | session card proposed 2026-11-06 |
-| `scaffold` | todo | human-led | | #4 | | Dave + /senior | next; attaches `davidfleming.me`; carries the CI and security workflows |
+| `scaffold` | in progress | human-led | | #4 | | senior subagent | branch `senior/4-scaffold` in `.claude/worktrees/scaffold`; attaches `davidfleming.me`; carries the CI and security workflows |
 | `merge-desk` | todo | human-led | | #5 | | Dave + /senior | GitHub App, ruleset, merge-desk scripts ported from Ramble; ADR 0001 to accept first; merges by bypass |
 | `shell` | todo | agent fan-out | | #6 | | | after scaffold and merge-desk; builds to the artifact, now carries Storybook |
 | `cms` | todo | human-led | | #7 | | | after scaffold and the spike; now also creates the Keystatic GitHub App |
