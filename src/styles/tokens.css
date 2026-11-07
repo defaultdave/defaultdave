@@ -1,0 +1,132 @@
+/*
+ * Design tokens for davidfleming.me. Source of truth for colour, type, spacing,
+ * radii and effects. Names map one to one from the signed-off design artifact
+ * (docs/designs/2026-11-06-design-comparison.md, "Token names"); a slash in a
+ * Figma-style name becomes a dash here.
+ *
+ * Light values live in :root, dark values in the prefers-color-scheme block.
+ * There is no toggle. Values are the signed-off direction: Playground style,
+ * foam palette, Inter, compact density.
+ */
+
+:root {
+  color-scheme: light dark;
+
+  /* Colour: light */
+  --color-bg: #fff7ee;
+  --color-surface: #ffffff;
+  --color-text: #18181b;
+  --color-muted: #57575f;
+  --color-border: #18181b;
+  --color-accent: #3949c9;
+  --color-focus: #2b3fd6;
+  --color-on-accent: #ffffff;
+
+  /* Ink is the same in both schemes. Text on a pop is always ink. */
+  --color-ink: #18181b;
+
+  /* Pops are the same in both schemes. */
+  --color-pop-1: #ff6fb5;
+  --color-pop-2: #3cc8b4;
+  --color-pop-3: #ff8a3d;
+  --color-pop-4: #5bb8ff;
+
+  /* Effects */
+  --effect-outline: 2px solid var(--color-border);
+  --effect-shadow: 5px 5px 0 var(--color-ink);
+
+  /* Radii */
+  --radius-sm: 4px;
+  --radius-md: 14px;
+  --radius-pill: 999px;
+
+  /* Spacing: compact scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+  --space-9: 64px;
+
+  /* Layout */
+  --layout-measure: 60ch;
+  --layout-page-x: 80px;
+
+  /*
+   * Font families. --font-inter and --font-jetbrains-mono are set on <html>
+   * by next/font in src/app/layout.tsx.
+   */
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+
+  /* Type scale: desktop (640px and up). Size and line height in px. */
+  --type-display-size: 56px;
+  --type-display-line: 62px;
+  --type-h1-size: 40px;
+  --type-h1-line: 48px;
+  --type-h2-size: 28px;
+  --type-h2-line: 36px;
+  --type-h3-size: 20px;
+  --type-h3-line: 28px;
+  --type-body-size: 17px;
+  --type-body-line: 28px;
+  --type-small-size: 14px;
+  --type-small-line: 20px;
+  --type-mono-size: 14px;
+  --type-mono-line: 22px;
+
+  /* Type weights and tracking, from the artifact's Playground style. */
+  --type-display-weight: 800;
+  --type-display-tracking: -0.03em;
+  --type-h1-weight: 800;
+  --type-h1-tracking: -0.03em;
+  --type-h2-weight: 600;
+  --type-h2-tracking: -0.015em;
+  --type-h3-weight: 600;
+  --type-h3-tracking: 0;
+  --type-body-weight: 400;
+  --type-body-tracking: 0;
+  --type-small-weight: 400;
+  --type-small-tracking: 0;
+  --type-mono-weight: 400;
+  --type-mono-tracking: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #1a1718;
+    --color-surface: #262123;
+    --color-text: #f4efea;
+    --color-muted: #b3aaa4;
+    --color-border: #8a8084;
+    --color-accent: #93a2ff;
+    --color-focus: #b4c0ff;
+    --color-on-accent: #111113;
+
+    --effect-shadow: 5px 5px 0 #3cc8b4;
+  }
+}
+
+/* Type scale: mobile, below 640px. Only the sizes change. */
+@media (width < 640px) {
+  :root {
+    --layout-page-x: 20px;
+
+    --type-display-size: 38px;
+    --type-display-line: 44px;
+    --type-h1-size: 30px;
+    --type-h1-line: 36px;
+    --type-h2-size: 23px;
+    --type-h2-line: 30px;
+    --type-h3-size: 19px;
+    --type-h3-line: 26px;
+    --type-body-size: 17px;
+    --type-body-line: 28px;
+    --type-small-size: 14px;
+    --type-small-line: 20px;
+    --type-mono-size: 13px;
+    --type-mono-line: 20px;
+  }
+}
