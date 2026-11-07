@@ -50,3 +50,11 @@ Fixed rules this project cannot follow yet, each with the reason and the conditi
 | Rule | Reason | Remove when |
 |---|---|---|
 | none | | |
+
+## Architecture notes
+
+Decided by Dave on 2026-11-07, from the `shell` round 2 architecture-audit.
+
+- **B2 and one-line expressions.** A short expression (about one line) that is used once and will not repeat may stay in a component body. Extract to a tested function when logic grows past that or a second caller appears. `Wordmark`'s colour index is the reference case and stays inline.
+- **Co-location.** Plain functions and data sit beside the components that use them (`nav-items.ts`, `contact-links.ts`) and beside the styles they read (`src/styles/parse-tokens.ts`). There is no `lib/` folder for the layout and primitives.
+
