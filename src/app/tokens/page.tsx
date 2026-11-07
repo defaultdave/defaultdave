@@ -52,7 +52,7 @@ function Swatch({ token, inkText }: { token: string; inkText?: boolean }) {
 
 export default function TokensPage() {
   return (
-    <main className={styles.page}>
+    <div className={styles.page}>
       <h1>Tokens</h1>
 
       <section className={styles.section}>
@@ -126,6 +126,6 @@ export default function TokensPage() {
           </div>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

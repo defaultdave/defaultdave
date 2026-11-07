@@ -1,0 +1,30 @@
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-6);
+  padding: var(--space-6) var(--shell-gutter, var(--layout-page-x));
+  border-block-start: var(--effect-outline);
+  font-size: var(--type-small-size);
+  line-height: var(--type-small-line);
+}
+
+.lead {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.link {
+  color: var(--color-accent);
+  font-weight: 600;
+  text-underline-offset: 0.2em;
+}
