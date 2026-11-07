@@ -1,0 +1,48 @@
+{
+  "name": "main: merge desk",
+  "target": "branch",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": { "include": ["refs/heads/main"], "exclude": [] }
+  },
+  "bypass_actors": [
+    { "actor_id": 5, "actor_type": "RepositoryRole", "bypass_mode": "always" }
+  ],
+  "rules": [
+    { "type": "deletion" },
+    { "type": "non_fast_forward" },
+    {
+      "type": "pull_request",
+      "parameters": {
+        "required_approving_review_count": 1,
+        "dismiss_stale_reviews_on_push": true,
+        "require_code_owner_review": false,
+        "require_last_push_approval": false,
+        "required_review_thread_resolution": false
+      }
+    },
+    {
+      "type": "required_status_checks",
+      "parameters": {
+        "strict_required_status_checks_policy": false,
+        "required_status_checks": [
+          { "context": "format:check", "integration_id": 15368 },
+          { "context": "lint", "integration_id": 15368 },
+          { "context": "typecheck", "integration_id": 15368 },
+          { "context": "test", "integration_id": 15368 },
+          { "context": "build", "integration_id": 15368 },
+          { "context": "knip", "integration_id": 15368 },
+          { "context": "e2e", "integration_id": 15368 },
+          { "context": "analyze", "integration_id": 15368 },
+          { "context": "scan", "integration_id": 15368 },
+          { "context": "scan-pr", "integration_id": 15368 },
+          { "context": "scope-manifest", "integration_id": 15368 },
+          { "context": "review-agent", "integration_id": "APP_ID" },
+          { "context": "qa-agent", "integration_id": "APP_ID" },
+          { "context": "spec-compliance", "integration_id": "APP_ID" },
+          { "context": "a11y-audit", "integration_id": "APP_ID" }
+        ]
+      }
+    }
+  ]
+}
