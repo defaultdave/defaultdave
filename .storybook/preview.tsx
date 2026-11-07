@@ -17,8 +17,8 @@ function block(selector: string, tokens: TokenMap): string {
   const body = Object.entries(tokens)
     .map(([name, value]) => `${name}: ${value};`)
     .join(" ");
-  // The outline effect is resolved on :root, so it is restated against the panel's border.
-  return `${selector} { ${body} --effect-outline: 2px solid var(--color-border); }`;
+  // --effect-outline is in the parsed map too, so its var(--color-border) resolves against the panel.
+  return `${selector} { ${body} }`;
 }
 
 // next/font sets these on <html> in the app; Storybook falls back to system fonts.
