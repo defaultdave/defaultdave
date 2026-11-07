@@ -5,3 +5,4 @@ One file per decision that shapes the codebase or how it is built. Status is Pro
 | # | Title | Status |
 |---|---|---|
 | 0001 | Agent workflow and merge rule | Proposed 2026-11-06, for Dave to accept before the `merge-desk` unit |
+| 0002 | Devcontainer for unattended agent sessions | Proposed 2026-11-07, for Dave to accept before the swarm |
