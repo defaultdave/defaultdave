@@ -60,6 +60,8 @@ Standing call (Dave, 2026-11-06): start fan-out work the moment its gates hold, 
 
 One orchestrator chat (Dave, 2026-11-06): this PM chat stays open as the hub. Run `/senior` work as a background `senior` subagent from here (the `/senior` skill's steps: worktree at `.claude/worktrees/<slug>` on branch `unit/<unit-id>-<slug>` (ADR 0001 rule 3), scope manifest, the agent, then the quality gates run here), not as separate sessions. Check each result against its issue and report to Dave in the chat.
 
+Visual units (Dave, 2026-11-07): every `/senior` brief for a unit that changes what is on screen tells it to capture the before from `main` before touching the UI and to follow the global `pr-images` skill; before asking Dave to approve a visual PR, run `~/.claude/skills/pr-images/bin/verify.sh defaultdave/defaultdave <n>` and do not ask until it passes.
+
 Every build prompt carries the issue's scope manifest. Model tiering: Sonnet for implementation and QA, Haiku for narrow checks, Opus only for a design call or an estimate in its own chat.
 
 ## GitHub
