@@ -142,7 +142,7 @@
         "m": 1,
         "p": 2
       },
-      "notes": "Human-led on the path. Keystatic schema and content-layer types are the architecture of the site. Re-estimate 2026-11-06: owns the Keystatic GitHub App and its secrets, moved from preflight."
+      "notes": "Human-led on the path. Keystatic schema and content-layer types are the architecture of the site. Re-estimate 2026-11-06: owns the Keystatic GitHub App and its secrets, moved from preflight. Spike 2026-11-07: GitHub mode works on next 16.4.5, estimate and scores unchanged (the open unknown is the two dynamic routes against the static goal, plus a stable slug field)."
     },
     {
       "id": "page-home",

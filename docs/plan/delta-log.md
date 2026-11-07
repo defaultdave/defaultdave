@@ -94,6 +94,7 @@ One row per milestone, after updating `plan.json` and running the script again.
 | 2026-11-06 | 1 Walkable (scope change, not a milestone) | 1.7 to 2.2 (unchanged) | 2.4 (unchanged) | ADR 0001 accepted with eight amendments; issue #5 amended (branch pattern, bypass mode `always`, wider bookkeeping paths, bookkeeping "not applicable" checks in `post-check.ts`, sandbox exclusion, CodeQL, Gitleaks and OSV required). Small additions inside the existing scripts; `merge-desk` estimate and `plan.json` unchanged |
 | 2026-11-06 | 0 Designed (scope change, not a milestone) | 1.7 to 2.2 (unchanged) | 2.4 (unchanged) | One shared agents App instead of a new one: tickets 01 and 05 reworded, `merge-desk` gains a repo-restricted token criterion; ADR 0001 (still Proposed) amended. Estimates unchanged |
 | 2026-11-07 | 1 Walkable (scope change, not a milestone) | not recomputed | not recomputed | Added outside the plan: `merge-desk` follow-up, App-backed issue and PR write commands in `agent-git.ts` (DECISIONS 2026-11-07); `keystatic-spike` criterion 1 re-routed to a `senior` |
+| 2026-11-07 | 1 Walkable (scope change, not a milestone) | 1.7 to 2.2 (unchanged); report not rerun | 2.4 (unchanged) | `keystatic-spike` closed: GitHub mode passed, so the `cms` estimate (0.5 / 1 / 2 days) and scores stay; `plan.json` notes only. `plan.mjs` now rejects `plan.json` (unit `preflight` kind, and `rounds` estimates on `shell`, `page-*`, `seo-perf`, `feed` need days), so `plan-report.md` is as of 2026-11-06; fix before the next real re-estimate |
 
 ## Read-back
 

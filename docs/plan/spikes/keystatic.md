@@ -72,22 +72,21 @@ Next 16 also generated an `AGENTS.md` in the scratch app (`agentRules: false` tu
 
 `keystatic.config.ts` (local storage, `posts` collection, `fields.slug` title, `fields.markdoc` content), `app/keystatic/[[...params]]/page.tsx` (`'use client'`, `makePage(config)` from `@keystatic/next/ui/app`), `app/api/keystatic/[...params]/route.ts` (`makeRouteHandler({ config })` from `@keystatic/next/route-handler`), `content/posts/hello/index.mdoc`.
 
-## GitHub mode (criterion 2, Dave)
+## GitHub mode (criterion 2): PASS
 
-Not run by me: it creates a GitHub App in your account and needs you to sign in.
+Run by Dave on 2026-11-07 against `defaultdave/keystatic-spike-scratch` (private), same scratch app, `storage: { kind: 'github', repo: { owner: 'defaultdave', name: 'keystatic-spike-scratch' } }`, dev server on next 16.4.5.
 
-1. Create a scratch GitHub repo, for example `defaultdave/keystatic-spike-scratch` (private is fine). Push the scratch app to it yourself (`git remote add origin ...`, `git push -u origin main`). Do not point this at the real site repo for the spike.
-2. In `keystatic.config.ts` change the storage line:
-   ```ts
-   storage: { kind: 'github', repo: { owner: 'defaultdave', name: 'keystatic-spike-scratch' } },
-   ```
-   (Pattern for the real site: `process.env.NODE_ENV === 'production' ? { kind: 'github', repo: ... } : { kind: 'local' }`.)
-3. Start `pnpm dev`, open `http://127.0.0.1:3000/keystatic` (port as printed). Keystatic shows a first-run "Set up GitHub app" flow. It sends you to GitHub, creates a GitHub App in your account, asks you to install it on the scratch repo only, then redirects back.
-4. In dev, Keystatic writes the credentials to `.env` in the scratch dir. Names only: `KEYSTATIC_GITHUB_CLIENT_ID`, `KEYSTATIC_GITHUB_CLIENT_SECRET`, `KEYSTATIC_SECRET`, `NEXT_PUBLIC_KEYSTATIC_GITHUB_APP_SLUG`. Keep the values out of chat and the repo. For the real site they go to the Vercel env store per the project's secrets rule.
-5. Reload `/keystatic`, sign in with GitHub when prompted, edit the seeded post title, and save. Keystatic commits to the repo (default branch unless you use branch prefixes).
+- Keystatic's first-run "Set up GitHub app" flow created a GitHub App in the owner's account; Dave left Deployed App URL and organization blank, installed it on the scratch repo only, and landed on `/keystatic/branch/main` signed in. The OAuth callback and token cookie flow work on Next 16.4.5 App Router.
+- One edit saved from the UI committed to GitHub: `df2e09b` "Update content/posts/new slug" (author David Fleming, 2026-11-07 20:25 UTC), verified with `gh api` on the repo: `content/posts/hello/index.mdoc` removed, `content/posts/new slug/index.mdoc` added.
+- Finding: the collection's slug field is the title, so editing the title renames the entry folder (`hello` to `new slug`, with a space). The real site needs a stable slug field separate from the title, or a title edit changes the URL.
+- Not tested: production (Vercel) OAuth callback with a real Deployed App URL, branch prefixes, and Node 26. The real Keystatic App, with `davidfleming.me` as the deployed URL and its secrets in the Vercel env store, is `cms` work.
+- Cleanup: Dave deleted the scratch repo and the scratch GitHub App on 2026-11-07.
 
-What one committed edit proves: the GitHub OAuth callback and token cookie flow work on Next 16.4.5 App Router (`/api/keystatic/github/*`), and the content round-trips through the GitHub API as a real commit on the scratch repo. Check the commit appears on GitHub with the new title. Remember the GitHub App steps above are Keystatic's documented flow; I could not run them, so treat exact button labels as unverified. Delete the scratch GitHub App and repo afterwards if you do not want them.
+## Decision: GitHub mode (Dave, 2026-11-07)
 
-## Decision: pending Dave (GitHub mode / local mode only / Payload)
+GitHub mode. Local mode stays the dev default through `process.env.NODE_ENV === 'production' ? { kind: 'github', ... } : { kind: 'local' }` (to confirm in `cms`). Payload is out. Carry into `cms`:
 
-Recommendation: GitHub mode, conditional on criterion 2 passing. Local mode already works on Next 16.4.5 and React 19.3.0 with no peer warnings and a passing build, so the only unproven half is the GitHub OAuth flow, and the fix needed so far (`allowedDevOrigins`) is one config line. It matches the plan (git-based CMS, MDX in `content/`, no database). Fall back to local mode only if the OAuth flow fails; Payload is not worth its database and hosting cost for a personal portfolio. Open item for the cms unit: how the two dynamic routes coexist with the "fully static" goal.
+1. `allowedDevOrigins: ['127.0.0.1']` in `next.config.ts`.
+2. A stable slug field, not the title.
+3. The two Keystatic routes are dynamic; settle them against the fully static goal (Vercel runs them as functions; `output: 'export'` is out).
+4. Create the real Keystatic GitHub App for `davidfleming.me` and put its secrets in the Vercel env store.
