@@ -2,7 +2,7 @@
 
 Current state only. History is in `DECISIONS.md` and `delta-log.md`. Kept under 25 KB by `scripts/pm.sh check`.
 
-Updated 2026-11-06 by portfolio-pm (Opus 5.5). GitHub repo: `defaultdave/defaultdave`, public; issues #1 to #21 are the tickets (no local copies; DECISIONS 2026-11-06), #1, #2 and #4 closed. Project board: [#20](https://github.com/users/defaultdave/projects/20), all 21 issues added; Route and Milestone fields not set up yet. Domain: `davidfleming.me` bought; Vercel project `defaultdave` live, domain not attached yet. Plan: 21 units; owner time 72 h, 2.4 weeks at 30 h/wk, accepted as a measurement.
+Updated 2026-11-06 by portfolio-pm (Opus 5.5), ADR 0001 review. GitHub repo: `defaultdave/defaultdave`, public; issues #1 to #21 are the tickets (no local copies; DECISIONS 2026-11-06), #1, #2 and #4 closed. Project board: [#20](https://github.com/users/defaultdave/projects/20), all 21 issues added; Route and Milestone fields not set up yet. Domain: `davidfleming.me` bought; Vercel project `defaultdave` live, domain not attached yet. Plan: 21 units; owner time 72 h, 2.4 weeks at 30 h/wk, accepted as a measurement.
 
 MILESTONE: 1 Walkable (exit: Home, the Work list and the ResortPass case study live at davidfleming.me). 0 Designed reached 2026-11-06
 
@@ -37,7 +37,7 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 ## Blocked on Dave
 
 1. Attach `davidfleming.me` in the Vercel project's Domains.
-2. Accept or amend `docs/adr/0001-agent-workflow-and-merge-rule.md`: one tier, approval window on, four agent checks (unblocks `merge-desk`).
+2. Accept or amend `docs/adr/0001-agent-workflow-and-merge-rule.md` (unblocks `merge-desk`). PM review 2026-11-06 found eight amendments: branch names (`senior/` vs `unit/`), bookkeeping PRs vs the agent checks, bypass mode `always`, PM memory and calibration paths protected, App key `.pem` unreadable in the sandbox, security scans not required, which tool posts which check, a shared-App check spoofing gap.
 3. Decide: which Bandcamp releases, and any release notes (unblocks `content-music`).
 4. Decide: can ResortPass be named, or anonymized as in the CrUX article (unblocks publishing `content-work`).
 5. Headshot and bio, or text-only About (unblocks `content-home-about`).
@@ -49,12 +49,12 @@ Dave attaches the domain (item 1), then accepts or amends ADR 0001 (item 2) so `
 
 ## Next chat
 
-**Before you start:** commit and push the bookkeeping.
+**Before you start:** commit the bookkeeping; decide on the eight ADR 0001 amendments (Blocked item 2).
 
-**Run:** `/senior #4` in a new chat in `~/Workspace/defaultdave` for `scaffold`; `/portfolio-pm` in another for bookkeeping (terminal: `claude --agent portfolio-pm`).
+**Run:** `/portfolio-pm` in `~/Workspace/defaultdave` (terminal: `claude --agent portfolio-pm`).
 
-**Model and effort:** Sonnet, medium, for both.
+**Model and effort:** Sonnet, medium.
 
-**Prompt:** Implement issue #4 (`scaffold`) on `defaultdave/defaultdave`: the issue body is the ticket and its scope manifest. Build to `.claude/standards/stack-decisions.md`. Attach `davidfleming.me` to the Vercel project as the ticket says; Dave clicks anything in the Vercel or GitHub console. Tick criteria in the issue body as they hold. Stop before push and print the push and PR commands.
+**Prompt:** Apply the ADR 0001 amendments Dave accepted (`docs/adr/0001-agent-workflow-and-merge-rule.md`), set its Status to Accepted with the date, log it in `DECISIONS.md`, and add a dated Amendment section to issue #5 for any criterion the amendments change (branch pattern, bypass mode, bookkeeping paths, sandbox, required security checks). Then start `merge-desk` (#5) as a background `senior` subagent per the orchestrator rule. Don't commit.
 
-**Swarm (standing call, DECISIONS 2026-11-06: start it the moment the gates hold, no ask):** the five `page-*` units go out as one `/senior #<n>` session each, in their own worktrees, only after `scaffold`, `merge-desk` and `cms` are merged, the design is signed off, the ruleset requires the CI and agent checks, and the merge-desk dry run has passed. Each session pushes and opens its PR through `scripts/merge-desk/agent-git.ts` as the App; reviewers post verdicts with `post-check.ts`.
+**Swarm (standing call, DECISIONS 2026-11-06: start it the moment the gates hold, no ask):** the five `page-*` units go out as one `senior` subagent each, in their own worktrees, only after `scaffold`, `merge-desk` and `cms` are merged, the design is signed off, the ruleset requires the CI and agent checks, and the merge-desk dry run has passed. Each pushes and opens its PR through `scripts/merge-desk/agent-git.ts` as the App; reviewers post verdicts with `post-check.ts`.
