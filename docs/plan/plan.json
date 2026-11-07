@@ -120,10 +120,10 @@
       "rounds": {
         "o": 1,
         "m": 2,
-        "p": 4
+        "p": 5
       },
-      "owner_minutes": 60,
-      "notes": "Agent fan-out. Round one delivers tokens.css and the primitives matching the Figma file; Dave checks them against the design before the layout is built. Design calls were made in figma-design. Routed to agent fan-out although on the path: uncertainty 1, and the design is already settled in Figma. Amended 2026-11-06: build to the signed-off artifact and the token map in docs/designs/2026-11-06-design-comparison.md; Figma was dropped.",
+      "owner_minutes": 75,
+      "notes": "Agent fan-out. Round one delivers tokens.css and the primitives matching the Figma file; Dave checks them against the design before the layout is built. Design calls were made in figma-design. Routed to agent fan-out although on the path: uncertainty 1, and the design is already settled in Figma. Amended 2026-11-06: build to the signed-off artifact and the token map in docs/designs/2026-11-06-design-comparison.md; Figma was dropped. Re-estimated 2026-11-06: Storybook added (stories for the layout components and primitives); rounds p 4 to 5, owner minutes 60 to 75.",
       "route": "agent fan-out"
     },
     {

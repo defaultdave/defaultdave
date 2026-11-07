@@ -101,3 +101,4 @@ Written when the tail unit closes.
 - Change to make to the next plan:
 - Reference-class entry for the next plan: `{ "name": "davidfleming.me portfolio", "units": 21, "days": <actual serial days> }`
 | 2026-11-06 | 0 Designed reached | not recomputed: `plan.mjs` takes no actuals; `preflight` and `design` closed 1.7 days under their expected 2.0 | 2.4 (not recomputed) | Figma dropped from `design` (scope cut); `shell` (#6) amended to build to the artifact and its token map; `plan.json` notes updated. Storybook named but not added to any unit (open, Blocked on Dave) |
+| 2026-11-06 | 1 Walkable (scope change, not a milestone) | 1.7 to 2.2 (unchanged); critical path 1.9 to 2.0 | 2.4 (unchanged) | Storybook added to `shell` (#6): rounds 1 / 2 / 5 (was 1 / 2 / 4), owner minutes 75 (was 60). Issue amended, `plan.json` updated, report rerun |

@@ -17,17 +17,17 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 | `keystatic-spike` | todo | human only | | #3 | | Dave | session card proposed 2026-11-06 |
 | `scaffold` | todo | human-led | | #4 | | Dave + /senior | next; attaches `davidfleming.me`; carries the CI and security workflows |
 | `merge-desk` | todo | human-led | | #5 | | Dave + /senior | GitHub App, ruleset, merge-desk scripts ported from Ramble; ADR 0001 to accept first; merges by bypass |
-| `shell` | todo | agent fan-out | | #6 | | | after scaffold, merge-desk and design sign-off |
+| `shell` | todo | agent fan-out | | #6 | | | after scaffold and merge-desk; builds to the artifact, now carries Storybook |
 | `cms` | todo | human-led | | #7 | | | after scaffold and the spike; now also creates the Keystatic GitHub App |
 | `page-home` | todo | agent fan-out | | #8 | | | swarm, after shell + cms |
 | `page-work` | todo | agent fan-out | | #9 | | | swarm |
 | `page-writing` | todo | agent fan-out | | #10 | | | swarm |
 | `page-music` | todo | agent fan-out | | #11 | | | swarm |
 | `page-about` | todo | agent fan-out | | #12 | | | swarm |
-| `content-work` | todo | human only | | #13 | | Dave | needs decision 4 |
-| `content-writing` | todo | human only | | #14 | | Dave | needs decision 6 |
-| `content-music` | todo | human only | | #15 | | Dave | needs decision 3 |
-| `content-home-about` | todo | human only | | #16 | | Dave | needs decision 5 |
+| `content-work` | todo | human only | | #13 | | Dave | needs decision 3 |
+| `content-writing` | todo | human only | | #14 | | Dave | needs decision 5 |
+| `content-music` | todo | human only | | #15 | | Dave | needs decision 2 |
+| `content-home-about` | todo | human only | | #16 | | Dave | needs decision 4 |
 | `seo-perf` | todo | agent fan-out | | #17 | | | after the five pages |
 | `feed` | todo | agent fan-out | | #18 | | | first to cut if the appetite bites |
 | `qa-pass` | todo | human-led | | #19 | | | |
@@ -36,12 +36,11 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 
 ## Blocked on Dave
 
-1. Storybook: you named it for components and their states, but no unit carries it. Add it to `shell` (#6) with a re-estimate, or drop it (unblocks `shell`).
-2. Accept or amend `docs/adr/0001-agent-workflow-and-merge-rule.md`: one tier, approval window on, four agent checks (unblocks `merge-desk`).
-3. Decide: which Bandcamp releases, and any release notes (unblocks `content-music`).
-4. Decide: can ResortPass be named, or anonymized as in the CrUX article (unblocks publishing `content-work`).
-5. Headshot and bio, or text-only About (unblocks `content-home-about`).
-6. List of published pieces with URLs (unblocks `content-writing`).
+1. Accept or amend `docs/adr/0001-agent-workflow-and-merge-rule.md`: one tier, approval window on, four agent checks (unblocks `merge-desk`).
+2. Decide: which Bandcamp releases, and any release notes (unblocks `content-music`).
+3. Decide: can ResortPass be named, or anonymized as in the CrUX article (unblocks publishing `content-work`).
+4. Headshot and bio, or text-only About (unblocks `content-home-about`).
+5. List of published pieces with URLs (unblocks `content-writing`).
 
 ## Next
 

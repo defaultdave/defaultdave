@@ -14,7 +14,7 @@ Project copy for `defaultdave` (davidfleming.me), filled by `plan-project` on 20
 | Backend contract (REST, GraphQL, RPC) and who owns it | None. Content is MDX and YAML in `content/`, read at build time through Keystatic's reader. No runtime API |
 | Web only, or web and mobile | Web only, responsive |
 | Analytics, monitoring, and feature-flag vendors (each gets a wrapper, ARCH-8) | Vercel Analytics and Speed Insights, behind one `analytics` wrapper. No flags vendor |
-| Design system or component library | None. A small token set (type scale, spacing, two colour palettes) in CSS custom properties, components in CSS Modules |
+| Design system or component library | None. A small token set (type scale, spacing, two colour palettes) in CSS custom properties, components in CSS Modules. Storybook (dev only, added in `shell` 2026-11-06) records components and their states; the signed-off Claude Design artifact is the design record |
 | CMS | Keystatic, GitHub mode in production, local mode in development, mounted at `/keystatic`. Collections: `work`, `articles`, `musings`, `music`; singletons: `home`, `about` |
 
 ## Decisions

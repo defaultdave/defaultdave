@@ -12,32 +12,32 @@ Recorded 2026-11-06. Durations are working days; a week is 5.
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `preflight` | preflight | 1 | 2 | none | 0.25 / 0.5 / 1 days | 0.5 | 0.0 | 0.5 | -0.0 | yes | human only |
 | `design` | build | 2 | 2 | none | 0.75 / 1.5 / 2.5 days | 1.5 | 0.0 | 1.5 | 1.1 | no | human only |
-| `keystatic-spike` | spike | 1 | 3 | none | 0.25 / 0.5 / 1 days | 0.5 | 0.0 | 0.5 | 2.1 | no | human only |
+| `keystatic-spike` | spike | 1 | 3 | none | 0.25 / 0.5 / 1 days | 0.5 | 0.0 | 0.5 | 2.2 | no | human only |
 | `scaffold` | build | 2 | 1 | preflight | 0.25 / 0.5 / 1 days | 0.5 | 0.5 | 1.1 | -0.0 | yes | human-led |
 | `merge-desk` | build | 2 | 2 | preflight, scaffold | 0.5 / 1 / 2 days | 1.1 + 0.5 | 1.1 | 2.7 | -0.0 | yes | human-led |
-| `shell` | build | 2 | 1 | scaffold, design, merge-desk | 1 / 2 / 4 rounds, 60 min | 1.1 + 0.5 | 2.7 | 4.3 | -0.0 | yes | agent fan-out |
-| `cms` | build | 2 | 2 | scaffold, keystatic-spike | 0.5 / 1 / 2 days | 1.1 + 0.5 | 1.1 | 2.7 | 1.6 | no | human-led |
-| `page-home` | build | 1 | 1 | shell, cms, design, merge-desk | 1 / 1 / 2 rounds, 20 min | 0.6 + 0.5 | 4.3 | 5.3 | 0.5 | no | agent fan-out |
-| `page-work` | build | 2 | 1 | shell, cms, design, merge-desk | 1 / 2 / 4 rounds, 60 min | 1.1 + 0.5 | 4.3 | 5.8 | -0.0 | yes | agent fan-out |
-| `page-writing` | build | 2 | 1 | shell, cms, design, merge-desk | 1 / 2 / 4 rounds, 45 min | 1.1 + 0.5 | 4.3 | 5.8 | -0.0 | yes | agent fan-out |
+| `shell` | build | 2 | 1 | scaffold, design, merge-desk | 1 / 2 / 5 rounds, 75 min | 1.2 + 0.5 | 2.7 | 4.3 | -0.0 | yes | agent fan-out |
+| `cms` | build | 2 | 2 | scaffold, keystatic-spike | 0.5 / 1 / 2 days | 1.1 + 0.5 | 1.1 | 2.7 | 1.7 | no | human-led |
+| `page-home` | build | 1 | 1 | shell, cms, design, merge-desk | 1 / 1 / 2 rounds, 20 min | 0.6 + 0.5 | 4.3 | 5.4 | 0.5 | no | agent fan-out |
+| `page-work` | build | 2 | 1 | shell, cms, design, merge-desk | 1 / 2 / 4 rounds, 60 min | 1.1 + 0.5 | 4.3 | 5.9 | 0.0 | yes | agent fan-out |
+| `page-writing` | build | 2 | 1 | shell, cms, design, merge-desk | 1 / 2 / 4 rounds, 45 min | 1.1 + 0.5 | 4.3 | 5.9 | 0.0 | yes | agent fan-out |
 | `page-music` | build | 2 | 1 | shell, cms, design, merge-desk | 1 / 2 / 3 rounds, 45 min | 1.0 + 0.5 | 4.3 | 5.8 | 0.1 | no | agent fan-out |
-| `page-about` | build | 1 | 1 | shell, cms, design, merge-desk | 1 / 1 / 2 rounds, 15 min | 0.6 + 0.5 | 4.3 | 5.3 | 0.5 | no | agent fan-out |
-| `content-work` | build | 1 | 2 | cms | 0.5 / 1 / 2 days | 1.1 | 2.7 | 3.8 | 3.6 | no | human only |
-| `content-writing` | build | 1 | 1 | cms | 0.25 / 0.5 / 1 days | 0.5 | 2.7 | 3.2 | 4.1 | no | human only |
-| `content-music` | build | 1 | 2 | cms | 0.25 / 0.5 / 1 days | 0.5 | 2.7 | 3.2 | 4.1 | no | human only |
-| `content-home-about` | build | 1 | 1 | cms | 0.1 / 0.25 / 0.5 days | 0.3 | 2.7 | 2.9 | 4.4 | no | human only |
-| `seo-perf` | build | 1 | 1 | page-home, page-work, page-writing, page-music, page-about, merge-desk | 1 / 2 / 3 rounds, 30 min | 1.0 + 0.5 | 5.8 | 7.3 | -0.0 | yes | agent fan-out |
-| `feed` | build | 1 | 1 | page-writing, merge-desk | 1 / 1 / 2 rounds, 15 min | 0.6 + 0.5 | 5.8 | 6.9 | 0.4 | no | agent fan-out |
-| `qa-pass` | qa | 1 | 2 | seo-perf, feed, content-work, content-writing, content-music, content-home-about | 0.5 / 0.75 / 1.5 days | 0.8 + 0.5 | 7.3 | 8.7 | -0.0 | yes | human-led |
-| `launch` | launch | 1 | 1 | qa-pass | 0.25 / 0.5 / 1 days | 0.5 | 8.7 | 9.2 | 0.0 | yes | human-led |
-| `tail` | tail | 1 | 1 | launch | 0.25 / 0.5 / 1 days | 0.5 | 9.2 | 9.7 | 0.0 | yes | human-led |
+| `page-about` | build | 1 | 1 | shell, cms, design, merge-desk | 1 / 1 / 2 rounds, 15 min | 0.6 + 0.5 | 4.3 | 5.4 | 0.5 | no | agent fan-out |
+| `content-work` | build | 1 | 2 | cms | 0.5 / 1 / 2 days | 1.1 | 2.7 | 3.8 | 3.7 | no | human only |
+| `content-writing` | build | 1 | 1 | cms | 0.25 / 0.5 / 1 days | 0.5 | 2.7 | 3.2 | 4.2 | no | human only |
+| `content-music` | build | 1 | 2 | cms | 0.25 / 0.5 / 1 days | 0.5 | 2.7 | 3.2 | 4.2 | no | human only |
+| `content-home-about` | build | 1 | 1 | cms | 0.1 / 0.25 / 0.5 days | 0.3 | 2.7 | 2.9 | 4.5 | no | human only |
+| `seo-perf` | build | 1 | 1 | page-home, page-work, page-writing, page-music, page-about, merge-desk | 1 / 2 / 3 rounds, 30 min | 1.0 + 0.5 | 5.9 | 7.4 | 0.0 | yes | agent fan-out |
+| `feed` | build | 1 | 1 | page-writing, merge-desk | 1 / 1 / 2 rounds, 15 min | 0.6 + 0.5 | 5.9 | 7.0 | 0.4 | no | agent fan-out |
+| `qa-pass` | qa | 1 | 2 | seo-perf, feed, content-work, content-writing, content-music, content-home-about | 0.5 / 0.75 / 1.5 days | 0.8 + 0.5 | 7.4 | 8.8 | 0.0 | yes | human-led |
+| `launch` | launch | 1 | 1 | qa-pass | 0.25 / 0.5 / 1 days | 0.5 | 8.8 | 9.3 | 0.0 | yes | human-led |
+| `tail` | tail | 1 | 1 | launch | 0.25 / 0.5 / 1 days | 0.5 | 9.3 | 9.8 | 0.0 | yes | human-led |
 
 ## Critical path
 
 `preflight -> scaffold -> merge-desk -> shell -> page-work -> seo-perf -> qa-pass -> launch -> tail`
 
-Expected 9.7 days (1.9 weeks). Range 8.6 to 10.9 days (1.7 to 2.2 weeks) at two standard deviations, which assumes the unit estimates are independent.
-Every unit at its optimistic figure: 6.0 days. Every unit at its pessimistic figure: 15.5 days.
+Expected 9.8 days (2.0 weeks). Range 8.6 to 11.0 days (1.7 to 2.2 weeks) at two standard deviations, which assumes the unit estimates are independent.
+Every unit at its optimistic figure: 6.0 days. Every unit at its pessimistic figure: 16.0 days.
 A join buffer of 0.5 days is added to each unit with two or more dependencies.
 
 ## Off the path
@@ -45,15 +45,15 @@ A join buffer of 0.5 days is added to each unit with two or more dependencies.
 | Unit | Float (days) | Route |
 | --- | --- | --- |
 | `design` | 1.1 | human only |
-| `keystatic-spike` | 2.1 | human only |
-| `cms` | 1.6 | human-led |
+| `keystatic-spike` | 2.2 | human only |
+| `cms` | 1.7 | human-led |
 | `page-home` | 0.5 | agent fan-out |
 | `page-music` | 0.1 | agent fan-out |
 | `page-about` | 0.5 | agent fan-out |
-| `content-work` | 3.6 | human only |
-| `content-writing` | 4.1 | human only |
-| `content-music` | 4.1 | human only |
-| `content-home-about` | 4.4 | human only |
+| `content-work` | 3.7 | human only |
+| `content-writing` | 4.2 | human only |
+| `content-music` | 4.2 | human only |
+| `content-home-about` | 4.5 | human only |
 | `feed` | 0.4 | agent fan-out |
 
 ## Execution model
@@ -62,7 +62,7 @@ A join buffer of 0.5 days is added to each unit with two or more dependencies.
 | --- | --- | --- |
 | human only | `preflight`, `design`, `keystatic-spike`, `content-work`, `content-writing`, `content-music`, `content-home-about` | 5.1 |
 | human-led | `scaffold`, `merge-desk`, `cms`, `qa-pass`, `launch`, `tail` | 6.1 |
-| agent fan-out | `shell`, `page-home`, `page-work`, `page-writing`, `page-music`, `page-about`, `seo-perf`, `feed` | 11.0 |
+| agent fan-out | `shell`, `page-home`, `page-work`, `page-writing`, `page-music`, `page-about`, `seo-perf`, `feed` | 11.1 |
 
 - `shell` is declared agent fan-out; its scores and path position give human-led.
 - `page-work` is declared agent fan-out; its scores and path position give human-led.
@@ -73,34 +73,34 @@ A join buffer of 0.5 days is added to each unit with two or more dependencies.
 
 | Staffing | Duration | What binds it |
 | --- | --- | --- |
-| 1 engineer, no fan-out | 4.4 weeks (22.2 days) | Everything runs serially |
+| 1 engineer, no fan-out | 4.5 weeks (22.3 days) | Everything runs serially |
 | 1 engineer + agent fan-out | 2.5 weeks (12.6 days) | Engineer capacity: owned units and review of agent work |
-| 2 engineers + agent fan-out | 2.0 weeks (9.9 days) | Engineer capacity: owned units and review of agent work |
-| 3 engineers + agent fan-out | 1.9 weeks (9.7 days) | The critical path: this is the floor |
-| 4 engineers + agent fan-out | 1.9 weeks (9.7 days) | No further gain: the path is saturated |
+| 2 engineers + agent fan-out | 2.0 weeks (10.0 days) | Engineer capacity: owned units and review of agent work |
+| 3 engineers + agent fan-out | 2.0 weeks (9.8 days) | The critical path: this is the floor |
+| 4 engineers + agent fan-out | 2.0 weeks (9.8 days) | No further gain: the path is saturated |
 
 Agent-built units estimated in rounds take 0.5 days a round, and an engineer for their owner minutes at the end, at 6 focus hours a day. The no-fan-out row prices them at that agent time, so it understates a team working without agents.
 
 ## Owner time
 
 The plan needs 72 hours of a person's time: 67 on units a person owns, at 6 focus hours a day, and 5 on agent-built units.
-At 30 hours a week from one lead, that is 2.4 weeks, against a floor of 1.9 weeks.
+At 30 hours a week from one lead, that is 2.4 weeks, against a floor of 2.0 weeks.
 The lead's hours, not the graph, set the date, unless other people take owned units.
 Rounds per unit, owner minutes, owner hours a week and the review fraction are assumptions until the delta log measures them after the third agent-built merge.
 
 ## Appetite and first milestone
 
-Appetite: 2 weeks. Floor 1.9 weeks; the lead's own time 2.4 weeks. The plan does not fit: cut or park units before the build starts.
+Appetite: 2 weeks. Floor 2.0 weeks; the lead's own time 2.4 weeks. The plan does not fit: cut or park units before the build starts.
 Home, the Work list and the ResortPass case study live at davidfleming.me: 10 units with their prerequisites (`preflight`, `design`, `keystatic-spike`, `scaffold`, `merge-desk`, `shell`, `cms`, `page-home`, `page-work`, `content-work`). Floor 1.2 weeks; the lead's own time 1.6 weeks at 30 hours a week.
 
 ## Cross-check
 
-Serial total: 22.2 days over 21 units, 1.1 days per unit.
+Serial total: 22.3 days over 21 units, 1.1 days per unit.
 - Ramble demo marketplace, Oct 20 to Nov 4 2026: the 36 units with a recorded actual (summed likely estimate 68.75 days): 0.5 days per unit predicts 11.5 days. This plan is 1.94 times that.
 
 ## The sentence
 
-> Critical path is Accounts, domain, GitHub App, Hobby caps and secrets, from preflight.md, Next.js app with strict TS, lint, format, Knip, Vitest, Playwright smoke, CI and Vercel link, Agent identity and merge desk: GitHub App, rulesets with required checks, agent-git, post-check, scope-manifest, revert, Layout, nav, footer, tokens, primitives, metadata defaults, a11y skeleton, Work list and case-study template with metrics and figures, Sitemap, robots, OG images, per-page metadata, Speed Insights, bundle analyzer, Lighthouse 95, Cross-page QA: axe, Lighthouse CI, Playwright smoke, content proofread, Domain live on production, link into resume and LinkedIn, analytics verified and Remove placeholders and scaffolding, enforce CSP, file would-likes as issues, delta read-back: about 1.9 weeks, range 1.7 to 2.2. Design: a Figma file and a Claude Design artifact of the same tokens, components and six layouts, compared, Prove Keystatic GitHub mode on the current Next.js App Router release, Keystatic config, collections and singletons, typed content layer, MDX pipeline, Home page from the home singleton and featured work, Music releases list with click-to-load embed facade, About page from the about singleton, ResortPass case study, anonymized; cards for gallery perf, vig, side projects, Tuscany Rule port, CrUX article final pass, published pieces with canonical URLs, Release list with embed links and notes, Positioning paragraph, bio, headshot, contact links and RSS feed for Articles and Musings (would-like; first to cut) are off it. One engineer with no fan-out is 4.4 weeks serial. The floor is 1.9 weeks, reached with 3 engineers + agent fan-out; more people add nothing. At 30 hours a week, the lead's own time is 2.4 weeks. The first walkable milestone, Home, the Work list and the ResortPass case study live at davidfleming.me, has a floor of 1.2 weeks.
+> Critical path is Accounts, domain, GitHub App, Hobby caps and secrets, from preflight.md, Next.js app with strict TS, lint, format, Knip, Vitest, Playwright smoke, CI and Vercel link, Agent identity and merge desk: GitHub App, rulesets with required checks, agent-git, post-check, scope-manifest, revert, Layout, nav, footer, tokens, primitives, metadata defaults, a11y skeleton, Work list and case-study template with metrics and figures, Sitemap, robots, OG images, per-page metadata, Speed Insights, bundle analyzer, Lighthouse 95, Cross-page QA: axe, Lighthouse CI, Playwright smoke, content proofread, Domain live on production, link into resume and LinkedIn, analytics verified and Remove placeholders and scaffolding, enforce CSP, file would-likes as issues, delta read-back: about 2.0 weeks, range 1.7 to 2.2. Design: a Figma file and a Claude Design artifact of the same tokens, components and six layouts, compared, Prove Keystatic GitHub mode on the current Next.js App Router release, Keystatic config, collections and singletons, typed content layer, MDX pipeline, Home page from the home singleton and featured work, Music releases list with click-to-load embed facade, About page from the about singleton, ResortPass case study, anonymized; cards for gallery perf, vig, side projects, Tuscany Rule port, CrUX article final pass, published pieces with canonical URLs, Release list with embed links and notes, Positioning paragraph, bio, headshot, contact links and RSS feed for Articles and Musings (would-like; first to cut) are off it. One engineer with no fan-out is 4.5 weeks serial. The floor is 2.0 weeks, reached with 3 engineers + agent fan-out; more people add nothing. At 30 hours a week, the lead's own time is 2.4 weeks. The first walkable milestone, Home, the Work list and the ResortPass case study live at davidfleming.me, has a floor of 1.2 weeks.
 
 ## Graph
 
