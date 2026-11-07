@@ -37,7 +37,7 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 ## Blocked on Dave
 
 1. Attach `davidfleming.me` in the Vercel project's Domains.
-2. Accept or amend `docs/adr/0001-agent-workflow-and-merge-rule.md` (unblocks `merge-desk`). PM review 2026-11-06 found eight amendments: branch names (`senior/` vs `unit/`), bookkeeping PRs vs the agent checks, bypass mode `always`, PM memory and calibration paths protected, App key `.pem` unreadable in the sandbox, security scans not required, which tool posts which check, a shared-App check spoofing gap.
+2. Accept or strike each of the eight drafted amendments in `docs/adr/0001-agent-workflow-and-merge-rule.md` (listed at its end), then accept the ADR (unblocks `merge-desk`).
 3. Decide: which Bandcamp releases, and any release notes (unblocks `content-music`).
 4. Decide: can ResortPass be named, or anonymized as in the CrUX article (unblocks publishing `content-work`).
 5. Headshot and bio, or text-only About (unblocks `content-home-about`).
@@ -49,12 +49,12 @@ Dave attaches the domain (item 1), then accepts or amends ADR 0001 (item 2) so `
 
 ## Next chat
 
-**Before you start:** commit the bookkeeping; decide on the eight ADR 0001 amendments (Blocked item 2).
+**Before you start:** commit the bookkeeping; accept or strike the eight drafted ADR 0001 amendments (Blocked item 2).
 
 **Run:** `/portfolio-pm` in `~/Workspace/defaultdave` (terminal: `claude --agent portfolio-pm`).
 
 **Model and effort:** Sonnet, medium.
 
-**Prompt:** Apply the ADR 0001 amendments Dave accepted (`docs/adr/0001-agent-workflow-and-merge-rule.md`), set its Status to Accepted with the date, log it in `DECISIONS.md`, and add a dated Amendment section to issue #5 for any criterion the amendments change (branch pattern, bypass mode, bookkeeping paths, sandbox, required security checks). Then start `merge-desk` (#5) as a background `senior` subagent per the orchestrator rule. Don't commit.
+**Prompt:** Remove any ADR 0001 amendment Dave struck (`docs/adr/0001-agent-workflow-and-merge-rule.md`; the drafts are in place), change the `senior/` worktree line in `.claude/agents/portfolio-pm.md` to `unit/<unit-id>-<slug>` if amendment 1 stands, set the ADR Status to Accepted with the date, log it in `DECISIONS.md`, and add a dated Amendment section to issue #5 for any criterion the amendments change (branch pattern, bypass mode, bookkeeping paths, sandbox, required security checks). Then start `merge-desk` (#5) as a background `senior` subagent per the orchestrator rule. Don't commit.
 
 **Swarm (standing call, DECISIONS 2026-11-06: start it the moment the gates hold, no ask):** the five `page-*` units go out as one `senior` subagent each, in their own worktrees, only after `scaffold`, `merge-desk` and `cms` are merged, the design is signed off, the ruleset requires the CI and agent checks, and the merge-desk dry run has passed. Each pushes and opens its PR through `scripts/merge-desk/agent-git.ts` as the App; reviewers post verdicts with `post-check.ts`.
