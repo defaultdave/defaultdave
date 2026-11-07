@@ -17,7 +17,7 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 | `keystatic-spike` | todo | human only | | #3 | | Dave | session card proposed 2026-11-06 |
 | `scaffold` | done | human-led | 2 | #4 | #22 | | merged 2026-11-06 (348b25e); production deploy green; Dave attaches `davidfleming.me` in Vercel; `minimatch` advisory ignored until 2027-01-06 (#23); Node 26 merged (#24) |
 | `merge-desk` | in progress | human-led | | #5 | #25 | PM | dry run passed (DECISIONS 2026-11-06; PRs #26 merged, #27 blocked, #28 revert opened, #27 and #28 closed unmerged 2026-11-07); #5 criteria all ticked except Ramble tokens (not this unit's); close #5 after the Actuals row |
-| `shell` | in review | agent fan-out | 1 | #6 | #29 | Dave | round 1 (tokens, type scale, noindex `/tokens` sample page; #6 amended 2026-11-07) on `unit/shell-tokens`, gates green locally; Dave approves the tokens on the preview, then `/review-pr` posts the agent checks and auto-merge is queued; primitives are round 2 |
+| `shell` | in review | agent fan-out | 2 | #6 | #29 | Dave | round 1 (tokens, type scale, noindex `/tokens` sample page; #6 amended 2026-11-07) on `unit/shell-tokens`; review 1 at 2e91bde failed spec-compliance and a11y-audit (DECISIONS 2026-11-07), review 2 at a4ee027 all four agent checks and CI green; auto-merge queued (squash); waits on Dave's re-approval; primitives are round 2 |
 | `cms` | todo | human-led | | #7 | | | after scaffold and the spike; now also creates the Keystatic GitHub App |
 | `page-home` | todo | agent fan-out | | #8 | | | swarm, after shell + cms |
 | `page-work` | todo | agent fan-out | | #9 | | | swarm |
@@ -44,16 +44,16 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 
 ## Next
 
-Dave reviews `/tokens` on PR #29's Vercel preview, light and dark, and approves the tokens or lists changes. Dave attaches the domain (item 1) meanwhile. `keystatic-spike` (#3) can run beside it; `cms` and the page swarm wait on it.
+Dave re-approves PR #29 at a4ee027 (check `/tokens` dark borders on the new preview); auto-merge then lands it. Dave attaches the domain (item 1) meanwhile. `keystatic-spike` (#3) can run beside it.
 
 ## Next chat
 
-**Before you start:** commit and push the bookkeeping to `main`.
+**Before you start:** commit and push the bookkeeping to `main`; PR #29 merged.
 
 **Run:** `/portfolio-pm` in `~/Workspace/defaultdave` (terminal: `claude --agent portfolio-pm`).
 
 **Model and effort:** Sonnet, medium.
 
-**Prompt:** The `merge-desk` dry run passed (DECISIONS 2026-11-06), and every criterion on #5 is ticked except Ramble tokens, which is not this unit's. Close `merge-desk`: write its Actuals row in `docs/plan/delta-log.md` (rounds from PR #25's check runs; owner minutes from Dave's message timestamps in this project's transcripts plus `scripts/track.sh sum merge-desk`), close #5, and move its board card to Done. Then pick up `shell` (#6) round 1 in `.claude/worktrees/shell`: check the diff against #6's `in_scope_globs`, run the quality gates, and bring `tokens.css` and the type scale to Dave for the token approval. Don't commit.
+**Prompt:** Close `merge-desk`: write its Actuals row in `docs/plan/delta-log.md` (rounds from PR #25's check runs; owner minutes from transcript timestamps plus `scripts/track.sh sum merge-desk`), close #5, and move its board card to Done. Then start `shell` (#6) round 2 as a background `senior` in `.claude/worktrees/shell` on a fresh `unit/shell-primitives` branch from `main`: landmarks and skip link, nav `aria-current`, the contrast unit test, primitives Stack, Prose, Card, Tag and LinkButton with tests, Storybook, default metadata, and a `:focus-visible` rule; carry the round 1 advisories (rem type sizes, a dark value or a pops-only note for `--color-ink`). Check the diff against #6's `in_scope_globs`, run the gates, open the PR through merge-desk. Don't commit bookkeeping.
 
 **Swarm (standing call, DECISIONS 2026-11-06: start it the moment the gates hold, no ask):** the five `page-*` units go out as one `senior` subagent each, in their own worktrees, only after `scaffold`, `merge-desk` and `cms` are merged, the design is signed off, the ruleset requires the CI and agent checks, and the merge-desk dry run has passed. Each pushes and opens its PR through `scripts/merge-desk/agent-git.ts` as the App; reviewers post verdicts with `post-check.ts`.
