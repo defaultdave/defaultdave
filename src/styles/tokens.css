@@ -33,7 +33,7 @@
 
   /* Effects */
   --effect-outline: 2px solid var(--color-border);
-  --effect-shadow: 5px 5px 0 #18181b;
+  --effect-shadow: 5px 5px 0 var(--color-ink);
 
   /* Radii */
   --radius-sm: 4px;
@@ -59,8 +59,6 @@
    * Font families. --font-inter and --font-jetbrains-mono are set on <html>
    * by next/font in src/app/layout.tsx.
    */
-  --font-heading: var(--font-inter), system-ui, sans-serif;
-  --font-body: var(--font-inter), system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
 
   /* Type scale: desktop (640px and up). Size and line height in px. */
@@ -102,7 +100,7 @@
     --color-surface: #262123;
     --color-text: #f4efea;
     --color-muted: #b3aaa4;
-    --color-border: #4a4245;
+    --color-border: #8a8084;
     --color-accent: #93a2ff;
     --color-focus: #b4c0ff;
     --color-on-accent: #111113;

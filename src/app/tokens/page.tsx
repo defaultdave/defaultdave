@@ -32,6 +32,9 @@ const typeSteps = [
 const spaces = ["1", "2", "3", "4", "5", "6", "7", "8", "9"] as const;
 const radii = ["sm", "md", "pill"] as const;
 
+const sansFont = "var(--font-inter), system-ui, sans-serif";
+const monoFont = "var(--font-mono)";
+
 const fill = (token: string): CSSProperties => ({
   background: `var(--color-${token})`,
 });
@@ -71,10 +74,7 @@ export default function TokensPage() {
             <span className={styles.name}>--type-{step}-*</span>
             <span
               style={{
-                fontFamily:
-                  step === "mono"
-                    ? "var(--font-mono)"
-                    : `var(--font-${step === "body" || step === "small" ? "body" : "heading"})`,
+                fontFamily: step === "mono" ? monoFont : sansFont,
                 fontSize: `var(--type-${step}-size)`,
                 lineHeight: `var(--type-${step}-line)`,
                 fontWeight: `var(--type-${step}-weight)`,
@@ -121,9 +121,7 @@ export default function TokensPage() {
           <div className={styles.box}>
             <span className={styles.name}>--effect-outline</span>
           </div>
-          <div
-            className={[styles.box, styles.shadow].filter(Boolean).join(" ")}
-          >
+          <div className={[styles.box, styles.shadow].join(" ")}>
             <span className={styles.name}>--effect-shadow</span>
           </div>
         </div>

@@ -38,13 +38,8 @@
   padding: var(--space-2) var(--space-3);
 }
 
-.name,
-.value {
+.name {
   font-family: var(--font-mono);
-}
-
-.value {
-  color: var(--color-muted);
 }
 
 .row {
