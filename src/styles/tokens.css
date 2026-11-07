@@ -22,7 +22,10 @@
   --color-focus: #2b3fd6;
   --color-on-accent: #ffffff;
 
-  /* Pops are the same in both schemes. Text on a pop is always ink #18181b. */
+  /* Ink is the same in both schemes. Text on a pop is always ink. */
+  --color-ink: #18181b;
+
+  /* Pops are the same in both schemes. */
   --color-pop-1: #ff6fb5;
   --color-pop-2: #3cc8b4;
   --color-pop-3: #ff8a3d;
