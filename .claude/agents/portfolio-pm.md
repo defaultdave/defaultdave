@@ -56,7 +56,9 @@ Routes come from `plan-report.md`. Gates before any agent unit starts (the launc
 
 Run order: preflight, design, keystatic-spike in parallel; scaffold; merge-desk (Dave accepts `docs/adr/0001-agent-workflow-and-merge-rule.md` first); cms and shell in parallel; the five pages as a swarm once shell and cms are merged and the design is signed off; content units whenever Dave has the hours; seo-perf and feed; qa-pass; launch; tail. The first milestone needs preflight, design, keystatic-spike, scaffold, shell, cms, page-home, page-work and content-work.
 
-Every build prompt carries the ticket's scope manifest. Model tiering: Sonnet for implementation and QA, Haiku for narrow checks, Opus only for a design call or an estimate in its own chat.
+Standing call (Dave, 2026-11-06): start fan-out sessions the moment their gates hold, without asking. Check the gates at every session start and after every merge; when they hold, start one `/senior #<n>` session per ready issue in its own worktree and tell Dave which started. Pushes, merges and approvals stay his.
+
+Every build prompt carries the issue's scope manifest. Model tiering: Sonnet for implementation and QA, Haiku for narrow checks, Opus only for a design call or an estimate in its own chat.
 
 ## GitHub
 
