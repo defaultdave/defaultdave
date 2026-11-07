@@ -53,6 +53,7 @@ One row as each unit closes. Rounds come from the unit's check runs or verdict f
 | Unit | Started | Finished | Actual (days) | Expected (days) | Rounds | Owner min | Delta | Why |
 |---|---|---|---|---|---|---|---|---|
 | `preflight` | 2026-11-06 | 2026-11-06 | 0.1 | 0.5 | n/a (human only) | 33 (5 outside from `track.sh`, the timer row corrected to Dave's estimate; 28 inside from message timestamps) | -0.4 | The dry run moved every row that needs code or a running app to `scaffold`, `cms`, `merge-desk` and `seo-perf`; what was left was console clicks and three decisions |
+| `design` | 2026-11-06 | 2026-11-06 | 0.2 | 1.5 | n/a (human only) | 59 (inside, from Dave's message timestamps in the design session; no `track.sh` row) | -1.3 | Figma dropped after the first rounds, so one rendering instead of two; seven option rounds on the artifact in one sitting |
 
 ## Calibration
 
@@ -99,3 +100,4 @@ Written when the tail unit closes.
 - Measures that missed their target, and what changed because of it:
 - Change to make to the next plan:
 - Reference-class entry for the next plan: `{ "name": "davidfleming.me portfolio", "units": 21, "days": <actual serial days> }`
+| 2026-11-06 | 0 Designed reached | not recomputed: `plan.mjs` takes no actuals; `preflight` and `design` closed 1.7 days under their expected 2.0 | 2.4 (not recomputed) | Figma dropped from `design` (scope cut); `shell` (#6) amended to build to the artifact and its token map; `plan.json` notes updated. Storybook named but not added to any unit (open, Blocked on Dave) |

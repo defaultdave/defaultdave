@@ -53,7 +53,7 @@
         "m": 1.5,
         "p": 2.5
       },
-      "notes": "Added 2026-11-06 at Dave's request after the range review. Two renderings of one design: a Figma file driven through the Figma MCP, and an interactive Claude Design artifact Dave can try options in. Dave compares, picks or merges, and signs off one source of truth for tokens. Shell and every page depend on it. Timing is measured, not promised: Dave logs start and stop times in docs/plan/time-log.csv."
+      "notes": "Added 2026-11-06 at Dave's request after the range review. Two renderings of one design: a Figma file driven through the Figma MCP, and an interactive Claude Design artifact Dave can try options in. Dave compares, picks or merges, and signs off one source of truth for tokens. Shell and every page depend on it. Timing is measured, not promised: Dave logs start and stop times in docs/plan/time-log.csv. Amended 2026-11-06: Figma dropped; signed off on the Claude Design artifact alone (version 21)."
     },
     {
       "id": "keystatic-spike",
@@ -123,7 +123,7 @@
         "p": 4
       },
       "owner_minutes": 60,
-      "notes": "Agent fan-out. Round one delivers tokens.css and the primitives matching the Figma file; Dave checks them against the design before the layout is built. Design calls were made in figma-design. Routed to agent fan-out although on the path: uncertainty 1, and the design is already settled in Figma.",
+      "notes": "Agent fan-out. Round one delivers tokens.css and the primitives matching the Figma file; Dave checks them against the design before the layout is built. Design calls were made in figma-design. Routed to agent fan-out although on the path: uncertainty 1, and the design is already settled in Figma. Amended 2026-11-06: build to the signed-off artifact and the token map in docs/designs/2026-11-06-design-comparison.md; Figma was dropped.",
       "route": "agent fan-out"
     },
     {
