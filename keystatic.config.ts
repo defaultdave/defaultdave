@@ -122,9 +122,10 @@ const postSchema = {
 };
 
 export default config({
-  storage: process.env.VERCEL
-    ? { kind: "github", repo: REPO }
-    : { kind: "local" },
+  storage:
+    process.env.KEYSTATIC_STORAGE_KIND === "github"
+      ? { kind: "github", repo: REPO }
+      : { kind: "local" },
   collections: {
     work: collection({
       label: "Work",
