@@ -43,13 +43,13 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 5. List of published pieces with URLs (unblocks `content-writing`).
 6. Footer email: confirm `defaultdave@gmail.com` is the public one (`src/components/layout/contact-links.ts`).
 
-7. Security, pre-existing: the merge-desk allow rules and sandbox exclusions in `.claude/settings.local.json` match cwd-relative script paths that agents can edit or shadow, so an agent can run its own code outside the sandbox with no prompt (found 2026-11-07, verdict `app-writes/.team-verdicts/review-workflow-r2.md`). Decide: prioritise the shared-engine RFC (PR #31, read-only launchers) before the swarm, or an interim launcher outside `~/Workspace`.
+7. Security, pre-existing: the merge-desk allow rules and sandbox exclusions in `.claude/settings.local.json` match cwd-relative script paths that agents can edit or shadow, so an agent can run its own code outside the sandbox with no prompt (found 2026-11-07, verdict `app-writes/.team-verdicts/review-workflow-r2.md`). Decided 2026-11-07: the shared-engine RFC (PR #31) lands before the swarm; until then no unattended agent runs.
 
 ## Next
 
-1. `merge-desk` follow-up on `unit/merge-desk-app-writes` (`.claude/worktrees/app-writes`, commits 02ee0a1 and 7d444e7, not pushed): gates pass (260 tests); review round 1 fixed in 7d444e7; guard check round 2 REQUEST_CHANGES (`.team-verdicts/review-workflow-r2.md`): three guard fixes in `agent-git.ts` (read once and pass on stdin, root from the script's location, refuse secret-named files), plus a pre-existing hole that only the shared-engine RFC (PR #31) closes, see Blocked item 7. One line left, blocked for the senior by the sandbox: the `## GitHub` bullet in `.claude/agents/portfolio-pm.md` still hands issue create/close to Dave; the replacement text is in the Next chat prompt. Then Dave pushes, opens the PR and bypass-merges (protected paths: `scripts/merge-desk/`, `.claude/`, `CLAUDE.md`).
+1. `merge-desk` follow-up on `unit/merge-desk-app-writes` (`.claude/worktrees/app-writes`, 5 commits to d54b41e, not pushed; gates pass, 291 tests). Guard rounds in the worktree's `.team-verdicts/review-workflow-r1.md` to `r4.md`: root and secret-name fixes hold; the body-file path check still loses a narrow race (r4). Next round: take the body on stdin (`-`) so the sandboxed caller reads the file and `agent-git.ts` opens none, after confirming a stdin redirect keeps the allow rule and sandbox exclusion. `.claude/agents/portfolio-pm.md` still carries the round-1 wording; Dave is reworking the PM agents, so leave it or drop it from the branch. Protected paths: Dave pushes and bypass-merges. Do not merge before the stdin round.
 2. `keystatic-spike` (#3): criterion 1 passed (local mode on next 16.4.5; evidence in `docs/plan/spikes/keystatic.md`, scratch app `~/Workspace/keystatic-spike-scratch`). Dave runs the GitHub-mode half from that file, then decides GitHub mode / local only / Payload. PM then does criterion 4 (cms estimate in `plan.json`, report rerun).
-3. Then `cms` (#7, human-led), then the swarm.
+3. Then `cms` (#7, human-led), the shared merge-desk engine (RFC PR #31, before the swarm, DECISIONS 2026-11-07), then the swarm. Paused 2026-11-07 while Dave reworks the PM agents.
 
 ## Next chat
 
