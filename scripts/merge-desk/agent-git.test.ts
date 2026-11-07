@@ -1,6 +1,14 @@
-import { mkdtempSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import {
+  mkdirSync,
+  mkdtempSync,
+  realpathSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { pathToFileURL } from "node:url";
 import { afterAll, describe, expect, it } from "vitest";
 import {
   automerge,
@@ -14,6 +22,7 @@ import {
   Refused,
   review,
   type RunResult,
+  scriptRoot,
 } from "./agent-git";
 
 const dir = mkdtempSync(join(tmpdir(), "agent-git-"));
@@ -35,13 +44,17 @@ const HTTPS = "https://github.com/defaultdave/defaultdave.git\n";
 function fakeDeps(
   options: { branch?: string; view?: string; remote?: string } = {},
 ) {
-  const calls: { command: string[]; env: Record<string, string> }[] = [];
+  const calls: {
+    command: string[];
+    env: Record<string, string>;
+    input?: Buffer | undefined;
+  }[] = [];
   const deps: Deps = {
     token: () => Promise.resolve("ghs_fake"),
     currentBranch: () => options.branch ?? "unit/merge-desk",
     repoRoot: () => process.cwd(),
-    run: (command, env): RunResult => {
-      calls.push({ command, env });
+    run: (command, env, input): RunResult => {
+      calls.push({ command, env, input });
       if (command[1] === "remote")
         return { code: 0, stdout: options.remote ?? HTTPS };
       const isView = command[1] === "pr" && command[2] === "view";
@@ -153,8 +166,9 @@ describe("pr", () => {
       "--title",
       "merge-desk: scripts",
       "--body-file",
-      body,
+      "-",
     ]);
+    expect(calls[0]?.input?.toString()).toBe("hello\n");
     expect(calls[0]?.env.GH_TOKEN).toBe("ghs_fake");
   });
 
@@ -275,9 +289,11 @@ describe("issue and PR body writes", () => {
         "--repo",
         "defaultdave/defaultdave",
         "--body-file",
-        body,
+        "-",
       ]);
+      expect(calls[0]?.input?.toString()).toBe("hello\n");
       expect(calls[0]?.command.join(" ")).not.toContain("ghs_fake");
+      expect(calls[0]?.command.join(" ")).not.toContain(body);
       expect(calls[0]?.env.GH_TOKEN).toBe("ghs_fake");
     },
   );
@@ -355,4 +371,65 @@ describe("issue and PR body writes", () => {
       );
     },
   );
+
+  it.each(writers)(
+    "$name sends the bytes read before the token was minted, even if the file is swapped",
+    async ({ call, target }) => {
+      const file = join(dir, "swap.md");
+      writeFileSync(file, "original\n");
+      const { deps, calls } = fakeDeps();
+      deps.token = () => {
+        writeFileSync(file, "swapped\n");
+        return Promise.resolve("ghs_fake");
+      };
+      await call(target, file, deps);
+      expect(calls[0]?.input?.toString()).toBe("original\n");
+      expect(calls[0]?.command).not.toContain(file);
+    },
+  );
+
+  it.each([
+    ".env",
+    ".env.local",
+    "server.pem",
+    "deploy.key",
+    "bundle.p12",
+    "bundle.pfx",
+    "credentials.json",
+    ".secrets",
+    "id_rsa",
+    "id_rsa.pub",
+    "id_ed25519",
+    ".ssh/notes.md",
+    ".aws/notes.md",
+    ".gnupg/notes.md",
+  ])("refuses the secret-style path %s", async (name) => {
+    const file = join(dir, name);
+    mkdirSync(join(file, ".."), { recursive: true });
+    writeFileSync(file, "dummy\n");
+    const { deps, calls } = fakeDeps();
+    await expect(issueComment("12", file, deps)).rejects.toThrow(
+      "refused: body file has a secret-file name",
+    );
+    expect(calls).toHaveLength(0);
+  });
+
+  it.each([".env.example", ".env.sample"])("accepts %s", async (name) => {
+    const file = join(dir, name);
+    writeFileSync(file, "dummy\n");
+    const { deps, calls } = fakeDeps();
+    await issueComment("12", file, deps);
+    expect(calls).toHaveLength(1);
+  });
+});
+
+describe("scriptRoot", () => {
+  it("is two levels above the script, resolved, regardless of the cwd", () => {
+    const root = join(dir, "checkout");
+    mkdirSync(join(root, "scripts", "merge-desk"), { recursive: true });
+    const url = pathToFileURL(
+      join(root, "scripts", "merge-desk", "agent-git.ts"),
+    ).href;
+    expect(scriptRoot(url)).toBe(realpathSync(root));
+  });
 });

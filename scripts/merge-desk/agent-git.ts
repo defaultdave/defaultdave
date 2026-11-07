@@ -7,9 +7,25 @@
 //   node scripts/merge-desk/agent-git.ts issue-body <issue number> <body-file>   (replaces the body)
 //   node scripts/merge-desk/agent-git.ts pr-body <pr number or branch> <body-file>   (replaces the body)
 import { spawnSync } from "node:child_process";
-import { lstatSync, readFileSync, realpathSync } from "node:fs";
+import {
+  closeSync,
+  constants,
+  fstatSync,
+  lstatSync,
+  openSync,
+  readFileSync,
+  realpathSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
-import { relative, isAbsolute } from "node:path";
+import {
+  basename,
+  dirname,
+  isAbsolute,
+  relative,
+  resolve,
+  sep,
+} from "node:path";
+import { fileURLToPath } from "node:url";
 // @ts-expect-error TS5097: Node needs the .ts extension, and the root tsconfig does not allow it
 import { mintToken } from "./app-token.ts";
 
@@ -29,9 +45,14 @@ export interface RunResult {
 
 export interface Deps {
   token: () => Promise<string>;
-  run: (command: string[], env: Record<string, string>) => RunResult;
+  /** `input`, when given, is written to the command's stdin. */
+  run: (
+    command: string[],
+    env: Record<string, string>,
+    input?: Buffer,
+  ) => RunResult;
   currentBranch: () => string;
-  /** `git rev-parse --show-toplevel` of the cwd. */
+  /** The repo root as derived from this script's own location, never from git or the cwd. */
   repoRoot: () => string;
 }
 
@@ -112,7 +133,7 @@ export async function pr(
   assertBase(base);
   const head = deps.currentBranch();
   assertPushable(head);
-  assertBodyFile(bodyFile, deps);
+  const bytes = readBodyFile(bodyFile, deps);
   const command = [
     "gh",
     "pr",
@@ -126,9 +147,12 @@ export async function pr(
     "--title",
     title,
     "--body-file",
-    bodyFile,
+    "-",
   ];
-  must(deps.run(command, { GH_TOKEN: await deps.token() }), "gh pr create");
+  must(
+    deps.run(command, { GH_TOKEN: await deps.token() }, bytes),
+    "gh pr create",
+  );
 }
 
 function assertTarget(target: string): void {
@@ -205,11 +229,37 @@ function realOrNull(path: string): string | null {
   }
 }
 
+/** The repo root from where this script lives (scripts/merge-desk/ is two levels down), resolved through symlinks. */
+export function scriptRoot(moduleUrl: string): string {
+  return realpathSync(resolve(dirname(fileURLToPath(moduleUrl)), "..", ".."));
+}
+
+const SECRET_SEGMENTS = new Set([".ssh", ".aws", ".gnupg"]);
+
+/** Mirrors the sandbox read-deny list: names that hold credentials. */
+function isSecretPath(real: string): boolean {
+  const name = basename(real);
+  if (real.split(sep).some((segment) => SECRET_SEGMENTS.has(segment)))
+    return true;
+  if (name === ".env.example" || name === ".env.sample") return false;
+  return (
+    name === ".env" ||
+    name.startsWith(".env.") ||
+    /\.(pem|key|p12|pfx)$/.test(name) ||
+    name === "credentials.json" ||
+    name.startsWith(".secret") ||
+    name.startsWith("id_rsa") ||
+    name.startsWith("id_ed25519")
+  );
+}
+
 /**
  * A body file is public text. This command is pre-allowed and sandbox-excluded, so it must not be a way
- * to post an arbitrary file: no symlinks, only files inside the repo or the temp dir, no private keys.
+ * to post an arbitrary file. The path is checked, then opened once (no symlink followed) and the bytes
+ * are read from that descriptor; the caller sends those bytes on stdin, never the path, so the file
+ * cannot change between the check and the send.
  */
-export function assertBodyFile(bodyFile: string, deps: Deps): void {
+export function readBodyFile(bodyFile: string, deps: Deps): Buffer {
   let info;
   try {
     info = lstatSync(bodyFile);
@@ -218,8 +268,6 @@ export function assertBodyFile(bodyFile: string, deps: Deps): void {
   }
   if (info.isSymbolicLink())
     throw new Refused("refused: body file is a symbolic link");
-  if (!info.isFile() || info.size === 0)
-    throw new Refused("refused: body file is not a non-empty regular file");
   const real = realpathSync(bodyFile);
   const roots = [deps.repoRoot(), tmpdir(), process.env.TMPDIR ?? ""]
     .filter(Boolean)
@@ -229,8 +277,27 @@ export function assertBodyFile(bodyFile: string, deps: Deps): void {
     throw new Refused(
       "refused: body file is outside the repo and the temp directory",
     );
-  if (readFileSync(real, "utf8").includes("PRIVATE KEY"))
-    throw new Refused("refused: body file contains a private key marker");
+  if (isSecretPath(real))
+    throw new Refused("refused: body file has a secret-file name");
+  let fd: number;
+  try {
+    fd = openSync(real, constants.O_RDONLY | constants.O_NOFOLLOW);
+  } catch {
+    throw new Refused("refused: body file cannot be opened");
+  }
+  try {
+    const stat = fstatSync(fd);
+    if (!stat.isFile() || stat.size === 0)
+      throw new Refused("refused: body file is not a non-empty regular file");
+    const bytes = readFileSync(fd);
+    if (bytes.length === 0)
+      throw new Refused("refused: body file is not a non-empty regular file");
+    if (bytes.includes("PRIVATE KEY"))
+      throw new Refused("refused: body file contains a private key marker");
+    return bytes;
+  } finally {
+    closeSync(fd);
+  }
 }
 
 /** Posts a comment on an issue as the App. */
@@ -240,20 +307,12 @@ export async function issueComment(
   deps: Deps,
 ): Promise<void> {
   assertIssueNumber(issue);
-  assertBodyFile(bodyFile, deps);
+  const bytes = readBodyFile(bodyFile, deps);
   must(
     deps.run(
-      [
-        "gh",
-        "issue",
-        "comment",
-        issue,
-        "--repo",
-        REPO,
-        "--body-file",
-        bodyFile,
-      ],
+      ["gh", "issue", "comment", issue, "--repo", REPO, "--body-file", "-"],
       { GH_TOKEN: await deps.token() },
+      bytes,
     ),
     "gh issue comment",
   );
@@ -266,11 +325,12 @@ export async function issueBody(
   deps: Deps,
 ): Promise<void> {
   assertIssueNumber(issue);
-  assertBodyFile(bodyFile, deps);
+  const bytes = readBodyFile(bodyFile, deps);
   must(
     deps.run(
-      ["gh", "issue", "edit", issue, "--repo", REPO, "--body-file", bodyFile],
+      ["gh", "issue", "edit", issue, "--repo", REPO, "--body-file", "-"],
       { GH_TOKEN: await deps.token() },
+      bytes,
     ),
     "gh issue edit",
   );
@@ -283,11 +343,12 @@ export async function prBody(
   deps: Deps,
 ): Promise<void> {
   assertTarget(target);
-  assertBodyFile(bodyFile, deps);
+  const bytes = readBodyFile(bodyFile, deps);
   must(
     deps.run(
-      ["gh", "pr", "edit", target, "--repo", REPO, "--body-file", bodyFile],
+      ["gh", "pr", "edit", target, "--repo", REPO, "--body-file", "-"],
       { GH_TOKEN: await deps.token() },
+      bytes,
     ),
     "gh pr edit",
   );
@@ -295,27 +356,31 @@ export async function prBody(
 
 function realDeps(): Deps {
   let cached: Promise<string> | null = null;
-  const spawn = (command: string[], env: Record<string, string>): RunResult => {
+  const spawn = (
+    command: string[],
+    env: Record<string, string>,
+    input?: Buffer,
+  ): RunResult => {
     const [file, ...args] = command;
     const result = spawnSync(file ?? "", args, {
       env: { ...process.env, ...env },
       encoding: "utf8",
-      stdio: ["ignore", "pipe", "inherit"],
+      input,
+      stdio: [input ? "pipe" : "ignore", "pipe", "inherit"],
     });
     return { code: result.status ?? 1, stdout: result.stdout };
   };
   return {
     token: () => (cached ??= mintToken()),
-    run: (command, env) => {
-      const result = spawn(command, env);
+    run: (command, env, input) => {
+      const result = spawn(command, env, input);
       if (command[0] === "gh" && command[2] !== "view")
         process.stdout.write(result.stdout);
       return result;
     },
     currentBranch: () =>
       spawn(["git", "branch", "--show-current"], {}).stdout.trim(),
-    repoRoot: () =>
-      spawn(["git", "rev-parse", "--show-toplevel"], {}).stdout.trim(),
+    repoRoot: () => scriptRoot(import.meta.url),
   };
 }
 
