@@ -16,7 +16,7 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 | `design` | done | human only | | #2 | | | signed off 2026-11-06 on the artifact (v21); Figma dropped |
 | `keystatic-spike` | todo | human only | | #3 | | Dave | session card proposed 2026-11-06 |
 | `scaffold` | done | human-led | 2 | #4 | #22 | | merged 2026-11-06 (348b25e); production deploy green; Dave attaches `davidfleming.me` in Vercel; `minimatch` advisory ignored until 2027-01-06 (#23); Node 26 merged (#24) |
-| `merge-desk` | todo | human-led | | #5 | | Dave + /senior | GitHub App, ruleset, merge-desk scripts ported from Ramble; ADR 0001 to accept first; merges by bypass |
+| `merge-desk` | in progress | human-led | | #5 | | senior subagent | ADR 0001 accepted with eight amendments, #5 amended; `senior` porting the scripts in `.claude/worktrees/merge-desk` on `unit/merge-desk`; App, ruleset, auto-merge, settings and dry run are Dave's |
 | `shell` | todo | agent fan-out | | #6 | | | after scaffold and merge-desk; builds to the artifact, now carries Storybook |
 | `cms` | todo | human-led | | #7 | | | after scaffold and the spike; now also creates the Keystatic GitHub App |
 | `page-home` | todo | agent fan-out | | #8 | | | swarm, after shell + cms |
@@ -37,7 +37,7 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 ## Blocked on Dave
 
 1. Attach `davidfleming.me` in the Vercel project's Domains.
-2. Accept or strike each of the eight drafted amendments in `docs/adr/0001-agent-workflow-and-merge-rule.md` (listed at its end), then accept the ADR (unblocks `merge-desk`).
+2. After the `merge-desk` subagent reports: push and open its PR, create the ruleset and turn on "Allow auto-merge" from `scripts/merge-desk/`, apply `settings.local.json`, run the dry run (unblocks `shell` and every fan-out unit).
 3. Decide: which Bandcamp releases, and any release notes (unblocks `content-music`).
 4. Decide: can ResortPass be named, or anonymized as in the CrUX article (unblocks publishing `content-work`).
 5. Headshot and bio, or text-only About (unblocks `content-home-about`).
@@ -45,16 +45,16 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 
 ## Next
 
-Dave attaches the domain (item 1), then accepts or amends ADR 0001 (item 2) so `merge-desk` (#5) can start as a `senior` subagent from the PM chat. `keystatic-spike` (#3) can run beside it.
+The `merge-desk` subagent finishes the port; the PM runs the quality gates in its worktree, checks the diff against #5, and hands Dave the push, PR and console steps (item 2). Dave attaches the domain (item 1) meanwhile. `keystatic-spike` (#3) can run beside it.
 
 ## Next chat
 
-**Before you start:** commit the bookkeeping; accept or strike the eight drafted ADR 0001 amendments (Blocked item 2).
+**Before you start:** commit the bookkeeping. If the `merge-desk` subagent was still running when the last chat closed, its work is on branch `unit/merge-desk` in `.claude/worktrees/merge-desk`.
 
 **Run:** `/portfolio-pm` in `~/Workspace/defaultdave` (terminal: `claude --agent portfolio-pm`).
 
 **Model and effort:** Sonnet, medium.
 
-**Prompt:** Remove any ADR 0001 amendment Dave struck (`docs/adr/0001-agent-workflow-and-merge-rule.md`; the drafts are in place), change the `senior/` worktree line in `.claude/agents/portfolio-pm.md` to `unit/<unit-id>-<slug>` if amendment 1 stands, set the ADR Status to Accepted with the date, log it in `DECISIONS.md`, and add a dated Amendment section to issue #5 for any criterion the amendments change (branch pattern, bypass mode, bookkeeping paths, sandbox, required security checks). Then start `merge-desk` (#5) as a background `senior` subagent per the orchestrator rule. Don't commit.
+**Prompt:** Check the `merge-desk` (#5) work on branch `unit/merge-desk` in `.claude/worktrees/merge-desk`: run format:check, lint, typecheck, test, build and knip there, compare the files touched with #5's `in_scope_globs`, and check each criterion, including the 2026-11-06 Amendment section, against the diff. Then give Dave the push and PR commands (it merges by his bypass) and his console steps from `scripts/merge-desk/`: ruleset, "Allow auto-merge", `settings.local.json`, dry run. Don't commit.
 
 **Swarm (standing call, DECISIONS 2026-11-06: start it the moment the gates hold, no ask):** the five `page-*` units go out as one `senior` subagent each, in their own worktrees, only after `scaffold`, `merge-desk` and `cms` are merged, the design is signed off, the ruleset requires the CI and agent checks, and the merge-desk dry run has passed. Each pushes and opens its PR through `scripts/merge-desk/agent-git.ts` as the App; reviewers post verdicts with `post-check.ts`.

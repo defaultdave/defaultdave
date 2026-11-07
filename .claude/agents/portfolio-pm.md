@@ -58,7 +58,7 @@ Run order: preflight, design, keystatic-spike in parallel; scaffold; merge-desk 
 
 Standing call (Dave, 2026-11-06): start fan-out work the moment its gates hold, without asking. Check the gates at every session start and after every merge; when they hold, start one `senior` per ready issue in its own worktree and tell Dave which started. Pushes, merges and approvals stay his.
 
-One orchestrator chat (Dave, 2026-11-06): this PM chat stays open as the hub. Run `/senior` work as a background `senior` subagent from here (the `/senior` skill's steps: worktree at `.claude/worktrees/<slug>` on branch `senior/<n>-<slug>`, scope manifest, the agent, then the quality gates run here), not as separate sessions. Check each result against its issue and report to Dave in the chat.
+One orchestrator chat (Dave, 2026-11-06): this PM chat stays open as the hub. Run `/senior` work as a background `senior` subagent from here (the `/senior` skill's steps: worktree at `.claude/worktrees/<slug>` on branch `unit/<unit-id>-<slug>` (ADR 0001 rule 3), scope manifest, the agent, then the quality gates run here), not as separate sessions. Check each result against its issue and report to Dave in the chat.
 
 Every build prompt carries the issue's scope manifest. Model tiering: Sonnet for implementation and QA, Haiku for narrow checks, Opus only for a design call or an estimate in its own chat.
 

@@ -1,6 +1,6 @@
 # ADR 0001: Agent workflow and merge rule
 
-- **Status:** Proposed 2026-11-06 by the planning session; amended draft 2026-11-06 by portfolio-pm after review (eight amendments, listed at the end). Dave accepts or amends before the `merge-desk` unit creates the ruleset.
+- **Status:** Accepted 2026-11-06 by Dave, with all eight amendments from the portfolio-pm review (listed at the end). Proposed 2026-11-06 by the planning session.
 - **Depends on:** `docs/plan/plan-report.md` (routes), `.claude/standards/stack-decisions.md`
 - **Model:** Ramble ADR 0010 and its merge-desk runbook, with the second tier removed.
 
@@ -43,9 +43,9 @@ The plan routes eight units to agent fan-out and the rest to Dave. Dave wants th
 - **Ramble's tokens are not restricted yet** (DECISIONS 2026-11-06), and the agent checks here are pinned to the shared App id, so a Ramble agent could post a passing check on a portfolio PR. Restricting Ramble's `app-token.ts` to `defaultdave/ramble` is a precondition for closing the approval window here.
 - The merge-desk commands run outside the sandbox. Their own refusals (branch names, no `main`, no `--admin`) are the only guard on them, which is why they are the only commands excluded.
 
-## Amendments (draft 2026-11-06, portfolio-pm review; Dave accepts or strikes each)
+## Amendments (accepted 2026-11-06, from the portfolio-pm review)
 
-1. **Branch names** (rule 3, new): one pattern for agent branches; PM worktrees move from `senior/<n>-<slug>` to `unit/<unit-id>-<slug>`. Without it `agent-git.ts` refuses the push and `scope-manifest` fails every PR. On acceptance, the worktree line in `.claude/agents/portfolio-pm.md` changes to match.
+1. **Branch names** (rule 3, new): one pattern for agent branches; PM worktrees move from `senior/<n>-<slug>` to `unit/<unit-id>-<slug>`. Without it `agent-git.ts` refuses the push and `scope-manifest` fails every PR. The worktree line in `.claude/agents/portfolio-pm.md` changed to match.
 2. **Bookkeeping PRs and the agent checks** (rule 6, new): bookkeeping-only PRs get "not applicable" agent checks, because the four required agent checks have nothing to judge in a STATUS edit.
 3. **Bypass mode `always`** (rule 9): issue #5 named `pull_request`, which ends Dave's direct pushes to `main`.
 4. **PM paths in the bookkeeping list** (rule 8): the PM's public memory and the planned calibration of `plan.json` and `plan-report.md` were protected with no exception.
@@ -54,4 +54,4 @@ The plan routes eight units to agent fan-out and the rest to Dave. Dave wants th
 7. **Who posts which check** (rule 5, new): `/review-pr` verdicts map to check names through `post-check.ts`; `/review-swarm` is advisory.
 8. **Shared-App spoofing** (Consequences, rule 7): any holder of an App token can post a passing check; Ramble's tokens must be restricted before the approval window closes. Also notes the "Allow auto-merge" repo setting.
 
-Issue #5 gets a dated Amendment section on acceptance for the branch pattern, bypass mode, bookkeeping paths, sandbox exclusion, the required security checks, and the bookkeeping "not applicable" posting in `post-check.ts`.
+Issue #5 carries a dated Amendment section (2026-11-06) for the branch pattern, bypass mode, bookkeeping paths, sandbox exclusion, the required security checks, and the bookkeeping "not applicable" posting in `post-check.ts`.

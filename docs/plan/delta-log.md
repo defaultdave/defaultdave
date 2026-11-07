@@ -89,6 +89,7 @@ One row per milestone, after updating `plan.json` and running the script again.
 | Date | Milestone | Remaining range (weeks) | Owner-time weeks | What changed |
 |---|---|---|---|---|
 | 2026-11-06 | 0 Designed (scope change, not a milestone) | 1.7 to 2.2 (unchanged) | 2.4 (unchanged) | `preflight` split after its dry run: rows that need code or a running app moved to `cms` (Keystatic App and secrets, new criterion), `scaffold` (Vercel project, local and preview rows), `merge-desk` (ruleset, agent access) and `seo-perf` (analytics). Tickets 01 and 07 and `plan.json` notes updated; estimates and routes unchanged, report rerun with no change |
+| 2026-11-06 | 1 Walkable (scope change, not a milestone) | 1.7 to 2.2 (unchanged) | 2.4 (unchanged) | ADR 0001 accepted with eight amendments; issue #5 amended (branch pattern, bypass mode `always`, wider bookkeeping paths, bookkeeping "not applicable" checks in `post-check.ts`, sandbox exclusion, CodeQL, Gitleaks and OSV required). Small additions inside the existing scripts; `merge-desk` estimate and `plan.json` unchanged |
 | 2026-11-06 | 0 Designed (scope change, not a milestone) | 1.7 to 2.2 (unchanged) | 2.4 (unchanged) | One shared agents App instead of a new one: tickets 01 and 05 reworded, `merge-desk` gains a repo-restricted token criterion; ADR 0001 (still Proposed) amended. Estimates unchanged |
 
 ## Read-back
