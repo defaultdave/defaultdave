@@ -1,0 +1,69 @@
+.prose {
+  max-inline-size: var(--layout-measure);
+}
+
+.prose > * {
+  margin-block: 0;
+}
+
+.prose > * + * {
+  margin-block-start: var(--space-5);
+}
+
+.prose > h2 {
+  margin-block-start: var(--space-8);
+}
+
+.prose > h3 {
+  margin-block-start: var(--space-7);
+}
+
+.prose > h2 + *,
+.prose > h3 + * {
+  margin-block-start: var(--space-3);
+}
+
+.prose a {
+  color: var(--color-accent);
+  text-underline-offset: 0.2em;
+}
+
+.prose ul,
+.prose ol {
+  padding-inline-start: var(--space-6);
+}
+
+.prose li + li {
+  margin-block-start: var(--space-2);
+}
+
+.prose blockquote {
+  padding-inline-start: var(--space-5);
+  border-inline-start: 4px solid var(--color-accent);
+  color: var(--color-muted);
+}
+
+.prose :not(pre) > code {
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  outline: 1px solid var(--color-border);
+}
+
+.prose pre {
+  padding: var(--space-4);
+  overflow-x: auto;
+  border: var(--effect-outline);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+}
+
+.prose img {
+  max-inline-size: 100%;
+  block-size: auto;
+}
+
+.prose hr {
+  border: 0;
+  border-block-start: var(--effect-outline);
+}

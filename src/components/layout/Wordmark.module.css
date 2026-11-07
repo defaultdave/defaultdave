@@ -1,0 +1,66 @@
+.wordmark {
+  --wordmark-1: #c2367f;
+  --wordmark-2: #0e7c6e;
+  --wordmark-3: #b5520f;
+  --wordmark-4: #1f6fb8;
+  --wordmark-5: #3949c9;
+
+  display: inline-block;
+  font-size: 1.875rem;
+  line-height: 1.2;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  text-decoration: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .wordmark {
+    --wordmark-1: #ff6fb5;
+    --wordmark-2: #3cc8b4;
+    --wordmark-3: #ff8a3d;
+    --wordmark-4: #5bb8ff;
+    --wordmark-5: #ffd84d;
+  }
+}
+
+@media (width < 640px) {
+  .wordmark {
+    font-size: 1.625rem;
+  }
+}
+
+.letter {
+  display: inline-block;
+  transition: transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.letter[data-colour="0"] {
+  color: var(--wordmark-1);
+  transform: rotate(-3deg);
+}
+.letter[data-colour="1"] {
+  color: var(--wordmark-2);
+  transform: rotate(2deg);
+}
+.letter[data-colour="2"] {
+  color: var(--wordmark-3);
+  transform: rotate(-2deg);
+}
+.letter[data-colour="3"] {
+  color: var(--wordmark-4);
+  transform: rotate(3deg);
+}
+.letter[data-colour="4"] {
+  color: var(--wordmark-5);
+  transform: rotate(-1deg);
+}
+
+.wordmark:hover .letter {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .letter {
+    transition: none;
+  }
+}

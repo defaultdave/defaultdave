@@ -48,3 +48,13 @@ pre {
   font-size: var(--type-mono-size);
   line-height: var(--type-mono-line);
 }
+
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* The skip link moves focus here; the whole region is not a control. */
+main[tabindex="-1"]:focus {
+  outline: none;
+}
