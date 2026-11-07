@@ -2,7 +2,7 @@
 
 Current state only. History is in `DECISIONS.md` and `delta-log.md`. Kept under 25 KB by `scripts/pm.sh check`.
 
-Updated 2026-11-06 by portfolio-pm (Opus 5.5), merge-desk PR #25 merged. GitHub repo: `defaultdave/defaultdave`, public; issues #1 to #21 are the tickets (no local copies; DECISIONS 2026-11-06), #1, #2 and #4 closed. Project board: [#20](https://github.com/users/defaultdave/projects/20), all 21 issues added; Route and Milestone fields not set up yet. Domain: `davidfleming.me` bought; Vercel project `defaultdave` live, domain not attached yet. Plan: 21 units; owner time 72 h, 2.4 weeks at 30 h/wk, accepted as a measurement.
+Updated 2026-11-07 by portfolio-pm (Opus 5.5), merge-desk dry run passed, `shell` started. GitHub repo: `defaultdave/defaultdave`, public; issues #1 to #21 are the tickets (no local copies; DECISIONS 2026-11-06), #1, #2 and #4 closed. Project board: [#20](https://github.com/users/defaultdave/projects/20), all 21 issues added; Route and Milestone fields not set up yet. Domain: `davidfleming.me` bought; Vercel project `defaultdave` live, domain not attached yet. Plan: 21 units; owner time 72 h, 2.4 weeks at 30 h/wk, accepted as a measurement.
 
 MILESTONE: 1 Walkable (exit: Home, the Work list and the ResortPass case study live at davidfleming.me). 0 Designed reached 2026-11-06
 
@@ -16,8 +16,8 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 | `design` | done | human only | | #2 | | | signed off 2026-11-06 on the artifact (v21); Figma dropped |
 | `keystatic-spike` | todo | human only | | #3 | | Dave | session card proposed 2026-11-06 |
 | `scaffold` | done | human-led | 2 | #4 | #22 | | merged 2026-11-06 (348b25e); production deploy green; Dave attaches `davidfleming.me` in Vercel; `minimatch` advisory ignored until 2027-01-06 (#23); Node 26 merged (#24) |
-| `merge-desk` | in progress | human-led | | #5 | #25 | Dave | PR #25 merged by bypass (cd32061); #5 reopened for the console criteria; OSV check fixed to `scan-pr / osv-scan` (1ddd499); auto-merge on; ruleset 26745949 created and read back; settings applied; dry run started (`push main` refused); rest of the dry run next |
-| `shell` | todo | agent fan-out | | #6 | | | after scaffold and merge-desk; builds to the artifact, now carries Storybook |
+| `merge-desk` | in progress | human-led | | #5 | #25 | PM | dry run passed (DECISIONS 2026-11-06; PRs #26 merged, #27 blocked, #28 revert opened); #5 criteria all ticked except Ramble tokens (not this unit's); close #5 after the Actuals row |
+| `shell` | in progress | agent fan-out | 1 | #6 | | senior | started 2026-11-07 in `.claude/worktrees/shell` on `unit/shell-tokens`; round 1 is `tokens.css` and the type scale only, then Dave approves the tokens before primitives |
 | `cms` | todo | human-led | | #7 | | | after scaffold and the spike; now also creates the Keystatic GitHub App |
 | `page-home` | todo | agent fan-out | | #8 | | | swarm, after shell + cms |
 | `page-work` | todo | agent fan-out | | #9 | | | swarm |
@@ -37,7 +37,7 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 ## Blocked on Dave
 
 1. Attach `davidfleming.me` in the Vercel project's Domains.
-2. `merge-desk`: the rest of the dry run (README steps 1 to 4 done; `push main` refused) (unblocks `shell` and every fan-out unit).
+2. Close dry-run PRs #27 and #28 unmerged (merging #28 would undo #26) (clears the review queue).
 3. Decide: which Bandcamp releases, and any release notes (unblocks `content-music`).
 4. Decide: can ResortPass be named, or anonymized as in the CrUX article (unblocks publishing `content-work`).
 5. Headshot and bio, or text-only About (unblocks `content-home-about`).
@@ -45,16 +45,16 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 
 ## Next
 
-Dave runs the merge-desk console steps (item 2), finishing the dry run. Dave attaches the domain (item 1) meanwhile. `keystatic-spike` (#3) can run beside it.
+`shell` round 1 builds `tokens.css` and the type scale; Dave approves the tokens before primitives. Dave closes #27 and #28 (item 2) and attaches the domain (item 1) meanwhile. `keystatic-spike` (#3) can run beside it; `cms` and the page swarm wait on it.
 
 ## Next chat
 
-**Before you start:** commit and push the bookkeeping to `main`.
+**Before you start:** commit and push the bookkeeping to `main`. Close PRs #27 and #28 unmerged.
 
 **Run:** `/portfolio-pm` in `~/Workspace/defaultdave` (terminal: `claude --agent portfolio-pm`).
 
 **Model and effort:** Sonnet, medium.
 
-**Prompt:** `merge-desk` (#5) is merged (PR #25, cd32061); #5 is reopened for its console criteria. Auto-merge is on and ruleset 26745949 is live. Walk Dave through `scripts/merge-desk/README.md` step 4 (`settings.local.json`), read it back, tick #5's remaining criteria, and run the dry run from criterion 9 with him, recording it in `DECISIONS.md`. Don't commit.
+**Prompt:** The `merge-desk` dry run passed (DECISIONS 2026-11-06), and every criterion on #5 is ticked except Ramble tokens, which is not this unit's. Close `merge-desk`: write its Actuals row in `docs/plan/delta-log.md` (rounds from PR #25's check runs; owner minutes from Dave's message timestamps in this project's transcripts plus `scripts/track.sh sum merge-desk`), close #5, and move its board card to Done. Then pick up `shell` (#6) round 1 in `.claude/worktrees/shell`: check the diff against #6's `in_scope_globs`, run the quality gates, and bring `tokens.css` and the type scale to Dave for the token approval. Don't commit.
 
 **Swarm (standing call, DECISIONS 2026-11-06: start it the moment the gates hold, no ask):** the five `page-*` units go out as one `senior` subagent each, in their own worktrees, only after `scaffold`, `merge-desk` and `cms` are merged, the design is signed off, the ruleset requires the CI and agent checks, and the merge-desk dry run has passed. Each pushes and opens its PR through `scripts/merge-desk/agent-git.ts` as the App; reviewers post verdicts with `post-check.ts`.
