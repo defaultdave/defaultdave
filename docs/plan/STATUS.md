@@ -2,7 +2,7 @@
 
 Current state only. History is in `DECISIONS.md` and `delta-log.md`. Kept under 25 KB by `scripts/pm.sh check`.
 
-Updated 2026-11-07 by portfolio-pm (Opus 5.5), merge-desk dry run passed, `shell` round 1 in review (#29). GitHub repo: `defaultdave/defaultdave`, public; issues #1 to #21 are the tickets (no local copies; DECISIONS 2026-11-06), #1, #2 and #4 closed. Project board: [#20](https://github.com/users/defaultdave/projects/20), all 21 issues added; Route and Milestone fields not set up yet. Domain: `davidfleming.me` bought; Vercel project `defaultdave` live, domain not attached yet. Plan: 21 units; owner time 72 h, 2.4 weeks at 30 h/wk, accepted as a measurement.
+Updated 2026-11-07 by portfolio-pm (Opus 5.5), merge-desk dry run passed, `shell` round 1 merged (#29). GitHub repo: `defaultdave/defaultdave`, public; issues #1 to #21 are the tickets (no local copies; DECISIONS 2026-11-06), #1, #2 and #4 closed. Project board: [#20](https://github.com/users/defaultdave/projects/20), all 21 issues added; Route and Milestone fields not set up yet. Domain: `davidfleming.me` bought; Vercel project `defaultdave` live, domain not attached yet. Plan: 21 units; owner time 72 h, 2.4 weeks at 30 h/wk, accepted as a measurement.
 
 MILESTONE: 1 Walkable (exit: Home, the Work list and the ResortPass case study live at davidfleming.me). 0 Designed reached 2026-11-06
 
@@ -17,7 +17,7 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 | `keystatic-spike` | todo | human only | | #3 | | Dave | session card proposed 2026-11-06 |
 | `scaffold` | done | human-led | 2 | #4 | #22 | | merged 2026-11-06 (348b25e); production deploy green; Dave attaches `davidfleming.me` in Vercel; `minimatch` advisory ignored until 2027-01-06 (#23); Node 26 merged (#24) |
 | `merge-desk` | in progress | human-led | | #5 | #25 | PM | dry run passed (DECISIONS 2026-11-06; PRs #26 merged, #27 blocked, #28 revert opened, #27 and #28 closed unmerged 2026-11-07); #5 criteria all ticked except Ramble tokens (not this unit's); close #5 after the Actuals row |
-| `shell` | in review | agent fan-out | 2 | #6 | #29 | Dave | round 1 (tokens, type scale, noindex `/tokens` sample page; #6 amended 2026-11-07) on `unit/shell-tokens`; review 1 at 2e91bde failed spec-compliance and a11y-audit (DECISIONS 2026-11-07), review 2 at a4ee027 all four agent checks and CI green; auto-merge queued (squash); waits on Dave's re-approval; primitives are round 2 |
+| `shell` | in progress | agent fan-out | 2 | #6 | #29 | PM | round 1 (tokens, type scale, noindex `/tokens` sample page; #6 amended 2026-11-07) merged 2026-11-07 (64d9a4b) after review 1 at 2e91bde failed spec-compliance and a11y-audit (DECISIONS 2026-11-07) and review 2 at a4ee027 passed; round 2 (primitives) not started |
 | `cms` | todo | human-led | | #7 | | | after scaffold and the spike; now also creates the Keystatic GitHub App |
 | `page-home` | todo | agent fan-out | | #8 | | | swarm, after shell + cms |
 | `page-work` | todo | agent fan-out | | #9 | | | swarm |
@@ -44,11 +44,11 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 
 ## Next
 
-Dave re-approves PR #29 at a4ee027 (check `/tokens` dark borders on the new preview); auto-merge then lands it. Dave attaches the domain (item 1) meanwhile. `keystatic-spike` (#3) can run beside it.
+New chat: close `merge-desk`, then start `shell` round 2 (prompt below). Dave attaches the domain (item 1) meanwhile. `keystatic-spike` (#3) can run beside it.
 
 ## Next chat
 
-**Before you start:** commit and push the bookkeeping to `main`; PR #29 merged.
+**Before you start:** commit and push the bookkeeping to `main`.
 
 **Run:** `/portfolio-pm` in `~/Workspace/defaultdave` (terminal: `claude --agent portfolio-pm`).
 
