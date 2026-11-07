@@ -52,7 +52,7 @@ Next.js App Router on Vercel, with Keystatic as a git-based CMS and MDX content.
 - TypeScript with `strict` and `exactOptionalPropertyTypes`
 - ESLint with typescript-eslint `strict-type-checked`, Prettier, Knip
 - Vitest for unit tests, Playwright with axe for the smoke test
-- pnpm (pinned in `packageManager`), Node 22 (`.nvmrc`)
+- pnpm (pinned in `packageManager`), Node 26 (`.nvmrc`)
 - GitHub Actions: CI gates, CodeQL, Gitleaks, OSV-Scanner; Dependabot weekly
 - Keystatic CMS and MDX content arrive in the `cms` unit
 
