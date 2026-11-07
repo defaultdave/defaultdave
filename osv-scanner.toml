@@ -1,0 +1,16 @@
+# OSV-Scanner config. Each ignore carries a reason and a review date; the scan reports it again after that date.
+
+# minimatch 10.2.6, pulled in only by @typescript-eslint/typescript-estree (dev dependency, lint time).
+# The fix is in minimatch 11.0.1, but typescript-eslint 8.72.1 requires ^10.2.2 and loads it with
+# require(), while 11 is ESM-only. Its only use here is matching allowDefaultProject globs from our
+# own ESLint config, so no outside input reaches it, and it never ships to the site.
+# Drop these entries when typescript-eslint moves to minimatch 11 (Dependabot opens that PR).
+[[IgnoredVulns]]
+id = "GHSA-g3hv-75wg-m249"
+ignoreUntil = 2027-01-06T00:00:00Z
+reason = "Dev-only, through typescript-eslint; patterns come from our own lint config; no 10.x fix and 11 is ESM-only. Review 2027-01-06."
+
+[[IgnoredVulns]]
+id = "CVE-2026-118764"
+ignoreUntil = 2027-01-06T00:00:00Z
+reason = "Alias of GHSA-g3hv-75wg-m249; same reason. Review 2027-01-06."
