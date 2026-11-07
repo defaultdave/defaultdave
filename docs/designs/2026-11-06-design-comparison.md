@@ -3,7 +3,10 @@
 Unit `design` (issue defaultdave/defaultdave#2). Signed off by Dave on 2026-11-06.
 
 - **Claude Design artifact:** https://claude.ai/artifact/8Npi9s5Yboe47QzQ7vrJDP (version 21). The explorer board has switches for every option below.
-- **Figma file:** on hold at Dave's request. The artifact is the source of truth until a Figma file exists. If one is made later, it copies the artifact and uses the same token names.
+- **Figma file:** dropped by Dave on 2026-11-06.
+  - Why: Figma costs money and needs an MCP server. It would be a second source of truth to keep in sync, and no designer is editing by hand.
+  - Instead: the artifact is the design record. In code, `tokens.css` is the source of truth for tokens and Storybook for components and their states.
+  - Revisit: if a designer or client needs to edit outside code.
 
 ## How we got here
 
