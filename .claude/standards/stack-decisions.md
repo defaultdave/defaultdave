@@ -9,7 +9,7 @@ Project copy for `defaultdave` (davidfleming.me), filled by `plan-project` on 20
 | Framework and version | Next.js, latest stable at setup (16.x on 2026-11-06; confirm in `preflight`), App Router only |
 | React version | 19, the version Next.js pins |
 | Package manager (SET-14, SET-16) | pnpm, with `packageManager` pinned in `package.json` |
-| Node version (`engines`) | 22 LTS, matching Vercel's default |
+| Node version (`engines`) | 26 LTS, matching Vercel's default (moved from 22 on 2026-11-06; 22 reaches end of life in April 2027) |
 | Hosting and deploy target | Vercel Hobby, Git integration from `defaultdave/defaultdave`, production on `main`, previews per PR |
 | Backend contract (REST, GraphQL, RPC) and who owns it | None. Content is MDX and YAML in `content/`, read at build time through Keystatic's reader. No runtime API |
 | Web only, or web and mobile | Web only, responsive |
