@@ -15,16 +15,10 @@ import {
   openSync,
   readFileSync,
   realpathSync,
+  statSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
-import {
-  basename,
-  dirname,
-  isAbsolute,
-  relative,
-  resolve,
-  sep,
-} from "node:path";
+import { dirname, isAbsolute, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 // @ts-expect-error TS5097: Node needs the .ts extension, and the root tsconfig does not allow it
 import { mintToken } from "./app-token.ts";
@@ -52,6 +46,8 @@ export interface Deps {
     input?: Buffer,
   ) => RunResult;
   currentBranch: () => string;
+  /** Test seam: runs between opening the body file and resolving its path. */
+  afterOpen?: () => void;
   /** The repo root as derived from this script's own location, never from git or the cwd. */
   repoRoot: () => string;
 }
@@ -223,7 +219,7 @@ function isInside(root: string, file: string): boolean {
 
 function realOrNull(path: string): string | null {
   try {
-    return realpathSync(path);
+    return realpathSync.native(path);
   } catch {
     return null;
   }
@@ -236,17 +232,18 @@ export function scriptRoot(moduleUrl: string): string {
 
 const SECRET_SEGMENTS = new Set([".ssh", ".aws", ".gnupg"]);
 
-/** Mirrors the sandbox read-deny list: names that hold credentials. */
+/** Mirrors the sandbox read-deny list, compared case-insensitively (APFS is): names that hold credentials. */
 function isSecretPath(real: string): boolean {
-  const name = basename(real);
-  if (real.split(sep).some((segment) => SECRET_SEGMENTS.has(segment)))
-    return true;
+  const segments = real.toLowerCase().split(sep);
+  const name = segments[segments.length - 1] ?? "";
+  if (segments.some((segment) => SECRET_SEGMENTS.has(segment))) return true;
   if (name === ".env.example" || name === ".env.sample") return false;
   return (
     name === ".env" ||
     name.startsWith(".env.") ||
     /\.(pem|key|p12|pfx)$/.test(name) ||
     name === "credentials.json" ||
+    name === "credentials" ||
     name.startsWith(".secret") ||
     name.startsWith("id_rsa") ||
     name.startsWith("id_ed25519")
@@ -255,9 +252,18 @@ function isSecretPath(real: string): boolean {
 
 /**
  * A body file is public text. This command is pre-allowed and sandbox-excluded, so it must not be a way
- * to post an arbitrary file. The path is checked, then opened once (no symlink followed) and the bytes
- * are read from that descriptor; the caller sends those bytes on stdin, never the path, so the file
- * cannot change between the check and the send.
+ * to post an arbitrary file. What is guaranteed:
+ *  - the file is opened once, without following a symlink in the last component, and the bytes are read
+ *    from that descriptor, so later changes to the file cannot alter what is sent;
+ *  - the descriptor is a regular, non-empty file with a single link (a hard-linked file is refused);
+ *  - the path's on-disk (native) realpath is inside the repo root or the temp directory, is not a
+ *    credential-style name (case-insensitive), and still names the same device and inode as the
+ *    descriptor, so a path or parent directory swapped after the open is refused;
+ *  - the content has no private key marker (case-insensitive).
+ * The caller sends those bytes on stdin (`--body-file -`); gh never receives the path.
+ * Not guaranteed: the root check is on the path as it resolves at check time, so a file that is moved
+ * into the roots by hard link or rename after being opened is only caught by the single-link and
+ * inode checks above.
  */
 export function readBodyFile(bodyFile: string, deps: Deps): Buffer {
   let info;
@@ -268,20 +274,9 @@ export function readBodyFile(bodyFile: string, deps: Deps): Buffer {
   }
   if (info.isSymbolicLink())
     throw new Refused("refused: body file is a symbolic link");
-  const real = realpathSync(bodyFile);
-  const roots = [deps.repoRoot(), tmpdir(), process.env.TMPDIR ?? ""]
-    .filter(Boolean)
-    .map(realOrNull)
-    .filter((root): root is string => root !== null);
-  if (!roots.some((root) => isInside(root, real)))
-    throw new Refused(
-      "refused: body file is outside the repo and the temp directory",
-    );
-  if (isSecretPath(real))
-    throw new Refused("refused: body file has a secret-file name");
   let fd: number;
   try {
-    fd = openSync(real, constants.O_RDONLY | constants.O_NOFOLLOW);
+    fd = openSync(bodyFile, constants.O_RDONLY | constants.O_NOFOLLOW);
   } catch {
     throw new Refused("refused: body file cannot be opened");
   }
@@ -289,10 +284,33 @@ export function readBodyFile(bodyFile: string, deps: Deps): Buffer {
     const stat = fstatSync(fd);
     if (!stat.isFile() || stat.size === 0)
       throw new Refused("refused: body file is not a non-empty regular file");
+    if (stat.nlink !== 1)
+      throw new Refused("refused: body file has more than one hard link");
+    deps.afterOpen?.();
+    let real: string;
+    let now;
+    try {
+      real = realpathSync.native(bodyFile);
+      now = statSync(real);
+    } catch {
+      throw new Refused("refused: body file path changed after it was opened");
+    }
+    const roots = [deps.repoRoot(), tmpdir(), process.env.TMPDIR ?? ""]
+      .filter(Boolean)
+      .map(realOrNull)
+      .filter((root): root is string => root !== null);
+    if (!roots.some((root) => isInside(root, real)))
+      throw new Refused(
+        "refused: body file is outside the repo and the temp directory",
+      );
+    if (isSecretPath(real))
+      throw new Refused("refused: body file has a secret-file name");
+    if (now.dev !== stat.dev || now.ino !== stat.ino)
+      throw new Refused("refused: body file path changed after it was opened");
     const bytes = readFileSync(fd);
     if (bytes.length === 0)
       throw new Refused("refused: body file is not a non-empty regular file");
-    if (bytes.includes("PRIVATE KEY"))
+    if (bytes.toString("latin1").toLowerCase().includes("private key"))
       throw new Refused("refused: body file contains a private key marker");
     return bytes;
   } finally {

@@ -1,7 +1,9 @@
 import {
+  linkSync,
   mkdirSync,
   mkdtempSync,
   realpathSync,
+  renameSync,
   rmSync,
   symlinkSync,
   writeFileSync,
@@ -400,6 +402,10 @@ describe("issue and PR body writes", () => {
     "id_rsa",
     "id_rsa.pub",
     "id_ed25519",
+    ".ENV",
+    "Key.PEM",
+    "credentials",
+    ".SSH/notes.md",
     ".ssh/notes.md",
     ".aws/notes.md",
     ".gnupg/notes.md",
@@ -408,11 +414,50 @@ describe("issue and PR body writes", () => {
     mkdirSync(join(file, ".."), { recursive: true });
     writeFileSync(file, "dummy\n");
     const { deps, calls } = fakeDeps();
-    await expect(issueComment("12", file, deps)).rejects.toThrow(
-      "refused: body file has a secret-file name",
+    await expect(issueComment("12", file, deps)).rejects.toBeInstanceOf(
+      Refused,
     );
     expect(calls).toHaveLength(0);
   });
+
+  it("names the secret-file reason", async () => {
+    const file = join(dir, "credentials");
+    const { deps } = fakeDeps();
+    await expect(issueComment("12", file, deps)).rejects.toThrow(
+      "refused: body file has a secret-file name",
+    );
+  });
+
+  it.each(writers)(
+    "$name refuses a hard-linked file",
+    async ({ name, call, target }) => {
+      const src = join(dir, `hl-src-${name}.md`);
+      writeFileSync(src, "hello\n");
+      linkSync(src, join(dir, `hl-copy-${name}.md`));
+      const { deps, calls } = fakeDeps();
+      await expect(call(target, src, deps)).rejects.toThrow(
+        "refused: body file has more than one hard link",
+      );
+      expect(calls).toHaveLength(0);
+    },
+  );
+
+  it.each(writers)(
+    "$name refuses a path swapped to another inode after the open",
+    async ({ name, call, target }) => {
+      const file = join(dir, `inode-${name}.md`);
+      writeFileSync(file, "original\n");
+      const { deps, calls } = fakeDeps();
+      deps.afterOpen = () => {
+        renameSync(file, `${file}.moved`);
+        writeFileSync(file, "replacement\n");
+      };
+      await expect(call(target, file, deps)).rejects.toThrow(
+        "refused: body file path changed after it was opened",
+      );
+      expect(calls).toHaveLength(0);
+    },
+  );
 
   it.each([".env.example", ".env.sample"])("accepts %s", async (name) => {
     const file = join(dir, name);
