@@ -5,3 +5,16 @@
 !.env.example
 node_modules/
 .next/
+
+# next.js
+/out/
+next-env.d.ts
+*.tsbuildinfo
+
+# testing
+/coverage
+/playwright-report/
+/test-results/
+
+# vercel
+.vercel
