@@ -3,7 +3,11 @@
 //   node scripts/merge-desk/agent-git.ts pr <base> <title> <body-file>
 //   node scripts/merge-desk/agent-git.ts automerge <pr number or branch>
 //   node scripts/merge-desk/agent-git.ts review <pr number or branch>
+//   node scripts/merge-desk/agent-git.ts issue-comment <issue number> <body-file>
+//   node scripts/merge-desk/agent-git.ts issue-body <issue number> <body-file>   (replaces the body)
+//   node scripts/merge-desk/agent-git.ts pr-body <pr number or branch> <body-file>   (replaces the body)
 import { spawnSync } from "node:child_process";
+import { statSync } from "node:fs";
 // @ts-expect-error TS5097: Node needs the .ts extension, and the root tsconfig does not allow it
 import { mintToken } from "./app-token.ts";
 
@@ -178,6 +182,82 @@ export async function review(target: string, deps: Deps): Promise<void> {
   );
 }
 
+function assertIssueNumber(issue: string): void {
+  if (!/^[1-9][0-9]*$/.test(issue))
+    throw new Refused(`refused: ${issue} is not a positive issue number`);
+}
+
+function assertBodyFile(bodyFile: string): void {
+  let size = 0;
+  try {
+    const stat = statSync(bodyFile);
+    size = stat.isFile() ? stat.size : 0;
+  } catch {
+    size = 0;
+  }
+  if (size === 0) throw new Refused(`refused: ${bodyFile} is missing or empty`);
+}
+
+/** Posts a comment on an issue as the App. */
+export async function issueComment(
+  issue: string,
+  bodyFile: string,
+  deps: Deps,
+): Promise<void> {
+  assertIssueNumber(issue);
+  assertBodyFile(bodyFile);
+  must(
+    deps.run(
+      [
+        "gh",
+        "issue",
+        "comment",
+        issue,
+        "--repo",
+        REPO,
+        "--body-file",
+        bodyFile,
+      ],
+      { GH_TOKEN: await deps.token() },
+    ),
+    "gh issue comment",
+  );
+}
+
+/** Replaces an issue body as the App (ticking criteria, adding Amendment sections). */
+export async function issueBody(
+  issue: string,
+  bodyFile: string,
+  deps: Deps,
+): Promise<void> {
+  assertIssueNumber(issue);
+  assertBodyFile(bodyFile);
+  must(
+    deps.run(
+      ["gh", "issue", "edit", issue, "--repo", REPO, "--body-file", bodyFile],
+      { GH_TOKEN: await deps.token() },
+    ),
+    "gh issue edit",
+  );
+}
+
+/** Replaces a PR body as the App. */
+export async function prBody(
+  target: string,
+  bodyFile: string,
+  deps: Deps,
+): Promise<void> {
+  assertTarget(target);
+  assertBodyFile(bodyFile);
+  must(
+    deps.run(
+      ["gh", "pr", "edit", target, "--repo", REPO, "--body-file", bodyFile],
+      { GH_TOKEN: await deps.token() },
+    ),
+    "gh pr edit",
+  );
+}
+
 function realDeps(): Deps {
   let cached: Promise<string> | null = null;
   const spawn = (command: string[], env: Record<string, string>): RunResult => {
@@ -214,9 +294,15 @@ if (import.meta.main) {
       await automerge(args[0] ?? "", deps);
     else if (command === "review" && args.length === 1)
       await review(args[0] ?? "", deps);
+    else if (command === "issue-comment" && args.length === 2)
+      await issueComment(args[0] ?? "", args[1] ?? "", deps);
+    else if (command === "issue-body" && args.length === 2)
+      await issueBody(args[0] ?? "", args[1] ?? "", deps);
+    else if (command === "pr-body" && args.length === 2)
+      await prBody(args[0] ?? "", args[1] ?? "", deps);
     else {
       throw new Error(
-        "usage: agent-git.ts push <branch> | pr <base> <title> <body-file> | automerge <pr or branch> | review <pr or branch>",
+        "usage: agent-git.ts push <branch> | pr <base> <title> <body-file> | automerge <pr or branch> | review <pr or branch> | issue-comment <issue> <body-file> | issue-body <issue> <body-file> | pr-body <pr or branch> <body-file>",
       );
     }
   } catch (error) {

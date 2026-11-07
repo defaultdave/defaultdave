@@ -1,9 +1,15 @@
-import { describe, expect, it } from "vitest";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { afterAll, describe, expect, it } from "vitest";
 import {
   automerge,
   type Deps,
   gitAuthEnv,
+  issueBody,
+  issueComment,
   pr,
+  prBody,
   push,
   Refused,
   review,
@@ -220,4 +226,99 @@ describe("review", () => {
     );
     expect(calls).toHaveLength(0);
   });
+});
+
+describe("issue and PR body writes", () => {
+  const dir = mkdtempSync(join(tmpdir(), "agent-git-"));
+  const body = join(dir, "body.md");
+  const empty = join(dir, "empty.md");
+  writeFileSync(body, "hello\n");
+  writeFileSync(empty, "");
+  afterAll(() => {
+    rmSync(dir, { recursive: true, force: true });
+  });
+
+  const writers = [
+    {
+      name: "issueComment",
+      call: issueComment,
+      target: "12",
+      expected: ["gh", "issue", "comment", "12"],
+    },
+    {
+      name: "issueBody",
+      call: issueBody,
+      target: "12",
+      expected: ["gh", "issue", "edit", "12"],
+    },
+    {
+      name: "prBody",
+      call: prBody,
+      target: "42",
+      expected: ["gh", "pr", "edit", "42"],
+    },
+  ];
+
+  it.each(writers)(
+    "$name builds the gh command with the App token in the environment",
+    async ({ call, target, expected }) => {
+      const { deps, calls } = fakeDeps();
+      await call(target, body, deps);
+      expect(calls).toHaveLength(1);
+      expect(calls[0]?.command).toEqual([
+        ...expected,
+        "--repo",
+        "defaultdave/defaultdave",
+        "--body-file",
+        body,
+      ]);
+      expect(calls[0]?.command.join(" ")).not.toContain("ghs_fake");
+      expect(calls[0]?.env.GH_TOKEN).toBe("ghs_fake");
+    },
+  );
+
+  it.each(["0", "-1", "1.5", "abc", "12 ", "--repo", ""])(
+    "issue commands refuse the issue number %p",
+    async (issue) => {
+      const { deps, calls } = fakeDeps();
+      await expect(issueComment(issue, body, deps)).rejects.toBeInstanceOf(
+        Refused,
+      );
+      await expect(issueBody(issue, body, deps)).rejects.toBeInstanceOf(
+        Refused,
+      );
+      expect(calls).toHaveLength(0);
+    },
+  );
+
+  it("pr-body refuses a flag-like target", async () => {
+    const { deps, calls } = fakeDeps();
+    await expect(prBody("--web", body, deps)).rejects.toBeInstanceOf(Refused);
+    expect(calls).toHaveLength(0);
+  });
+
+  it.each([
+    ["a missing file", join(dir, "nope.md")],
+    ["an empty file", empty],
+    ["a directory", dir],
+  ])("refuses %s as the body file", async (_label, file) => {
+    const { deps, calls } = fakeDeps();
+    await expect(issueComment("12", file, deps)).rejects.toBeInstanceOf(
+      Refused,
+    );
+    await expect(issueBody("12", file, deps)).rejects.toBeInstanceOf(Refused);
+    await expect(prBody("42", file, deps)).rejects.toBeInstanceOf(Refused);
+    expect(calls).toHaveLength(0);
+  });
+
+  it.each(writers)(
+    "$name propagates a failing gh exit",
+    async ({ call, target }) => {
+      const { deps } = fakeDeps();
+      deps.run = () => ({ code: 1, stdout: "" });
+      await expect(call(target, body, deps)).rejects.toThrow(
+        /failed \(exit 1\)/,
+      );
+    },
+  );
 });
