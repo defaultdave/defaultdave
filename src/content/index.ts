@@ -31,7 +31,8 @@ function entryFile(
   ext = "mdx",
 ) {
   if (pathPattern === undefined) throw new Error("collection has no path");
-  const dir = slug === null ? pathPattern : pathPattern.replace("*", slug);
+  const dir =
+    slug === null ? pathPattern : pathPattern.replaceAll("*", () => slug);
   return `${dir.replace(/\/$/, "")}/index.${ext}`;
 }
 
