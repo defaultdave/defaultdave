@@ -8,6 +8,7 @@
 //   node scripts/merge-desk/agent-git.ts pr-body <pr number or branch> -   (replaces the body)
 import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
+import { isatty } from "node:tty";
 // @ts-expect-error TS5097: Node needs the .ts extension, and the root tsconfig does not allow it
 import { mintToken } from "./app-token.ts";
 
@@ -199,9 +200,9 @@ function assertIssueNumber(issue: string): void {
 export const STDIN_BODY = "-";
 
 /**
- * The body comes from this script's own stdin, so a caller writes `... - < body.md` or a heredoc and
- * this script opens no file. A path is refused, which keeps the pre-allowed command from posting
- * an arbitrary file.
+ * The body of issue-comment, issue-body and pr-body comes from this script's own stdin, so a caller
+ * writes `... - < body.md` or a heredoc and these commands open no file. A path is refused, so they
+ * cannot post an arbitrary file. (`pr` still hands a path to gh; that is outside this guarantee.)
  */
 export function readBody(arg: string, deps: Deps): Buffer {
   if (arg !== STDIN_BODY)
@@ -299,7 +300,8 @@ function realDeps(): Deps {
     currentBranch: () =>
       spawn(["git", "branch", "--show-current"], {}).stdout.trim(),
     stdin: () => readFileSync(0),
-    stdinIsTTY: () => process.stdin.isTTY,
+    // isatty(0), not process.stdin.isTTY: touching process.stdin puts a pipe in non-blocking mode and readFileSync(0) then fails with EAGAIN.
+    stdinIsTTY: () => isatty(0),
   };
 }
 

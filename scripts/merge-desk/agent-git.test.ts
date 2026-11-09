@@ -1,7 +1,7 @@
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
-import { afterAll, describe, expect, it } from "vitest";
+import { spawn } from "node:child_process";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { describe, expect, it } from "vitest";
 import {
   automerge,
   type Deps,
@@ -16,13 +16,6 @@ import {
   type RunResult,
 } from "./agent-git";
 
-const dir = mkdtempSync(join(tmpdir(), "agent-git-"));
-const body = join(dir, "body.md");
-writeFileSync(body, "hello\n");
-afterAll(() => {
-  rmSync(dir, { recursive: true, force: true });
-});
-
 const VIEW_OK = '{"headRefName":"unit/merge-desk","baseRefName":"main"}';
 const HTTPS = "https://github.com/defaultdave/defaultdave.git\n";
 
@@ -35,6 +28,7 @@ function fakeDeps(
     tty?: boolean;
   } = {},
 ) {
+  const reads = { stdin: 0 };
   const calls: {
     command: string[];
     env: Record<string, string>;
@@ -43,7 +37,10 @@ function fakeDeps(
   const deps: Deps = {
     token: () => Promise.resolve("ghs_fake"),
     currentBranch: () => options.branch ?? "unit/merge-desk",
-    stdin: () => Buffer.from(options.stdin ?? ""),
+    stdin: () => {
+      reads.stdin += 1;
+      return Buffer.from(options.stdin ?? "");
+    },
     stdinIsTTY: () => options.tty ?? false,
     run: (command, env, input): RunResult => {
       calls.push({ command, env, input });
@@ -53,7 +50,7 @@ function fakeDeps(
       return { code: 0, stdout: isView ? (options.view ?? VIEW_OK) : "" };
     },
   };
-  return { deps, calls };
+  return { deps, calls, reads };
 }
 
 describe("push", () => {
@@ -144,7 +141,7 @@ describe("push", () => {
 describe("pr", () => {
   it("opens from the current branch into main", async () => {
     const { deps, calls } = fakeDeps();
-    await pr("main", "merge-desk: scripts", body, deps);
+    await pr("main", "merge-desk: scripts", "/tmp/body.md", deps);
     expect(calls[0]?.command).toEqual([
       "gh",
       "pr",
@@ -158,20 +155,20 @@ describe("pr", () => {
       "--title",
       "merge-desk: scripts",
       "--body-file",
-      body,
+      "/tmp/body.md",
     ]);
     expect(calls[0]?.env.GH_TOKEN).toBe("ghs_fake");
   });
 
   it.each(["integration", "release", ""])("refuses base %p", async (base) => {
     const { deps, calls } = fakeDeps();
-    await expect(pr(base, "t", body, deps)).rejects.toBeInstanceOf(Refused);
+    await expect(pr(base, "t", "b", deps)).rejects.toBeInstanceOf(Refused);
     expect(calls).toHaveLength(0);
   });
 
   it.each(["main", "feature/x"])("refuses a head of %s", async (branch) => {
     const { deps, calls } = fakeDeps({ branch });
-    await expect(pr("main", "t", body, deps)).rejects.toBeInstanceOf(Refused);
+    await expect(pr("main", "t", "b", deps)).rejects.toBeInstanceOf(Refused);
     expect(calls).toHaveLength(0);
   });
 });
@@ -291,12 +288,13 @@ describe("issue and PR body writes", () => {
   it.each(writers)(
     "$name refuses a path argument and reads nothing",
     async ({ call, target }) => {
-      const { deps, calls } = fakeDeps({ stdin: "hello\n" });
+      const { deps, calls, reads } = fakeDeps({ stdin: "hello\n" });
       await expect(call(target, "body.md", deps)).rejects.toThrow(/stdin/);
       await expect(call(target, "/etc/hosts", deps)).rejects.toBeInstanceOf(
         Refused,
       );
       expect(calls).toHaveLength(0);
+      expect(reads.stdin).toBe(0);
     },
   );
 
@@ -336,5 +334,63 @@ describe("issue and PR body writes", () => {
     const { deps, calls } = fakeDeps({ stdin: "hello\n" });
     await expect(prBody("--web", "-", deps)).rejects.toBeInstanceOf(Refused);
     expect(calls).toHaveLength(0);
+  });
+});
+
+describe("agent-git.ts as a subprocess", () => {
+  const script = join(dirname(fileURLToPath(import.meta.url)), "agent-git.ts");
+  const DELAY_MS = 300;
+
+  /** Runs the real script with a missing app.conf, so a body that reads fine stops at the token mint with no network. */
+  function run(args: string[], chunks: string[], delayMs = 0) {
+    return new Promise<{ code: number | null; stderr: string }>((resolve) => {
+      const child = spawn(process.execPath, [script, ...args], {
+        env: { ...process.env, DEFAULTDAVE_APP_CONF: "/nonexistent/app.conf" },
+        stdio: ["pipe", "ignore", "pipe"],
+      });
+      let stderr = "";
+      child.stderr.on("data", (chunk: Buffer) => {
+        stderr += chunk.toString();
+      });
+      child.on("close", (code) => {
+        resolve({ code, stderr });
+      });
+      void (async () => {
+        for (const chunk of chunks) {
+          if (delayMs) await new Promise((r) => setTimeout(r, delayMs));
+          child.stdin.write(chunk);
+        }
+        child.stdin.end();
+      })();
+    });
+  }
+
+  it.each([
+    { name: "an immediate pipe", chunks: ["hello\n"], delayMs: 0 },
+    { name: "a slow pipe", chunks: ["a\n", "b\n"], delayMs: DELAY_MS },
+  ])(
+    "reads the body from $name without EAGAIN and goes on to the token mint",
+    async ({ chunks, delayMs }) => {
+      const { code, stderr } = await run(
+        ["issue-comment", "1", "-"],
+        chunks,
+        delayMs,
+      );
+      expect(stderr).not.toContain("EAGAIN");
+      expect(stderr).toContain("app.conf");
+      expect(code).toBe(1);
+    },
+  );
+
+  it("refuses an empty stdin with exit 2", async () => {
+    const { code, stderr } = await run(["issue-body", "1", "-"], []);
+    expect(code).toBe(2);
+    expect(stderr).toContain("empty");
+  });
+
+  it("refuses a path argument with exit 2", async () => {
+    const { code, stderr } = await run(["pr-body", "1", "body.md"], ["x\n"]);
+    expect(code).toBe(2);
+    expect(stderr).toContain("stdin");
   });
 });
