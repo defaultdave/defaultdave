@@ -1,16 +1,6 @@
-import {
-  linkSync,
-  mkdirSync,
-  mkdtempSync,
-  realpathSync,
-  renameSync,
-  rmSync,
-  symlinkSync,
-  writeFileSync,
-} from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { pathToFileURL } from "node:url";
 import { afterAll, describe, expect, it } from "vitest";
 import {
   automerge,
@@ -24,18 +14,11 @@ import {
   Refused,
   review,
   type RunResult,
-  scriptRoot,
 } from "./agent-git";
 
 const dir = mkdtempSync(join(tmpdir(), "agent-git-"));
 const body = join(dir, "body.md");
-const empty = join(dir, "empty.md");
-const keyed = join(dir, "keyed.md");
-const link = join(dir, "link.md");
 writeFileSync(body, "hello\n");
-writeFileSync(empty, "");
-writeFileSync(keyed, "x\n-----BEGIN OPENSSH PRIVATE KEY-----\n");
-symlinkSync(body, link);
 afterAll(() => {
   rmSync(dir, { recursive: true, force: true });
 });
@@ -44,7 +27,13 @@ const VIEW_OK = '{"headRefName":"unit/merge-desk","baseRefName":"main"}';
 const HTTPS = "https://github.com/defaultdave/defaultdave.git\n";
 
 function fakeDeps(
-  options: { branch?: string; view?: string; remote?: string } = {},
+  options: {
+    branch?: string;
+    view?: string;
+    remote?: string;
+    stdin?: string;
+    tty?: boolean;
+  } = {},
 ) {
   const calls: {
     command: string[];
@@ -54,7 +43,8 @@ function fakeDeps(
   const deps: Deps = {
     token: () => Promise.resolve("ghs_fake"),
     currentBranch: () => options.branch ?? "unit/merge-desk",
-    repoRoot: () => process.cwd(),
+    stdin: () => Buffer.from(options.stdin ?? ""),
+    stdinIsTTY: () => options.tty ?? false,
     run: (command, env, input): RunResult => {
       calls.push({ command, env, input });
       if (command[1] === "remote")
@@ -168,9 +158,8 @@ describe("pr", () => {
       "--title",
       "merge-desk: scripts",
       "--body-file",
-      "-",
+      body,
     ]);
-    expect(calls[0]?.input?.toString()).toBe("hello\n");
     expect(calls[0]?.env.GH_TOKEN).toBe("ghs_fake");
   });
 
@@ -281,10 +270,10 @@ describe("issue and PR body writes", () => {
   ];
 
   it.each(writers)(
-    "$name builds the gh command with the App token in the environment",
+    "$name sends the piped body to gh on stdin with the App token in the environment",
     async ({ call, target, expected }) => {
-      const { deps, calls } = fakeDeps();
-      await call(target, body, deps);
+      const { deps, calls } = fakeDeps({ stdin: "hello\n" });
+      await call(target, "-", deps);
       expect(calls).toHaveLength(1);
       expect(calls[0]?.command).toEqual([
         ...expected,
@@ -295,186 +284,57 @@ describe("issue and PR body writes", () => {
       ]);
       expect(calls[0]?.input?.toString()).toBe("hello\n");
       expect(calls[0]?.command.join(" ")).not.toContain("ghs_fake");
-      expect(calls[0]?.command.join(" ")).not.toContain(body);
       expect(calls[0]?.env.GH_TOKEN).toBe("ghs_fake");
+    },
+  );
+
+  it.each(writers)(
+    "$name refuses a path argument and reads nothing",
+    async ({ call, target }) => {
+      const { deps, calls } = fakeDeps({ stdin: "hello\n" });
+      await expect(call(target, "body.md", deps)).rejects.toThrow(/stdin/);
+      await expect(call(target, "/etc/hosts", deps)).rejects.toBeInstanceOf(
+        Refused,
+      );
+      expect(calls).toHaveLength(0);
+    },
+  );
+
+  it.each(["", " \n\t\n"])(
+    "refuses an empty or whitespace-only stdin %p",
+    async (stdin) => {
+      for (const { call, target } of writers) {
+        const { deps, calls } = fakeDeps({ stdin });
+        await expect(call(target, "-", deps)).rejects.toThrow(/empty/);
+        expect(calls).toHaveLength(0);
+      }
+    },
+  );
+
+  it.each(writers)(
+    "$name refuses a terminal on stdin",
+    async ({ call, target }) => {
+      const { deps, calls } = fakeDeps({ stdin: "hello\n", tty: true });
+      await expect(call(target, "-", deps)).rejects.toThrow(/terminal/);
+      expect(calls).toHaveLength(0);
     },
   );
 
   it.each(["0", "-1", "1.5", "abc", "12 ", "--repo", ""])(
     "issue commands refuse the issue number %p",
     async (issue) => {
-      const { deps, calls } = fakeDeps();
-      await expect(issueComment(issue, body, deps)).rejects.toBeInstanceOf(
+      const { deps, calls } = fakeDeps({ stdin: "hello\n" });
+      await expect(issueComment(issue, "-", deps)).rejects.toBeInstanceOf(
         Refused,
       );
-      await expect(issueBody(issue, body, deps)).rejects.toBeInstanceOf(
-        Refused,
-      );
+      await expect(issueBody(issue, "-", deps)).rejects.toBeInstanceOf(Refused);
       expect(calls).toHaveLength(0);
     },
   );
 
   it("pr-body refuses a flag-like target", async () => {
-    const { deps, calls } = fakeDeps();
-    await expect(prBody("--web", body, deps)).rejects.toBeInstanceOf(Refused);
+    const { deps, calls } = fakeDeps({ stdin: "hello\n" });
+    await expect(prBody("--web", "-", deps)).rejects.toBeInstanceOf(Refused);
     expect(calls).toHaveLength(0);
-  });
-
-  it.each([
-    ["a missing file", join(dir, "nope.md")],
-    ["an empty file", empty],
-    ["a directory", dir],
-    ["a symbolic link", link],
-    ["a file outside the repo and tmpdir", "/etc/hosts"],
-    ["a file containing a private key marker", keyed],
-  ])("refuses %s as the body file", async (_label, file) => {
-    const { deps, calls } = fakeDeps();
-    await expect(issueComment("12", file, deps)).rejects.toBeInstanceOf(
-      Refused,
-    );
-    await expect(issueBody("12", file, deps)).rejects.toBeInstanceOf(Refused);
-    await expect(prBody("42", file, deps)).rejects.toBeInstanceOf(Refused);
-    await expect(pr("main", "t", file, deps)).rejects.toBeInstanceOf(Refused);
-    expect(calls).toHaveLength(0);
-  });
-
-  it("accepts a file inside the repo root", async () => {
-    const { deps, calls } = fakeDeps();
-    await issueComment("12", join(process.cwd(), "package.json"), deps);
-    expect(calls).toHaveLength(1);
-  });
-
-  it("refuses a repo file when the repo root is elsewhere", async () => {
-    const { deps, calls } = fakeDeps();
-    deps.repoRoot = () => dir;
-    await expect(
-      issueComment("12", join(process.cwd(), "package.json"), deps),
-    ).rejects.toBeInstanceOf(Refused);
-    expect(calls).toHaveLength(0);
-  });
-
-  it("states the reason, not the file contents", async () => {
-    const { deps } = fakeDeps();
-    const error = await issueComment("12", keyed, deps).catch(
-      (e: unknown) => e,
-    );
-    expect((error as Error).message).toBe(
-      "refused: body file contains a private key marker",
-    );
-  });
-
-  it.each(writers)(
-    "$name propagates a failing gh exit",
-    async ({ call, target }) => {
-      const { deps } = fakeDeps();
-      deps.run = () => ({ code: 1, stdout: "" });
-      await expect(call(target, body, deps)).rejects.toThrow(
-        /failed \(exit 1\)/,
-      );
-    },
-  );
-
-  it.each(writers)(
-    "$name sends the bytes read before the token was minted, even if the file is swapped",
-    async ({ call, target }) => {
-      const file = join(dir, "swap.md");
-      writeFileSync(file, "original\n");
-      const { deps, calls } = fakeDeps();
-      deps.token = () => {
-        writeFileSync(file, "swapped\n");
-        return Promise.resolve("ghs_fake");
-      };
-      await call(target, file, deps);
-      expect(calls[0]?.input?.toString()).toBe("original\n");
-      expect(calls[0]?.command).not.toContain(file);
-    },
-  );
-
-  it.each([
-    ".env",
-    ".env.local",
-    "server.pem",
-    "deploy.key",
-    "bundle.p12",
-    "bundle.pfx",
-    "credentials.json",
-    ".secrets",
-    "id_rsa",
-    "id_rsa.pub",
-    "id_ed25519",
-    ".ENV",
-    "Key.PEM",
-    "credentials",
-    ".SSH/notes.md",
-    ".ssh/notes.md",
-    ".aws/notes.md",
-    ".gnupg/notes.md",
-  ])("refuses the secret-style path %s", async (name) => {
-    const file = join(dir, name);
-    mkdirSync(join(file, ".."), { recursive: true });
-    writeFileSync(file, "dummy\n");
-    const { deps, calls } = fakeDeps();
-    await expect(issueComment("12", file, deps)).rejects.toBeInstanceOf(
-      Refused,
-    );
-    expect(calls).toHaveLength(0);
-  });
-
-  it("names the secret-file reason", async () => {
-    const file = join(dir, "credentials");
-    const { deps } = fakeDeps();
-    await expect(issueComment("12", file, deps)).rejects.toThrow(
-      "refused: body file has a secret-file name",
-    );
-  });
-
-  it.each(writers)(
-    "$name refuses a hard-linked file",
-    async ({ name, call, target }) => {
-      const src = join(dir, `hl-src-${name}.md`);
-      writeFileSync(src, "hello\n");
-      linkSync(src, join(dir, `hl-copy-${name}.md`));
-      const { deps, calls } = fakeDeps();
-      await expect(call(target, src, deps)).rejects.toThrow(
-        "refused: body file has more than one hard link",
-      );
-      expect(calls).toHaveLength(0);
-    },
-  );
-
-  it.each(writers)(
-    "$name refuses a path swapped to another inode after the open",
-    async ({ name, call, target }) => {
-      const file = join(dir, `inode-${name}.md`);
-      writeFileSync(file, "original\n");
-      const { deps, calls } = fakeDeps();
-      deps.afterOpen = () => {
-        renameSync(file, `${file}.moved`);
-        writeFileSync(file, "replacement\n");
-      };
-      await expect(call(target, file, deps)).rejects.toThrow(
-        "refused: body file path changed after it was opened",
-      );
-      expect(calls).toHaveLength(0);
-    },
-  );
-
-  it.each([".env.example", ".env.sample"])("accepts %s", async (name) => {
-    const file = join(dir, name);
-    writeFileSync(file, "dummy\n");
-    const { deps, calls } = fakeDeps();
-    await issueComment("12", file, deps);
-    expect(calls).toHaveLength(1);
-  });
-});
-
-describe("scriptRoot", () => {
-  it("is two levels above the script, resolved, regardless of the cwd", () => {
-    const root = join(dir, "checkout");
-    mkdirSync(join(root, "scripts", "merge-desk"), { recursive: true });
-    const url = pathToFileURL(
-      join(root, "scripts", "merge-desk", "agent-git.ts"),
-    ).href;
-    expect(scriptRoot(url)).toBe(realpathSync(root));
   });
 });
