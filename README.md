@@ -75,4 +75,14 @@ First run: `pnpm install`, then `pnpm exec playwright install chromium` for `pnp
 
 ## Keystatic locally
 
-Placeholder. Keystatic is added in the `cms` unit; this section will say how to run it at `/keystatic`.
+Run `pnpm dev` and open `/keystatic` (use `http://127.0.0.1:3000`; Keystatic normalizes `localhost` to it). Edits write straight to `content/` on disk, with no sign-in and no secrets.
+
+On Vercel (production and previews) the admin runs in GitHub mode instead: sign in with GitHub and each save is a commit to the repo through the Keystatic GitHub App. The mode is chosen at build time in `next.config.ts` (`VERCEL` set means GitHub). To try GitHub mode locally, start the dev server with `VERCEL=1 pnpm dev` and set the three variables below in `.env`.
+
+| Variable                         | Where it comes from                        |
+| -------------------------------- | ------------------------------------------ |
+| `KEYSTATIC_GITHUB_CLIENT_ID`     | The Keystatic GitHub App                   |
+| `KEYSTATIC_GITHUB_CLIENT_SECRET` | The same App (generate a client secret)    |
+| `KEYSTATIC_SECRET`               | Any long random string, used to sign state |
+
+Keep them in the Vercel env store and your local `.env`, nowhere else. `.env.example` lists the names.
