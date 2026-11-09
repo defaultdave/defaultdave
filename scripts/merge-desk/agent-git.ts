@@ -292,7 +292,14 @@ export function spawnCommand(
   return { code: result.status ?? 1, stdout: result.stdout };
 }
 
-function realDeps(): Deps {
+/**
+ * The live dependencies: an App token minted once per run, commands spawned for real, and gh
+ * output echoed except for `view` calls. Exported so a test can check that `run` forwards the
+ * body to the child's stdin.
+ *
+ * @returns Deps backed by the App token and real child processes.
+ */
+export function realDeps(): Deps {
   let cached: Promise<string> | null = null;
   const spawn = spawnCommand;
   return {
