@@ -71,7 +71,7 @@ node scripts/merge-desk/post-check.ts bookkeeping --pr <n> --sha "$(git rev-pars
 Body arguments for `issue-comment`, `issue-body` and `pr-body`:
 
 - Single-quote the body. Write a literal single quote as `'\''`.
-- Do not use a redirect, heredoc or pipe. Any of them takes the command out of the sandbox exclusion, so it runs sandboxed and cannot read the App key.
+- Do not use a redirect, heredoc or pipe. Any of them takes the command out of the sandbox exclusion, so it runs sandboxed and cannot reach GitHub.
 - Known hole, tracked for the git-hardening piece: the excluded command line runs unsandboxed, so any `$()` or backticks the shell sees outside single quotes execute outside the sandbox, including one after an unescaped apostrophe in a single-quoted body or anywhere in an unquoted body. Writing every literal quote as `'\''` is what keeps the body inert. Same hole as every excluded `... *` rule.
 
 A required check with no verdict file stays pending. It is never posted green by hand.
