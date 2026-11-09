@@ -1,0 +1,27 @@
+.metric {
+  margin: 0;
+  padding: var(--space-4) var(--space-5);
+  border: var(--effect-outline);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.label {
+  font-size: var(--type-small-size);
+  line-height: var(--type-small-line);
+  color: var(--color-muted);
+}
+
+.value {
+  margin: 0;
+  font-size: var(--type-h1-size);
+  line-height: var(--type-h1-line);
+  font-weight: var(--type-h1-weight);
+}
+
+.note {
+  margin: 0;
+  font-size: var(--type-small-size);
+  line-height: var(--type-small-line);
+  color: var(--color-muted);
+}

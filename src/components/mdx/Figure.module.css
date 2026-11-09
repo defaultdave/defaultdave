@@ -1,0 +1,18 @@
+.figure {
+  margin: 0;
+}
+
+.image {
+  display: block;
+  max-inline-size: 100%;
+  block-size: auto;
+  border: var(--effect-outline);
+  border-radius: var(--radius-md);
+}
+
+.figure figcaption {
+  margin-block-start: var(--space-2);
+  font-size: var(--type-small-size);
+  line-height: var(--type-small-line);
+  color: var(--color-muted);
+}
