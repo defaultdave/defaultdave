@@ -36,14 +36,14 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 
 ## Blocked on Dave
 
-1. Attach `davidfleming.me` in the Vercel project's Domains.
-2. Decide: which Bandcamp releases, and any release notes (unblocks `content-music`).
-3. Decide: can ResortPass be named, or anonymized as in the CrUX article (unblocks publishing `content-work`).
-4. Headshot and bio, or text-only About (unblocks `content-home-about`).
-5. List of published pieces with URLs (unblocks `content-writing`).
-6. Footer email: confirm `defaultdave@gmail.com` is the public one (`src/components/layout/contact-links.ts`).
+1. ~~Attach domain~~ done 2026-11-08.
+2. `content-music` unblocked: Bandcamp `davidfleming.bandcamp.com` (DECISIONS 2026-11-08).
+3. ResortPass naming: Dave is reviewing what the case study names; anonymized until he confirms (password-lock is the fallback).
+4. About: headshot supplied; still need the bio text, or confirm text-only.
+5. `content-writing` unblocked: three LinkedIn pulse URLs (DECISIONS 2026-11-08).
+6. Footer email: Dave wants an address at `davidfleming.me` (forwarding alias; set up before launch).
 
-7. Security, pre-existing: the merge-desk allow rules and sandbox exclusions in `.claude/settings.local.json` match cwd-relative script paths that agents can edit or shadow, so an agent can run its own code outside the sandbox with no prompt (found 2026-11-07, verdict `app-writes/.team-verdicts/review-workflow-r2.md`). Decided 2026-11-07: the shared-engine RFC (PR #31) lands before the swarm; until then no unattended agent runs.
+7. Security, pre-existing (Dave: fix it now, 2026-11-08): the merge-desk allow rules and sandbox exclusions in `.claude/settings.local.json` match cwd-relative script paths that agents can edit or shadow, so an agent can run its own code outside the sandbox with no prompt (found 2026-11-07, verdict `app-writes/.team-verdicts/review-workflow-r2.md`). Decided 2026-11-07: the shared-engine RFC (PR #31) lands before the swarm; until then no unattended agent runs.
 
 ## Next
 
