@@ -3,6 +3,9 @@
 //   node scripts/merge-desk/agent-git.ts pr <base> <title> <body-file>
 //   node scripts/merge-desk/agent-git.ts automerge <pr number or branch>
 //   node scripts/merge-desk/agent-git.ts review <pr number or branch>
+//   node scripts/merge-desk/agent-git.ts issue-comment <issue number> --body '<text>'
+//   node scripts/merge-desk/agent-git.ts issue-body <issue number> --body '<text>'   (replaces the body)
+//   node scripts/merge-desk/agent-git.ts pr-body <pr number or branch> --body '<text>'   (replaces the body)
 import { spawnSync } from "node:child_process";
 // @ts-expect-error TS5097: Node needs the .ts extension, and the root tsconfig does not allow it
 import { mintToken } from "./app-token.ts";
@@ -23,7 +26,12 @@ export interface RunResult {
 
 export interface Deps {
   token: () => Promise<string>;
-  run: (command: string[], env: Record<string, string>) => RunResult;
+  /** `input`, when given, is written to the command's stdin. */
+  run: (
+    command: string[],
+    env: Record<string, string>,
+    input?: Buffer,
+  ) => RunResult;
   currentBranch: () => string;
 }
 
@@ -178,21 +186,126 @@ export async function review(target: string, deps: Deps): Promise<void> {
   );
 }
 
-function realDeps(): Deps {
+function assertIssueNumber(issue: string): void {
+  if (!/^[1-9][0-9]*$/.test(issue))
+    throw new Refused(`refused: ${issue} is not a positive issue number`);
+}
+
+/** GitHub's limit for an issue, comment or PR body, in characters. */
+export const MAX_BODY_CHARS = 65_536;
+
+/**
+ * The body of issue-comment, issue-body and pr-body is one argv element after `--body`, so the
+ * command line is the only input: no shell sees it here, and this script opens no file and reads
+ * no stdin. `--body=<text>`, the old `-` form and extra arguments are refused. (`pr` still hands
+ * a path to gh; that is outside this guarantee.)
+ */
+export function parseBody(rest: string[]): Buffer {
+  const [flag, text, ...extra] = rest;
+  if (flag === undefined)
+    throw new Refused("refused: pass the body as --body '<text>'");
+  if (flag !== "--body")
+    throw new Refused(
+      `refused: expected --body '<text>' after the target, not ${flag}`,
+    );
+  if (text === undefined)
+    throw new Refused("refused: --body needs a value: --body '<text>'");
+  if (extra.length > 0)
+    throw new Refused(
+      "refused: the body must be one argument; single-quote it: --body '<text>'",
+    );
+  if (text.trim() === "") throw new Refused("refused: the body is empty");
+  const length = Array.from(text).length;
+  if (length > MAX_BODY_CHARS)
+    throw new Refused(
+      `refused: the body is ${String(length)} characters; the limit is ${String(MAX_BODY_CHARS)} characters`,
+    );
+  return Buffer.from(text, "utf8");
+}
+
+/** Posts a comment on an issue as the App. */
+export async function issueComment(
+  issue: string,
+  bodyArgs: string[],
+  deps: Deps,
+): Promise<void> {
+  assertIssueNumber(issue);
+  const bytes = parseBody(bodyArgs);
+  must(
+    deps.run(
+      ["gh", "issue", "comment", issue, "--repo", REPO, "--body-file", "-"],
+      { GH_TOKEN: await deps.token() },
+      bytes,
+    ),
+    "gh issue comment",
+  );
+}
+
+/** Replaces an issue body as the App (ticking criteria, adding Amendment sections). */
+export async function issueBody(
+  issue: string,
+  bodyArgs: string[],
+  deps: Deps,
+): Promise<void> {
+  assertIssueNumber(issue);
+  const bytes = parseBody(bodyArgs);
+  must(
+    deps.run(
+      ["gh", "issue", "edit", issue, "--repo", REPO, "--body-file", "-"],
+      { GH_TOKEN: await deps.token() },
+      bytes,
+    ),
+    "gh issue edit",
+  );
+}
+
+/** Replaces a PR body as the App. */
+export async function prBody(
+  target: string,
+  bodyArgs: string[],
+  deps: Deps,
+): Promise<void> {
+  assertTarget(target);
+  const bytes = parseBody(bodyArgs);
+  must(
+    deps.run(
+      ["gh", "pr", "edit", target, "--repo", REPO, "--body-file", "-"],
+      { GH_TOKEN: await deps.token() },
+      bytes,
+    ),
+    "gh pr edit",
+  );
+}
+
+export function spawnCommand(
+  command: string[],
+  env: Record<string, string>,
+  input?: Buffer,
+): RunResult {
+  const [file, ...args] = command;
+  const result = spawnSync(file ?? "", args, {
+    env: { ...process.env, ...env },
+    encoding: "utf8",
+    input,
+    stdio: [input ? "pipe" : "ignore", "pipe", "inherit"],
+  });
+  return { code: result.status ?? 1, stdout: result.stdout };
+}
+
+/**
+ * The live dependencies: an App token minted once per run, commands spawned for real, and gh
+ * output echoed except for `view` calls. Exported so a test can check that `run` forwards the
+ * body to the child's stdin.
+ *
+ * @returns Deps backed by the App token and real child processes.
+ */
+export function realDeps(): Deps {
   let cached: Promise<string> | null = null;
-  const spawn = (command: string[], env: Record<string, string>): RunResult => {
-    const [file, ...args] = command;
-    const result = spawnSync(file ?? "", args, {
-      env: { ...process.env, ...env },
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "inherit"],
-    });
-    return { code: result.status ?? 1, stdout: result.stdout };
-  };
+  const spawn = spawnCommand;
   return {
     token: () => (cached ??= mintToken()),
-    run: (command, env) => {
-      const result = spawn(command, env);
+    run: (command, env, input) => {
+      const result = spawn(command, env, input);
       if (command[0] === "gh" && command[2] !== "view")
         process.stdout.write(result.stdout);
       return result;
@@ -214,9 +327,15 @@ if (import.meta.main) {
       await automerge(args[0] ?? "", deps);
     else if (command === "review" && args.length === 1)
       await review(args[0] ?? "", deps);
+    else if (command === "issue-comment" && args[0] !== undefined)
+      await issueComment(args[0], args.slice(1), deps);
+    else if (command === "issue-body" && args[0] !== undefined)
+      await issueBody(args[0], args.slice(1), deps);
+    else if (command === "pr-body" && args[0] !== undefined)
+      await prBody(args[0], args.slice(1), deps);
     else {
       throw new Error(
-        "usage: agent-git.ts push <branch> | pr <base> <title> <body-file> | automerge <pr or branch> | review <pr or branch>",
+        "usage: agent-git.ts push <branch> | pr <base> <title> <body-file> | automerge <pr or branch> | review <pr or branch> | issue-comment <issue> --body <text> | issue-body <issue> --body <text> | pr-body <pr or branch> --body <text>",
       );
     }
   } catch (error) {
