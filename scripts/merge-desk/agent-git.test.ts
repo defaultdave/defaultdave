@@ -15,17 +15,14 @@ import {
   Refused,
   review,
   type RunResult,
+  spawnCommand,
 } from "./agent-git";
 
 const VIEW_OK = '{"headRefName":"unit/merge-desk","baseRefName":"main"}';
 const HTTPS = "https://github.com/defaultdave/defaultdave.git\n";
 
 function fakeDeps(
-  options: {
-    branch?: string;
-    view?: string;
-    remote?: string;
-  } = {},
+  options: { branch?: string; view?: string; remote?: string } = {},
 ) {
   const calls: {
     command: string[];
@@ -412,5 +409,37 @@ describe("agent-git.ts as a subprocess", () => {
     const { code, stderr } = await run(args);
     expect(code).toBe(2);
     expect(stderr).toContain(text);
+  });
+});
+
+describe("spawnCommand", () => {
+  const echoStdin = [
+    process.execPath,
+    "-e",
+    "process.stdout.write(require('fs').readFileSync(0))",
+  ];
+
+  it("delivers the exact input bytes, quotes and newlines included, to the child's stdin", () => {
+    const body =
+      'line one\nDave\'s "fix" $(echo x) `y`\n\nlast line, no newline';
+    const result = spawnCommand(echoStdin, {}, Buffer.from(body, "utf8"));
+    expect(result.code).toBe(0);
+    expect(result.stdout).toBe(body);
+  });
+
+  it("gives the child an ignored stdin when there is no input", () => {
+    const probe = [
+      process.execPath,
+      "-e",
+      "const fs=require('fs');let n=-1;try{n=fs.readFileSync(0).length}catch{n=-1}process.stdout.write(String(n)+':'+fs.fstatSync(0).isFIFO())",
+    ];
+    const result = spawnCommand(probe, {});
+    expect(result.stdout).not.toMatch(/:true$/);
+  });
+
+  it("returns the child's exit code", () => {
+    expect(
+      spawnCommand([process.execPath, "-e", "process.exit(3)"], {}).code,
+    ).toBe(3);
   });
 });

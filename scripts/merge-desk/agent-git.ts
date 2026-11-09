@@ -277,22 +277,24 @@ export async function prBody(
   );
 }
 
+export function spawnCommand(
+  command: string[],
+  env: Record<string, string>,
+  input?: Buffer,
+): RunResult {
+  const [file, ...args] = command;
+  const result = spawnSync(file ?? "", args, {
+    env: { ...process.env, ...env },
+    encoding: "utf8",
+    input,
+    stdio: [input ? "pipe" : "ignore", "pipe", "inherit"],
+  });
+  return { code: result.status ?? 1, stdout: result.stdout };
+}
+
 function realDeps(): Deps {
   let cached: Promise<string> | null = null;
-  const spawn = (
-    command: string[],
-    env: Record<string, string>,
-    input?: Buffer,
-  ): RunResult => {
-    const [file, ...args] = command;
-    const result = spawnSync(file ?? "", args, {
-      env: { ...process.env, ...env },
-      encoding: "utf8",
-      input,
-      stdio: [input ? "pipe" : "ignore", "pipe", "inherit"],
-    });
-    return { code: result.status ?? 1, stdout: result.stdout };
-  };
+  const spawn = spawnCommand;
   return {
     token: () => (cached ??= mintToken()),
     run: (command, env, input) => {
