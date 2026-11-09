@@ -3,12 +3,10 @@
 //   node scripts/merge-desk/agent-git.ts pr <base> <title> <body-file>
 //   node scripts/merge-desk/agent-git.ts automerge <pr number or branch>
 //   node scripts/merge-desk/agent-git.ts review <pr number or branch>
-//   node scripts/merge-desk/agent-git.ts issue-comment <issue number> -   (body on stdin: ... - < body.md)
-//   node scripts/merge-desk/agent-git.ts issue-body <issue number> -   (replaces the body)
-//   node scripts/merge-desk/agent-git.ts pr-body <pr number or branch> -   (replaces the body)
+//   node scripts/merge-desk/agent-git.ts issue-comment <issue number> --body '<text>'
+//   node scripts/merge-desk/agent-git.ts issue-body <issue number> --body '<text>'   (replaces the body)
+//   node scripts/merge-desk/agent-git.ts pr-body <pr number or branch> --body '<text>'   (replaces the body)
 import { spawnSync } from "node:child_process";
-import { readFileSync } from "node:fs";
-import { isatty } from "node:tty";
 // @ts-expect-error TS5097: Node needs the .ts extension, and the root tsconfig does not allow it
 import { mintToken } from "./app-token.ts";
 
@@ -35,9 +33,6 @@ export interface Deps {
     input?: Buffer,
   ) => RunResult;
   currentBranch: () => string;
-  /** The body for the issue and PR body commands: this script's stdin. */
-  stdin: () => Buffer;
-  stdinIsTTY: () => boolean;
 }
 
 /** Only unit/…, pm/… and revert/pr-<n> branches may be pushed; main never. */
@@ -196,37 +191,46 @@ function assertIssueNumber(issue: string): void {
     throw new Refused(`refused: ${issue} is not a positive issue number`);
 }
 
-/** The literal argument that selects stdin as the body source. */
-export const STDIN_BODY = "-";
+/** GitHub's limit for an issue, comment or PR body, in characters. */
+export const MAX_BODY_CHARS = 65_536;
 
 /**
- * The body of issue-comment, issue-body and pr-body comes from this script's own stdin, so a caller
- * writes `... - < body.md` or a heredoc and these commands open no file. A path is refused, so they
- * cannot post an arbitrary file. (`pr` still hands a path to gh; that is outside this guarantee.)
+ * The body of issue-comment, issue-body and pr-body is one argv element after `--body`, so the
+ * command line is the only input: no shell sees it here, and this script opens no file and reads
+ * no stdin. `--body=<text>`, the old `-` form and extra arguments are refused. (`pr` still hands
+ * a path to gh; that is outside this guarantee.)
  */
-export function readBody(arg: string, deps: Deps): Buffer {
-  if (arg !== STDIN_BODY)
+export function parseBody(rest: string[]): Buffer {
+  const [flag, text, ...extra] = rest;
+  if (flag === undefined)
+    throw new Refused("refused: pass the body as --body '<text>'");
+  if (flag !== "--body")
     throw new Refused(
-      `refused: the body is read from stdin; pass - and redirect the file (... - < body.md), not ${arg}`,
+      `refused: expected --body '<text>' after the target, not ${flag}`,
     );
-  if (deps.stdinIsTTY())
+  if (text === undefined)
+    throw new Refused("refused: --body needs a value: --body '<text>'");
+  if (extra.length > 0)
     throw new Refused(
-      "refused: stdin is a terminal; redirect the body (... - < body.md)",
+      "refused: the body must be one argument; single-quote it: --body '<text>'",
     );
-  const bytes = deps.stdin();
-  if (bytes.toString("utf8").trim() === "")
-    throw new Refused("refused: the body on stdin is empty");
-  return bytes;
+  if (text.trim() === "") throw new Refused("refused: the body is empty");
+  const length = Array.from(text).length;
+  if (length > MAX_BODY_CHARS)
+    throw new Refused(
+      `refused: the body is ${String(length)} characters; the limit is ${String(MAX_BODY_CHARS)} characters`,
+    );
+  return Buffer.from(text, "utf8");
 }
 
 /** Posts a comment on an issue as the App. */
 export async function issueComment(
   issue: string,
-  bodyArg: string,
+  bodyArgs: string[],
   deps: Deps,
 ): Promise<void> {
   assertIssueNumber(issue);
-  const bytes = readBody(bodyArg, deps);
+  const bytes = parseBody(bodyArgs);
   must(
     deps.run(
       ["gh", "issue", "comment", issue, "--repo", REPO, "--body-file", "-"],
@@ -240,11 +244,11 @@ export async function issueComment(
 /** Replaces an issue body as the App (ticking criteria, adding Amendment sections). */
 export async function issueBody(
   issue: string,
-  bodyArg: string,
+  bodyArgs: string[],
   deps: Deps,
 ): Promise<void> {
   assertIssueNumber(issue);
-  const bytes = readBody(bodyArg, deps);
+  const bytes = parseBody(bodyArgs);
   must(
     deps.run(
       ["gh", "issue", "edit", issue, "--repo", REPO, "--body-file", "-"],
@@ -258,11 +262,11 @@ export async function issueBody(
 /** Replaces a PR body as the App. */
 export async function prBody(
   target: string,
-  bodyArg: string,
+  bodyArgs: string[],
   deps: Deps,
 ): Promise<void> {
   assertTarget(target);
-  const bytes = readBody(bodyArg, deps);
+  const bytes = parseBody(bodyArgs);
   must(
     deps.run(
       ["gh", "pr", "edit", target, "--repo", REPO, "--body-file", "-"],
@@ -299,9 +303,6 @@ function realDeps(): Deps {
     },
     currentBranch: () =>
       spawn(["git", "branch", "--show-current"], {}).stdout.trim(),
-    stdin: () => readFileSync(0),
-    // isatty(0), not process.stdin.isTTY: touching process.stdin puts a pipe in non-blocking mode and readFileSync(0) then fails with EAGAIN.
-    stdinIsTTY: () => isatty(0),
   };
 }
 
@@ -317,15 +318,15 @@ if (import.meta.main) {
       await automerge(args[0] ?? "", deps);
     else if (command === "review" && args.length === 1)
       await review(args[0] ?? "", deps);
-    else if (command === "issue-comment" && args.length === 2)
-      await issueComment(args[0] ?? "", args[1] ?? "", deps);
-    else if (command === "issue-body" && args.length === 2)
-      await issueBody(args[0] ?? "", args[1] ?? "", deps);
-    else if (command === "pr-body" && args.length === 2)
-      await prBody(args[0] ?? "", args[1] ?? "", deps);
+    else if (command === "issue-comment" && args[0] !== undefined)
+      await issueComment(args[0], args.slice(1), deps);
+    else if (command === "issue-body" && args[0] !== undefined)
+      await issueBody(args[0], args.slice(1), deps);
+    else if (command === "pr-body" && args[0] !== undefined)
+      await prBody(args[0], args.slice(1), deps);
     else {
       throw new Error(
-        "usage: agent-git.ts push <branch> | pr <base> <title> <body-file> | automerge <pr or branch> | review <pr or branch> | issue-comment <issue> - | issue-body <issue> - | pr-body <pr or branch> - (body on stdin)",
+        "usage: agent-git.ts push <branch> | pr <base> <title> <body-file> | automerge <pr or branch> | review <pr or branch> | issue-comment <issue> --body <text> | issue-body <issue> --body <text> | pr-body <pr or branch> --body <text>",
       );
     }
   } catch (error) {

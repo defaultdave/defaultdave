@@ -8,6 +8,7 @@ import {
   gitAuthEnv,
   issueBody,
   issueComment,
+  MAX_BODY_CHARS,
   pr,
   prBody,
   push,
@@ -24,11 +25,8 @@ function fakeDeps(
     branch?: string;
     view?: string;
     remote?: string;
-    stdin?: string;
-    tty?: boolean;
   } = {},
 ) {
-  const reads = { stdin: 0 };
   const calls: {
     command: string[];
     env: Record<string, string>;
@@ -37,11 +35,6 @@ function fakeDeps(
   const deps: Deps = {
     token: () => Promise.resolve("ghs_fake"),
     currentBranch: () => options.branch ?? "unit/merge-desk",
-    stdin: () => {
-      reads.stdin += 1;
-      return Buffer.from(options.stdin ?? "");
-    },
-    stdinIsTTY: () => options.tty ?? false,
     run: (command, env, input): RunResult => {
       calls.push({ command, env, input });
       if (command[1] === "remote")
@@ -50,7 +43,7 @@ function fakeDeps(
       return { code: 0, stdout: isView ? (options.view ?? VIEW_OK) : "" };
     },
   };
-  return { deps, calls, reads };
+  return { deps, calls };
 }
 
 describe("push", () => {
@@ -267,10 +260,10 @@ describe("issue and PR body writes", () => {
   ];
 
   it.each(writers)(
-    "$name sends the piped body to gh on stdin with the App token in the environment",
+    "$name sends the --body text to gh on stdin with the App token in the environment",
     async ({ call, target, expected }) => {
-      const { deps, calls } = fakeDeps({ stdin: "hello\n" });
-      await call(target, "-", deps);
+      const { deps, calls } = fakeDeps();
+      await call(target, ["--body", "hello\n"], deps);
       expect(calls).toHaveLength(1);
       expect(calls[0]?.command).toEqual([
         ...expected,
@@ -285,112 +278,139 @@ describe("issue and PR body writes", () => {
     },
   );
 
+  const LITERAL =
+    'it\'s "quoted"\nline two $(id) `id` ${HOME} \\n ; | > & \u00e9\u{1F600}';
   it.each(writers)(
-    "$name refuses a path argument and reads nothing",
+    "$name passes quotes, newlines, $() and backticks to gh byte for byte",
     async ({ call, target }) => {
-      const { deps, calls, reads } = fakeDeps({ stdin: "hello\n" });
-      await expect(call(target, "body.md", deps)).rejects.toThrow(/stdin/);
-      await expect(call(target, "/etc/hosts", deps)).rejects.toBeInstanceOf(
-        Refused,
-      );
-      expect(calls).toHaveLength(0);
-      expect(reads.stdin).toBe(0);
+      const { deps, calls } = fakeDeps();
+      await call(target, ["--body", LITERAL], deps);
+      expect(calls[0]?.input).toEqual(Buffer.from(LITERAL, "utf8"));
+      expect(calls[0]?.command).not.toContain(LITERAL);
     },
   );
 
-  it.each(["", " \n\t\n"])(
-    "refuses an empty or whitespace-only stdin %p",
-    async (stdin) => {
-      for (const { call, target } of writers) {
-        const { deps, calls } = fakeDeps({ stdin });
-        await expect(call(target, "-", deps)).rejects.toThrow(/empty/);
+  const bad: [string, string[]][] = [
+    ["a missing --body", []],
+    ["--body with no value", ["--body"]],
+    ["the old - form", ["-"]],
+    ["a file path", ["body.md"]],
+    ["the --body=<text> spelling", ["--body=hello"]],
+    ["an extra argument", ["--body", "hello", "world"]],
+    ["an unquoted multi-word body", ["--body", "a", "b", "c"]],
+    ["a flag before --body", ["--repo", "--body", "hello"]],
+    ["an empty body", ["--body", ""]],
+    ["a whitespace-only body", ["--body", " \n\t\n"]],
+  ];
+  it.each(bad)("every writer refuses %s and runs nothing", async (_n, rest) => {
+    for (const { call, target } of writers) {
+      const { deps, calls } = fakeDeps();
+      await expect(call(target, rest, deps)).rejects.toBeInstanceOf(Refused);
+      expect(calls).toHaveLength(0);
+    }
+  });
+
+  it("refuses the old - form with a message that names --body", async () => {
+    const { deps } = fakeDeps();
+    await expect(issueComment("1", ["-"], deps)).rejects.toThrow(/--body/);
+  });
+
+  it.each([
+    ["exactly 65,536 characters", MAX_BODY_CHARS, true],
+    ["65,537 characters", MAX_BODY_CHARS + 1, false],
+  ])("the limit: %s", async (_n, size, accepted) => {
+    for (const { call, target } of writers) {
+      const { deps, calls } = fakeDeps();
+      const run = call(target, ["--body", "x".repeat(size)], deps);
+      if (accepted) {
+        await run;
+        expect(calls[0]?.input?.length).toBe(size);
+      } else {
+        await expect(run).rejects.toThrow(/65536 characters|65,536 characters/);
         expect(calls).toHaveLength(0);
       }
-    },
-  );
+    }
+  });
 
-  it.each(writers)(
-    "$name refuses a terminal on stdin",
-    async ({ call, target }) => {
-      const { deps, calls } = fakeDeps({ stdin: "hello\n", tty: true });
-      await expect(call(target, "-", deps)).rejects.toThrow(/terminal/);
-      expect(calls).toHaveLength(0);
-    },
-  );
+  it("counts characters, not bytes", async () => {
+    const { deps, calls } = fakeDeps();
+    await issueComment("1", ["--body", "\u00e9".repeat(MAX_BODY_CHARS)], deps);
+    expect(calls).toHaveLength(1);
+  });
 
   it.each(["0", "-1", "1.5", "abc", "12 ", "--repo", ""])(
     "issue commands refuse the issue number %p",
     async (issue) => {
-      const { deps, calls } = fakeDeps({ stdin: "hello\n" });
-      await expect(issueComment(issue, "-", deps)).rejects.toBeInstanceOf(
-        Refused,
-      );
-      await expect(issueBody(issue, "-", deps)).rejects.toBeInstanceOf(Refused);
+      const { deps, calls } = fakeDeps();
+      await expect(
+        issueComment(issue, ["--body", "hi"], deps),
+      ).rejects.toBeInstanceOf(Refused);
+      await expect(
+        issueBody(issue, ["--body", "hi"], deps),
+      ).rejects.toBeInstanceOf(Refused);
       expect(calls).toHaveLength(0);
     },
   );
 
   it("pr-body refuses a flag-like target", async () => {
-    const { deps, calls } = fakeDeps({ stdin: "hello\n" });
-    await expect(prBody("--web", "-", deps)).rejects.toBeInstanceOf(Refused);
+    const { deps, calls } = fakeDeps();
+    await expect(
+      prBody("--web", ["--body", "hi"], deps),
+    ).rejects.toBeInstanceOf(Refused);
     expect(calls).toHaveLength(0);
   });
 });
 
 describe("agent-git.ts as a subprocess", () => {
   const script = join(dirname(fileURLToPath(import.meta.url)), "agent-git.ts");
-  const DELAY_MS = 300;
 
-  /** Runs the real script with a missing app.conf, so a body that reads fine stops at the token mint with no network. */
-  function run(args: string[], chunks: string[], delayMs = 0) {
-    return new Promise<{ code: number | null; stderr: string }>((resolve) => {
-      const child = spawn(process.execPath, [script, ...args], {
-        env: { ...process.env, DEFAULTDAVE_APP_CONF: "/nonexistent/app.conf" },
-        stdio: ["pipe", "ignore", "pipe"],
-      });
-      let stderr = "";
-      child.stderr.on("data", (chunk: Buffer) => {
-        stderr += chunk.toString();
-      });
-      child.on("close", (code) => {
-        resolve({ code, stderr });
-      });
-      void (async () => {
-        for (const chunk of chunks) {
-          if (delayMs) await new Promise((r) => setTimeout(r, delayMs));
-          child.stdin.write(chunk);
-        }
-        child.stdin.end();
-      })();
-    });
+  /**
+   * Runs the real script with a missing app.conf, so a valid body stops at the token mint with no
+   * network. stdin is a pipe that is never written or closed: a script that read it would hang.
+   */
+  function run(args: string[]) {
+    return new Promise<{ code: number | null; stderr: string }>(
+      (resolve, reject) => {
+        const child = spawn(process.execPath, [script, ...args], {
+          env: {
+            ...process.env,
+            DEFAULTDAVE_APP_CONF: "/nonexistent/app.conf",
+          },
+          stdio: ["pipe", "ignore", "pipe"],
+        });
+        let stderr = "";
+        child.stderr.on("data", (chunk: Buffer) => {
+          stderr += chunk.toString();
+        });
+        const timer = setTimeout(() => {
+          child.kill("SIGKILL");
+          reject(new Error("script hung: it is reading stdin"));
+        }, 10_000);
+        child.on("close", (code) => {
+          clearTimeout(timer);
+          resolve({ code, stderr });
+        });
+      },
+    );
   }
 
-  it.each([
-    { name: "an immediate pipe", chunks: ["hello\n"], delayMs: 0 },
-    { name: "a slow pipe", chunks: ["a\n", "b\n"], delayMs: DELAY_MS },
-  ])(
-    "reads the body from $name without EAGAIN and goes on to the token mint",
-    async ({ chunks, delayMs }) => {
-      const { code, stderr } = await run(
-        ["issue-comment", "1", "-"],
-        chunks,
-        delayMs,
-      );
-      expect(stderr).not.toContain("EAGAIN");
+  it.each(["issue-comment", "issue-body", "pr-body"])(
+    "%s with a valid body goes on to the token mint without reading stdin",
+    async (command) => {
+      const { code, stderr } = await run([command, "1", "--body", "hello"]);
       expect(stderr).toContain("app.conf");
       expect(code).toBe(1);
     },
   );
 
-  it("refuses an empty stdin with exit 2", async () => {
-    const { code, stderr } = await run(["issue-body", "1", "-"], []);
+  it.each([
+    ["the old - form", ["issue-comment", "1", "-"], "--body"],
+    ["an empty body", ["issue-body", "1", "--body", ""], "empty"],
+    ["--body=<text>", ["pr-body", "1", "--body=x"], "--body"],
+    ["a missing value", ["issue-comment", "1", "--body"], "needs a value"],
+  ])("refuses %s with exit 2 without reading stdin", async (_n, args, text) => {
+    const { code, stderr } = await run(args);
     expect(code).toBe(2);
-    expect(stderr).toContain("empty");
-  });
-
-  it("refuses a path argument with exit 2", async () => {
-    const { code, stderr } = await run(["pr-body", "1", "body.md"], ["x\n"]);
-    expect(code).toBe(2);
-    expect(stderr).toContain("stdin");
+    expect(stderr).toContain(text);
   });
 });
