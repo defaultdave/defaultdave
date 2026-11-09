@@ -385,7 +385,7 @@ describe("agent-git.ts as a subprocess", () => {
         const timer = setTimeout(() => {
           child.kill("SIGKILL");
           reject(new Error("script hung: it is reading stdin"));
-        }, 10_000);
+        }, 3_000);
         child.on("close", (code) => {
           clearTimeout(timer);
           resolve({ code, stderr });
