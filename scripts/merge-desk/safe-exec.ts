@@ -14,7 +14,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { userInfo } from "node:os";
-import { join, sep } from "node:path";
+import { join, resolve, sep } from "node:path";
 
 export const GIT = "/Library/Developer/CommandLineTools/usr/bin/git";
 export const GH = "/opt/homebrew/bin/gh";
@@ -341,7 +341,9 @@ export function writeGhHosts(runDir: string, token: string): string {
 }
 
 function insideRunDir(runDir: string, path: string): boolean {
-  return path === runDir || path.startsWith(runDir + sep);
+  const root = resolve(runDir);
+  const target = resolve(path);
+  return target === root || target.startsWith(root + sep);
 }
 
 export interface GitRunOptions {

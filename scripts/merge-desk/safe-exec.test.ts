@@ -514,6 +514,53 @@ describe("the engine root and run dir", () => {
     });
   });
 
+  it("refuses a cwd that climbs out of the run dir", async () => {
+    await withRunDir(join(scratch(), "engine"), (run) => {
+      expect(() =>
+        runGit({ git: REAL_GIT }, ["status"], {
+          runDir: run,
+          cwd: join(run, "..", "elsewhere"),
+        }),
+      ).toThrow(Refused);
+      expect(() =>
+        runGit({ git: REAL_GIT }, ["status"], {
+          runDir: run,
+          cwd: `${run}/sub/../../x`,
+        }),
+      ).toThrow(Refused);
+    });
+  });
+
+  it("keeps a repository's own hooksPath from running a hook, which only the hardening keys prevent", async () => {
+    await withRunDir(join(scratch(), "engine"), (run) => {
+      const repo = join(run, "hostile");
+      mkdirSync(repo);
+      git(repo, "init", "-q", "-b", "main");
+      git(repo, "config", "user.name", "t");
+      git(repo, "config", "user.email", "t@example.com");
+      const hooks = join(repo, "evil-hooks");
+      mkdirSync(hooks);
+      const marker = join(repo, "hook-ran");
+      const hook = join(hooks, "pre-commit");
+      writeFileSync(hook, `#!/bin/sh\ntouch "${marker}"\n`);
+      chmodSync(hook, 0o755);
+      git(repo, "config", "core.hooksPath", hooks);
+
+      // Control: the same repository with only a minimal env does run the hook.
+      git(repo, "commit", "-q", "--allow-empty", "-m", "control");
+      expect(existsSync(marker)).toBe(true);
+      rmSync(marker);
+
+      const result = runGit(
+        { git: REAL_GIT },
+        ["commit", "-q", "--allow-empty", "-m", "hardened"],
+        { runDir: run, cwd: repo, quiet: true },
+      );
+      expect(result.code).toBe(0);
+      expect(existsSync(marker)).toBe(false);
+    });
+  });
+
   it("runs gh only with --repo defaultdave/defaultdave", async () => {
     await withRunDir(join(scratch(), "engine"), (run) => {
       const options = { runDir: run, configDir: run };
