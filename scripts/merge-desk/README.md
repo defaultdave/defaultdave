@@ -87,5 +87,6 @@ Body arguments for `pr`, `issue-comment`, `issue-body` and `pr-body`:
 - **The worktree is untrusted.** It supplies the branch name and the commits, and only read-only calls run in it: `rev-parse`, `symbolic-ref`, `remote get-url` and `config --get`. Its common dir must be the constant `EXPECTED_COMMON_DIR`, and every fetch and push URL of `origin` must be the repository's HTTPS URL, with no `insteadOf` or `pushInsteadOf` anywhere.
 - **Push runs elsewhere.** `push` makes a bare repo in the run dir, points its `alternates` at the shared object store, and pushes `<sha>:refs/heads/<branch>` to the constant HTTPS URL from there, never by remote name and never from the worktree.
 - **gh arguments.** `--repo defaultdave/defaultdave` on every call, the body on stdin with `--body-file -`, the title as `--title=<title>`, and no path.
+- **Not covered here: the parent Node process.** The token is minted and sent by `mintToken` and `post-check.ts` inside the launching process, so its own environment can capture it. The piece 3 launcher must scrub `NODE_OPTIONS`, `NODE_USE_ENV_PROXY`, `HTTP_PROXY`, `HTTPS_PROXY`, `NO_PROXY`, `NODE_EXTRA_CA_CERTS`, `NODE_TLS_REJECT_UNAUTHORIZED`, `SSL_CERT_FILE` and `SSL_CERT_DIR` before it starts these scripts.
 
 A required check with no verdict file stays pending. It is never posted green by hand.

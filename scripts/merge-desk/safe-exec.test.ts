@@ -216,6 +216,16 @@ describe("static properties of the merge-desk scripts", () => {
     "%s never reads the process environment",
     (name) => {
       expect(source(name)).not.toContain("process.env");
+      expect(source(name)).not.toMatch(/process\s*(\[|\??\.\s*env\b)/);
+    },
+  );
+
+  it.each(["agent-git.ts", "post-check.ts", "app-token.ts"])(
+    "%s loads no module by a dynamic import or require",
+    (name) => {
+      expect(source(name)).not.toMatch(
+        /\bimport\s*\(|\brequire\s*\(|createRequire/,
+      );
     },
   );
 });
@@ -564,7 +574,12 @@ describe("the engine root and run dir", () => {
   it("runs gh only with --repo defaultdave/defaultdave", async () => {
     await withRunDir(join(scratch(), "engine"), (run) => {
       const options = { runDir: run, configDir: run };
-      for (const args of [[], ["pr", "list"], ["--repo", "other/x"]])
+      for (const args of [
+        [],
+        ["pr", "list"],
+        ["defaultdave/defaultdave"],
+        ["--repo", "other/x"],
+      ])
         expect(() => runGh("/does/not/exist", args, options)).toThrow(Refused);
     });
   });

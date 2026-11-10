@@ -387,7 +387,7 @@ export function runGh(
   options: GhRunOptions,
 ): ChildResult {
   const at = args.indexOf("--repo");
-  if (args[at + 1] !== REPO_SLUG)
+  if (at < 0 || args[at + 1] !== REPO_SLUG)
     throw new Refused(`refused: gh must run with --repo ${REPO_SLUG}`);
   return forwardStderr(
     spawnChild(gh, args, {

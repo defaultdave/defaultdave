@@ -772,7 +772,7 @@ describe("the engine root", () => {
 });
 
 describe("realDeps", () => {
-  it("creates and stats nothing", () => {
+  it("creates nothing under the engine root", () => {
     const root = defaultEngineRoot();
     const before = existsSync(root);
     realDeps();
@@ -803,6 +803,12 @@ describe("realDeps", () => {
 });
 
 describe("a hostile repository and parent environment", () => {
+  // These scenarios prove the architecture (read-only worktree calls, a bare
+  // run-dir repo for the push, a rebuilt environment). Several settings below,
+  // such as filter and merge drivers, gpg, credential.helper, pager, sshCommand
+  // and gitProxy, are never reached by those calls, so they pass whatever
+  // HARDENING_KEYS holds. The keys themselves are proved by the HARDENING_KEYS
+  // snapshot and the core.hooksPath control run in safe-exec.test.ts.
   const HOOKS = [
     "pre-push",
     "reference-transaction",
@@ -934,7 +940,7 @@ describe("a hostile repository and parent environment", () => {
   ];
 
   it.each(scenarios)(
-    "%s: push and pr run no program, touch no decoy, and the right commit lands",
+    "architecture, %s: push and pr run no program, touch no decoy, and the right commit lands",
     async (_name, arrange) => {
       const fx = makeFixture();
       arrange(fx);
