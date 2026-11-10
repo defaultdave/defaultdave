@@ -1,8 +1,8 @@
 import { createVerify, generateKeyPairSync } from "node:crypto";
 import { mkdtempSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { tmpdir, userInfo } from "node:os";
 import { join } from "node:path";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   mintToken,
   parseConf,
@@ -167,5 +167,26 @@ describe("mintToken", () => {
     await expect(
       mintToken({ confPath: setup(CONF), fetch: fake }),
     ).rejects.toThrow("no token");
+  });
+});
+
+describe("home directory", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.resetModules();
+  });
+
+  it("resolves DEFAULT_CONF and a ~/ APP_KEY from the passwd entry, whatever HOME says", async () => {
+    vi.stubEnv("HOME", "/evil");
+    vi.resetModules();
+    const fresh = await import("./app-token");
+    const home = userInfo().homedir;
+    expect(fresh.DEFAULT_CONF).toBe(
+      `${home}/.config/defaultdave-agents/app.conf`,
+    );
+    const conf = fresh.parseConf(
+      "APP_ID=1\nAPP_INSTALLATION_ID=2\nAPP_KEY=~/k.pem\n",
+    );
+    expect(conf.keyPath).toBe(`${home}/k.pem`);
   });
 });

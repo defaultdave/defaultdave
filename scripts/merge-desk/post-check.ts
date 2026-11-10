@@ -2,14 +2,21 @@
 // "post green": a check comes from a /review-pr verdict file, or from bookkeeping mode.
 //   node scripts/merge-desk/post-check.ts verdict --agent <review|qa|spec-compliance|a11y-audit|architecture-audit|perf-check> --sha <head sha> [--dir .team-verdicts]
 //   node scripts/merge-desk/post-check.ts bookkeeping --pr <number> --sha <head sha>
-import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseArgs } from "node:util";
 // @ts-expect-error TS5097: Node needs the .ts extension, and the root tsconfig does not allow it
-import { mintToken } from "./app-token.ts";
+import { DEFAULT_CONF, mintToken } from "./app-token.ts";
 // @ts-expect-error TS5097: Node needs the .ts extension, and the root tsconfig does not allow it
 import { checkScope } from "./scope-check.ts";
+import {
+  type Deps as SafeDeps,
+  EXPECTED_COMMON_DIR,
+  GIT,
+  gitRead,
+  locateWorktree,
+  // @ts-expect-error TS5097: Node needs the .ts extension, and the root tsconfig does not allow it
+} from "./safe-exec.ts";
 
 export const REPO = "defaultdave/defaultdave";
 /** Required on `main`, pinned to the App. */
@@ -307,16 +314,44 @@ function readIfPresent(path: string): string | null {
   }
 }
 
-/** A verdict file describes the checked-out commit, so refuse to post it on any other sha. */
-function localHead(): string {
-  const result = spawnSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" });
-  if (result.status !== 0) throw new Error("git rev-parse HEAD failed");
+/**
+ * A verdict file describes the checked-out commit, so refuse to post it on any other sha. The worktree is
+ * located first: only a worktree of this repository is asked for its HEAD.
+ */
+export function localHead(
+  cwd: string,
+  deps: Pick<SafeDeps, "git" | "expectedCommonDir">,
+): string {
+  locateWorktree(cwd, deps);
+  const result = gitRead(cwd, ["rev-parse", "HEAD"], deps);
+  if (result.code !== 0) throw new Error("git rev-parse HEAD failed");
   return result.stdout.trim();
 }
 
-if (import.meta.main) {
+export interface Deps extends SafeDeps {
+  /** The untrusted worktree the verdict describes. */
+  cwd: string;
+  token: () => Promise<string>;
+}
+
+/** The live dependencies: fixed git, the constant common dir, and an App token minted from an explicit conf path. */
+export function realDeps(): Deps {
+  return {
+    git: GIT,
+    expectedCommonDir: EXPECTED_COMMON_DIR,
+    cwd: process.cwd(),
+    token: () => mintToken({ confPath: DEFAULT_CONF }),
+  };
+}
+
+const USAGE =
+  "usage: post-check.ts verdict --agent <name> --sha <sha> [--dir <dir>] | bookkeeping --pr <n> --sha <sha>";
+
+/** Runs one mode. Returns the exit code: 0 done, 1 any failure. */
+export async function main(argv: string[], deps: Deps): Promise<number> {
   try {
     const { values, positionals } = parseArgs({
+      args: argv,
       allowPositionals: true,
       options: {
         agent: { type: "string" },
@@ -329,7 +364,12 @@ if (import.meta.main) {
     if (!values.sha) throw new Error("--sha is required");
     if (mode === "verdict") {
       if (!values.agent) throw new Error("--agent is required");
-      if (values.sha !== localHead())
+      // Validate before touching the worktree or minting a token.
+      if (!VERDICTS[values.agent])
+        throw new Error(
+          `--agent must be one of ${Object.keys(VERDICTS).join(", ")}`,
+        );
+      if (values.sha !== localHead(deps.cwd, deps))
         throw new Error(
           "refused: --sha is not the checked-out commit the verdict describes",
         );
@@ -339,16 +379,11 @@ if (import.meta.main) {
         dir: values.dir,
         read: readIfPresent,
       };
-      // Validate before minting a token.
-      if (!VERDICTS[values.agent])
-        throw new Error(
-          `--agent must be one of ${Object.keys(VERDICTS).join(", ")}`,
-        );
       if (readIfPresent(join(values.dir, `${values.agent}.md`)) === null) {
         console.error(`no ${values.dir}/${values.agent}.md; posted nothing`);
       } else {
         console.log(
-          `posted ${(await postVerdict({ ...options, token: await mintToken() })) ?? ""} on ${values.sha.slice(0, 7)}`,
+          `posted ${(await postVerdict({ ...options, token: await deps.token() })) ?? ""} on ${values.sha.slice(0, 7)}`,
         );
       }
     } else if (mode === "bookkeeping") {
@@ -358,16 +393,19 @@ if (import.meta.main) {
       for (const line of await postBookkeeping({
         pr,
         sha: values.sha,
-        token: await mintToken(),
+        token: await deps.token(),
       }))
         console.log(`posted ${line}`);
     } else {
-      throw new Error(
-        "usage: post-check.ts verdict --agent <name> --sha <sha> [--dir <dir>] | bookkeeping --pr <n> --sha <sha>",
-      );
+      throw new Error(USAGE);
     }
+    return 0;
   } catch (error) {
     console.error((error as Error).message);
-    process.exit(1);
+    return 1;
   }
+}
+
+if (import.meta.main) {
+  process.exit(await main(process.argv.slice(2), realDeps()));
 }

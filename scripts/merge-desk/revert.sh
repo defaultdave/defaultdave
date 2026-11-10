@@ -23,10 +23,8 @@ fi
 git fetch origin "$base"
 git switch -c "$branch" "origin/$base"
 git revert --no-edit "$sha"
-body=$(mktemp)
-printf 'Reverts #%s (merge commit %s).\n' "$pr" "$sha" > "$body"
 node scripts/merge-desk/agent-git.ts push "$branch"
-node scripts/merge-desk/agent-git.ts pr "$base" "Revert: $title" "$body"
+node scripts/merge-desk/agent-git.ts pr "$base" "Revert: $title" --body "Reverts #$pr (merge commit $sha)."
 node scripts/merge-desk/agent-git.ts review "$branch"
 node scripts/merge-desk/agent-git.ts automerge "$branch"
 # Auto-merge is only queued. The revert merges after the CI and security checks pass and the four agent checks
