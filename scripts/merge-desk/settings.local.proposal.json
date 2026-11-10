@@ -1,18 +1,30 @@
 {
   "permissions": {
     "allow": [
-      "Bash(node scripts/merge-desk/agent-git.ts *)",
-      "Bash(node scripts/merge-desk/post-check.ts *)",
-      "Bash(node scripts/merge-desk/app-token.ts)",
-      "Bash(scripts/merge-desk/revert.sh *)"
+      "Bash(/Users/davidfleming/.local/share/defaultdave-merge-desk/bin/defaultdave/agent-git *)",
+      "Bash(/Users/davidfleming/.local/share/defaultdave-merge-desk/bin/defaultdave/post-check *)"
     ]
   },
   "sandbox": {
     "excludedCommands": [
-      "node scripts/merge-desk/agent-git.ts",
-      "node scripts/merge-desk/post-check.ts",
-      "node scripts/merge-desk/app-token.ts",
-      "scripts/merge-desk/revert.sh"
+      "/Users/davidfleming/.local/share/defaultdave-merge-desk/bin/defaultdave/agent-git *",
+      "/Users/davidfleming/.local/share/defaultdave-merge-desk/bin/defaultdave/post-check *"
+    ],
+    "filesystem": {
+      "denyRead": ["~/.config/defaultdave-agents", "~/.config/gh"]
+    }
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/davidfleming/.local/share/defaultdave-merge-desk/bin/defaultdave/command-guard"
+          }
+        ]
+      }
     ]
   }
 }
