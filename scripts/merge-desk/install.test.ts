@@ -464,7 +464,7 @@ describe("install: refusals from the clone and the archive", () => {
     const f = makeFixture({
       files: {
         "ok.ts":
-          'import { readFileSync } from "node:fs";\nimport { join } from "node:path";\nimport { x } from "./other.ts";\nexport { readFileSync, join, x };\n',
+          '// Built from nothing, never copied from\n/* or the usual import\n */\nimport { readFileSync } from "node:fs";\nimport { join } from "node:path";\nimport { x } from "./other.ts";\nexport { readFileSync, join, x };\n',
         "other.ts": "export const x = 1;\n",
         "ok.test.ts":
           'import { it } from "vitest";\nit("x", () => undefined);\n',

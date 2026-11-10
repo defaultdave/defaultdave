@@ -161,7 +161,7 @@ esac
 # ---- git with a clean environment
 git_clean() {
   /usr/bin/env -i HOME="$home" PATH=/usr/bin:/bin GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null \
-    GIT_NO_REPLACE_OBJECTS=1 "$git_real" -c core.hooksPath=/dev/null "$@"
+    GIT_NO_REPLACE_OBJECTS=1 GIT_NO_LAZY_FETCH=1 "$git_real" -c core.hooksPath=/dev/null "$@"
 }
 
 [ -d "$checkout" ] || die "--checkout $checkout is not a directory"
@@ -236,7 +236,8 @@ tar -xf "$work/export.tar" -C "$exp"
 
 while IFS= read -r file; do
   if grep -Eq '(^|[^A-Za-z0-9_.])(import|require)[[:space:]]*\(' "$file"; then die "${file#"$exp"/} uses a dynamic import or require"; fi
-  if grep -Eq '(^|[^A-Za-z0-9_])(from|import)[[:space:]]*$' "$file"; then die "${file#"$exp"/} splits an import across lines"; fi
+  # Whole-line comments are skipped here only: prose may end a line with "from" or "import"; code never may.
+  if grep -Ev '^[[:space:]]*(//|/\*|\*)' "$file" | grep -Eq '(^|[^A-Za-z0-9_])(from|import)[[:space:]]*$'; then die "${file#"$exp"/} splits an import across lines"; fi
   specs=$(grep -Eo "(^|[^A-Za-z0-9_])(from|import)[[:space:]]+['\"][^'\"]*['\"]" "$file" | sed -E "s/^.?(from|import)[[:space:]]+['\"]//; s/['\"]\$//" || true)
   while IFS= read -r spec; do
     [ -n "$spec" ] || continue
