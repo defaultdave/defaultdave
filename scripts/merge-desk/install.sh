@@ -164,9 +164,27 @@ git_clean() {
     GIT_NO_REPLACE_OBJECTS=1 GIT_NO_LAZY_FETCH=1 "$git_real" -c core.hooksPath=/dev/null "$@"
 }
 
+# The checkout's .git/config is agent-writable, so the one read of it also gets the safe-exec.ts HARDENING_KEYS through
+# GIT_CONFIG_COUNT, which outranks every config file. install.test.ts keeps this list equal to HARDENING_KEYS.
+HARDENING_KEYS=(
+  core.hooksPath=/dev/null core.fsmonitor=false core.askPass= core.editor=false sequence.editor=false core.pager=cat
+  core.sshCommand=false credential.helper= http.proxy= http.sslVerify=true http.followRedirects=false protocol.allow=never
+  protocol.https.allow=always submodule.recurse=false push.recurseSubmodules=no fetch.recurseSubmodules=false
+  commit.gpgSign=false tag.gpgSign=false transfer.fsckObjects=true
+)
+git_hardened() {
+  local pair i=0 kv=()
+  for pair in "${HARDENING_KEYS[@]}"; do
+    kv+=("GIT_CONFIG_KEY_$i=${pair%%=*}" "GIT_CONFIG_VALUE_$i=${pair#*=}")
+    i=$((i + 1))
+  done
+  /usr/bin/env -i HOME="$home" PATH=/usr/bin:/bin GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null \
+    GIT_NO_REPLACE_OBJECTS=1 GIT_NO_LAZY_FETCH=1 GIT_CONFIG_COUNT="$i" "${kv[@]}" "$git_real" "$@"
+}
+
 [ -d "$checkout" ] || die "--checkout $checkout is not a directory"
 checkout_real=$(realpath "$checkout")
-common=$(git_clean -C "$checkout_real" rev-parse --path-format=absolute --git-common-dir 2>/dev/null) ||
+common=$(git_hardened -C "$checkout_real" rev-parse --path-format=absolute --git-common-dir 2>/dev/null) ||
   die "$checkout_real is not a git checkout"
 [ "$common" = "$checkout_real/.git" ] || die "the git common dir of $checkout_real is $common, not $checkout_real/.git (a worktree or a redirected checkout)"
 
@@ -299,8 +317,16 @@ exec /usr/bin/env -i $env_words \\
   /bin/bash -p $bin/.stage/$1 "\$@"
 LAUNCHER
 }
+# The hook launcher must fail closed: Claude Code blocks a PreToolUse hook only on exit 2, so every failure maps to 2.
+write_hook_launcher() {
+  cat >"$new_bin/$1" <<LAUNCHER
+#!/bin/bash -p
+$header
+/usr/bin/env -i $env_words /bin/bash -p $bin/.stage/$1 "\$@" || exit 2
+LAUNCHER
+}
 write_stage() {
-  local name=$1 run=$2
+  local name=$1 run=$2 pin_code=${3:-4}
   cat >"$new_bin/.stage/$name" <<STAGE
 #!/bin/bash -p
 $header
@@ -312,7 +338,7 @@ while read -r want path; do
   have=\$(/usr/bin/shasum -a 256 "\$path" 2>/dev/null) || have=missing
   if [ "\${have%% *}" != "\$want" ]; then
     echo "pin: \$label changed; rerun install" >&2
-    exit 4
+    exit $pin_code
   fi
 done < $bin/.hashes
 $run
@@ -323,8 +349,13 @@ for name in agent-git post-check; do
   write_stage "$name" "/usr/bin/env -i $env_words $bin/.path/node $export_dir/worktree.ts < /dev/null
 exec /usr/bin/env -i $env_words $bin/.path/node $export_dir/$name.ts \"\$@\""
 done
-write_launcher command-guard
-write_stage command-guard "exec /usr/bin/env -i $env_words $bin/.path/node $export_dir/command-guard.ts $bin/"
+write_hook_launcher command-guard
+write_stage command-guard "rc=0
+/usr/bin/env -i $env_words $bin/.path/node $export_dir/command-guard.ts $bin/ || rc=\$?
+if [ \"\$rc\" -ne 0 ] && [ \"\$rc\" -ne 2 ]; then
+  echo \"command-guard: denied: guard failed with exit \$rc\" >&2
+fi
+[ \"\$rc\" -eq 0 ] || exit 2" 2
 
 find "$new_bin" -type f ! -name .hashes -exec chmod 555 {} +
 chmod 444 "$new_bin/.hashes"
@@ -338,7 +369,10 @@ else
     old_bin="$prefix/bin/defaultdave.old.$$"
     mv "$bin" "$old_bin"
   fi
-  mv "$new_bin" "$bin"
+  if ! mv "$new_bin" "$bin"; then
+    if [ -n "$old_bin" ] && [ -d "$old_bin" ] && mv "$old_bin" "$bin"; then old_bin=""; fi
+    die "cannot move the new launchers into $bin; the previous launchers are restored"
+  fi
   chmod 555 "$bin"
 fi
 

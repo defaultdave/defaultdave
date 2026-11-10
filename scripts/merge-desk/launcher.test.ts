@@ -196,7 +196,7 @@ describe("agent-git and post-check launchers", () => {
   const hostile: Record<string, string> = {
     NODE_OPTIONS: `--require ${join(l.root, "preload.cjs")}`,
     BASH_ENV: join(l.root, "bashenv.sh"),
-    "BASH_FUNC_git%%": "() { echo hijacked; }",
+    "BASH_FUNC_shasum%%": `() { echo shasum > ${marker}; }`,
     GIT_DIR: "/nowhere",
     GH_TOKEN: "ghp_fake",
     HTTPS_PROXY: "http://127.0.0.1:9",
@@ -351,10 +351,15 @@ describe("pins", () => {
     lines[index] =
       `${"0".repeat(64)} ${(lines[index] ?? "").split(" ")[1] ?? ""}`;
     writeFileSync(hashes, lines.join("\n"));
-    for (const name of ["agent-git", "post-check", "command-guard"]) {
+    for (const [name, code] of [
+      ["agent-git", 4],
+      ["post-check", 4],
+      // A PreToolUse hook blocks only on exit 2, so the hook launcher fails closed.
+      ["command-guard", 2],
+    ] as const) {
       const result = launch(l, name, [], { input: "{}" });
       expect(result).toEqual({
-        code: 4,
+        code,
         stdout: "",
         stderr: `pin: ${label} changed; rerun install\n`,
       });
@@ -379,6 +384,41 @@ describe("command-guard launcher", () => {
     expect(
       hook(`${l.bin}/agent-git issue-comment 1 --body 'it'\\''s fine $(x)'`),
     ).toEqual({ code: 0, stdout: "", stderr: "" });
+  });
+
+  it("denies a launcher-naming command with exit 2 when the pins fail, so the substitution never runs", () => {
+    const broken = installed();
+    unlock(join(broken.bin, ".hashes"));
+    writeFileSync(join(broken.bin, ".hashes"), `${"0".repeat(64)} /x\n`);
+    const result = launch(broken, "command-guard", [], {
+      input: JSON.stringify({
+        tool_name: "Bash",
+        tool_input: { command: `${broken.bin}/agent-git push $(evil)` },
+      }),
+    });
+    expect(result.code).toBe(2);
+    expect(result.stderr).toMatch(/pin: .+ changed; rerun install/);
+  });
+
+  it("maps a guard crash to exit 2 with a reason line", () => {
+    const broken = installed();
+    unlock(join(broken.bin, ".stage", "command-guard"));
+    const stage = join(broken.bin, ".stage", "command-guard");
+    const text = readFileSync(stage, "utf8").replace(
+      /\/\S+command-guard\.ts/,
+      "/nonexistent/command-guard.ts",
+    );
+    writeFileSync(stage, text);
+    const result = launch(broken, "command-guard", [], {
+      input: JSON.stringify({
+        tool_name: "Bash",
+        tool_input: { command: `${broken.bin}/agent-git push $(evil)` },
+      }),
+    });
+    expect(result.code).toBe(2);
+    expect(result.stderr).toContain(
+      "command-guard: denied: guard failed with exit 1",
+    );
   });
 
   it("passes a command that does not name the launcher directory", () => {

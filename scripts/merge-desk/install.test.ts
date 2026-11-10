@@ -19,6 +19,8 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
 
+import { HARDENING_KEYS } from "./safe-exec";
+
 const HERE = import.meta.dirname;
 const INSTALL_SH = join(HERE, "install.sh");
 const real = (name: string) => readFileSync(join(HERE, name), "utf8");
@@ -608,7 +610,16 @@ describe("install: the export and the launchers", () => {
     );
     const guard = readFileSync(join(f.bin, ".stage", "command-guard"), "utf8");
     expect(guard).not.toContain("worktree.ts");
-    expect(guard).toContain(`${f.exportDir}/command-guard.ts ${f.bin}/\n`);
+    expect(guard).toContain(
+      `${f.exportDir}/command-guard.ts ${f.bin}/ || rc=$?\n`,
+    );
+    expect(guard).toContain("exit 2");
+    expect(guard).not.toContain("exit 4");
+    const hook = readFileSync(join(f.bin, "command-guard"), "utf8");
+    expect(hook).not.toContain("exec ");
+    expect(hook).toContain(
+      `/bin/bash -p ${f.bin}/.stage/command-guard "$@" || exit 2\n`,
+    );
   });
 
   it("points .path/node at the node realpath and pins node, gh and git by sha256", () => {
@@ -812,3 +823,18 @@ describe("settings.local.proposal.json", () => {
 function asEnv(vars: Record<string, string | undefined>): NodeJS.ProcessEnv {
   return vars as NodeJS.ProcessEnv;
 }
+
+describe("install.sh git hardening", () => {
+  it("lists exactly the HARDENING_KEYS of safe-exec.ts", () => {
+    const text = real("install.sh");
+    const block = /HARDENING_KEYS=\(([^)]*)\)/.exec(text)?.[1] ?? "";
+    const pairs = block
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((word) => {
+        const at = word.indexOf("=");
+        return [word.slice(0, at), word.slice(at + 1)];
+      });
+    expect(pairs).toEqual(HARDENING_KEYS.map(([k, v]) => [k, v]));
+  });
+});
