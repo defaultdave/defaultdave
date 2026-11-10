@@ -5,11 +5,12 @@
 // Run: node scripts/merge-desk/app-token.ts
 import { createSign } from "node:crypto";
 import { readFileSync } from "node:fs";
-import { homedir } from "node:os";
+import { userInfo } from "node:os";
 import { join } from "node:path";
 
+// The passwd entry, not $HOME: a caller's environment must not redirect where the key is read from.
 export const DEFAULT_CONF = join(
-  homedir(),
+  userInfo().homedir,
   ".config",
   "defaultdave-agents",
   "app.conf",
@@ -42,7 +43,7 @@ export function parseConf(text: string): AppConf {
     appId: required("APP_ID"),
     clientId: values.APP_CLIENT_ID ?? null,
     installationId: required("APP_INSTALLATION_ID"),
-    keyPath: required("APP_KEY").replace(/^~(?=\/)/, homedir()),
+    keyPath: required("APP_KEY").replace(/^~(?=\/)/, userInfo().homedir),
   };
 }
 

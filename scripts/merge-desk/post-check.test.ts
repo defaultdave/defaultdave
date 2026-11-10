@@ -1,13 +1,28 @@
-import { describe, expect, it } from "vitest";
+import { execFileSync } from "node:child_process";
+import {
+  chmodSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  realpathSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   buildCheckRun,
   CHECK_NAMES,
   conclusionFromVerdict,
   fetchPrFiles,
+  localHead,
+  main,
   NOT_APPLICABLE_SUMMARY,
   postBookkeeping,
   postCheck,
   postVerdict,
+  type Deps,
   REQUIRED_CHECKS,
   SUMMARY_LIMIT,
 } from "./post-check";
@@ -351,5 +366,183 @@ describe("postBookkeeping", () => {
     const { result, seen } = run(GOOD, "b".repeat(40));
     await expect(result).rejects.toThrow("head is");
     expect(posts(seen)).toHaveLength(0);
+  });
+});
+
+const scratchDirs: string[] = [];
+afterEach(() => {
+  vi.unstubAllEnvs();
+  for (const dir of scratchDirs.splice(0))
+    rmSync(dir, { recursive: true, force: true });
+});
+
+function git(cwd: string, ...args: string[]): string {
+  return execFileSync("git", args, {
+    cwd,
+    encoding: "utf8",
+    env: {
+      PATH: "/usr/bin:/bin:/opt/homebrew/bin:/usr/local/bin",
+      NODE_ENV: "test",
+      GIT_CONFIG_GLOBAL: "/dev/null",
+      GIT_CONFIG_NOSYSTEM: "1",
+      GIT_AUTHOR_NAME: "t",
+      GIT_AUTHOR_EMAIL: "t@example.com",
+      GIT_COMMITTER_NAME: "t",
+      GIT_COMMITTER_EMAIL: "t@example.com",
+    },
+  }).trim();
+}
+
+function makeRepo(origin = "https://github.com/defaultdave/defaultdave.git") {
+  const scratch = realpathSync(mkdtempSync(join(tmpdir(), "post-check-")));
+  scratchDirs.push(scratch);
+  const root = join(scratch, "repo");
+  mkdirSync(root);
+  git(root, "init", "-q", "-b", "main");
+  writeFileSync(join(root, "a.txt"), "a");
+  git(root, "add", "a.txt");
+  git(root, "commit", "-q", "-m", "one");
+  git(root, "remote", "add", "origin", origin);
+  const marker = join(scratch, "MARKER");
+  const trap = join(scratch, "trap");
+  writeFileSync(trap, `#!/bin/sh\ntouch '${marker}'\n`);
+  chmodSync(trap, 0o755);
+  return {
+    scratch,
+    root,
+    marker,
+    trap,
+    gitDir: join(root, ".git"),
+    sha: git(root, "rev-parse", "HEAD"),
+  };
+}
+
+function makeDeps(
+  repo: ReturnType<typeof makeRepo>,
+  tokens: string[] = [],
+): Deps {
+  return {
+    git: "git",
+    expectedCommonDir: repo.gitDir,
+    cwd: repo.root,
+    token: () => {
+      tokens.push("minted");
+      return Promise.resolve("ghs_fake");
+    },
+  };
+}
+
+describe("localHead", () => {
+  it("returns HEAD of a worktree of this repository", () => {
+    const repo = makeRepo();
+    expect(localHead(repo.root, makeDeps(repo))).toBe(repo.sha);
+  });
+
+  it("refuses a worktree of another repository, and an origin that is not this repo", () => {
+    const repo = makeRepo();
+    const other = makeRepo();
+    expect(() =>
+      localHead(other.root, { ...makeDeps(repo), git: "git" }),
+    ).toThrow(/^refused: this worktree belongs to another repository/);
+    const foreign = makeRepo("git@github.com:defaultdave/defaultdave.git");
+    expect(() => localHead(foreign.root, makeDeps(foreign))).toThrow(
+      /^refused: every fetch and push URL/,
+    );
+  });
+
+  it.each([
+    [
+      "a hook, hooksPath and fsmonitor",
+      (repo: ReturnType<typeof makeRepo>) => {
+        writeFileSync(
+          join(repo.gitDir, "hooks", "reference-transaction"),
+          `#!/bin/sh\ntouch '${repo.marker}'\n`,
+        );
+        chmodSync(join(repo.gitDir, "hooks", "reference-transaction"), 0o755);
+        git(repo.root, "config", "core.hooksPath", repo.scratch);
+        git(repo.root, "config", "core.fsmonitor", repo.trap);
+      },
+    ],
+    [
+      "include.path",
+      (repo: ReturnType<typeof makeRepo>) => {
+        const file = join(repo.scratch, "inc.cfg");
+        writeFileSync(
+          file,
+          `[core]\n\tfsmonitor = ${repo.trap}\n\tpager = ${repo.trap}\n`,
+        );
+        git(repo.root, "config", "include.path", file);
+      },
+    ],
+    [
+      "a parent GIT_DIR, GIT_CONFIG_COUNT and GIT_EXEC_PATH",
+      (repo: ReturnType<typeof makeRepo>) => {
+        vi.stubEnv("GIT_DIR", join(repo.scratch, "nowhere"));
+        vi.stubEnv("GIT_CONFIG_COUNT", "1");
+        vi.stubEnv("GIT_CONFIG_KEY_0", "core.fsmonitor");
+        vi.stubEnv("GIT_CONFIG_VALUE_0", repo.trap);
+        vi.stubEnv("GIT_EXEC_PATH", repo.scratch);
+        vi.stubEnv("PATH", `${repo.scratch}:${process.env.PATH ?? ""}`);
+      },
+    ],
+  ])("runs no program from %s", (_n, arrange) => {
+    const repo = makeRepo();
+    arrange(repo);
+    expect(localHead(repo.root, makeDeps(repo))).toBe(repo.sha);
+    expect(existsSync(repo.marker)).toBe(false);
+  });
+});
+
+describe("post-check main", () => {
+  const verdictArgs = (repo: ReturnType<typeof makeRepo>, sha = repo.sha) => [
+    "verdict",
+    "--agent",
+    "review",
+    "--sha",
+    sha,
+    "--dir",
+    join(repo.scratch, "verdicts"),
+  ];
+
+  it.each([
+    ["no mode", []],
+    ["no --sha", ["verdict", "--agent", "review"]],
+    ["no --agent", ["verdict", "--sha", "a".repeat(40)]],
+    [
+      "an unknown agent",
+      ["verdict", "--agent", "nope", "--sha", "a".repeat(40)],
+    ],
+    ["a bad --pr", ["bookkeeping", "--pr", "x", "--sha", "a".repeat(40)]],
+    ["an unknown option", ["verdict", "--bogus"]],
+  ])("%s exits 1 and mints no token", async (_n, argv) => {
+    const repo = makeRepo();
+    const tokens: string[] = [];
+    expect(await main(argv, makeDeps(repo, tokens))).toBe(1);
+    expect(tokens).toEqual([]);
+  });
+
+  it("refuses a sha that is not the checked-out commit", async () => {
+    const repo = makeRepo();
+    const tokens: string[] = [];
+    expect(
+      await main(verdictArgs(repo, "b".repeat(40)), makeDeps(repo, tokens)),
+    ).toBe(1);
+    expect(tokens).toEqual([]);
+  });
+
+  it("refuses a worktree of another repository before reading any verdict", async () => {
+    const repo = makeRepo();
+    const other = makeRepo();
+    const tokens: string[] = [];
+    const deps = { ...makeDeps(repo, tokens), cwd: other.root };
+    expect(await main(verdictArgs(other), deps)).toBe(1);
+    expect(tokens).toEqual([]);
+  });
+
+  it("posts nothing and exits 0 when the verdict file is missing", async () => {
+    const repo = makeRepo();
+    const tokens: string[] = [];
+    expect(await main(verdictArgs(repo), makeDeps(repo, tokens))).toBe(0);
+    expect(tokens).toEqual([]);
   });
 });
