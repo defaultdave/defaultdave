@@ -39,19 +39,56 @@ Each step needs Dave's `gh` login; the App cannot change settings. Nothing here 
 
    Read it back: `gh api repos/defaultdave/defaultdave/rulesets`. It requires a PR, one approval dismissed on push, no force push or deletion, and the checks above. The only bypass actor is the repository admin role (`actor_id` 5) in mode `always`, so Dave can still push to `main` and merge any PR.
 
-4. **Let the agents run the four commands outside the sandbox.** Copy the proposal into the gitignored local settings (merge by hand if the file already has entries):
-
-   ```bash
-   cp scripts/merge-desk/settings.local.proposal.json .claude/settings.local.json
-   ```
-
-   It allows, and excludes from the sandbox, only the four merge-desk commands. The App key is a `.pem` the sandbox cannot read, so these commands cannot run inside it; their own refusals are the guard on them.
+4. **Install the pinned launchers first** (the Install section below). The settings change that lets agents use them is the piece 4 cutover, not this step; until then agents keep running `node scripts/merge-desk/...` from the working tree.
 
 5. **This unit's PR** merges by Dave's bypass, since the rule it sets up does not exist until it lands: `gh pr merge <n> --admin --squash --delete-branch`.
 
 6. **Dry run** (after steps 1 to 4): a `pm/dry-run` PR merges after the checks and Dave's approval; a PR with one failing check does not; `revert.sh` works; `agent-git.ts push main` is refused.
 
 7. **Closing the approval window** (`scripts/merge-desk/approval-window.sh off`) waits until Ramble's tokens are restricted to `defaultdave/ramble` (ADR Consequences).
+
+## Install
+
+Dave runs this, outside any agent session. It exports `scripts/merge-desk/` at a pinned sha from a fresh clone into `/Users/davidfleming/.local/share/defaultdave-merge-desk/<sha>/` (read-only) and writes the launchers `agent-git` and `post-check` and the hook command `command-guard` into `/Users/davidfleming/.local/share/defaultdave-merge-desk/bin/defaultdave/`. It prints the settings blocks and applies none of them. The working-tree `install.sh` is agent-editable, so the bootstrap runs the copy archived in the sha. The clone is anonymous (no credentials, no git config), so the repository must be readable without a login.
+
+1. Make the staging directory:
+
+   ```bash
+   mkdir -p -m 700 /Users/davidfleming/.local/share/defaultdave-merge-desk/.staging
+   ```
+
+2. Clone `main` bare:
+
+   ```bash
+   git clone --bare --single-branch --branch main --no-tags https://github.com/defaultdave/defaultdave.git /Users/davidfleming/.local/share/defaultdave-merge-desk/.staging/boot.git
+   ```
+
+3. Choose the sha (a full 40-character commit on `main` you have reviewed), and take `install.sh` from it:
+
+   ```bash
+   git --git-dir=/Users/davidfleming/.local/share/defaultdave-merge-desk/.staging/boot.git show <sha>:scripts/merge-desk/install.sh > /Users/davidfleming/.local/share/defaultdave-merge-desk/.staging/install.sh
+   ```
+
+4. Run it:
+
+   ```bash
+   bash /Users/davidfleming/.local/share/defaultdave-merge-desk/.staging/install.sh <sha> --checkout /Users/davidfleming/Workspace/defaultdave
+   ```
+
+It lists the commits that touched `scripts/merge-desk/` since the installed pin and asks for `y`. It refuses a short sha or ref, a sha that is not on `main`, a script outside `.staging/`, a checkout whose git common dir is not `<checkout>/.git`, an `APP_KEY` not ending `.pem` or `.key`, a `node`, `gh` or `git` under `~/Workspace` or a temp root, a node older than 24.2, and an export that holds a symlink, a `package.json`, or a non-test `.ts` importing anything but `node:` modules and sibling `./<name>.ts` files. A rerun at the same sha changes nothing; a new sha adds a directory, replaces the launchers and keeps the old directory. Each launcher pins `node`, `gh` and `git` by sha256: when one changes (a `brew upgrade`), the launcher exits 4 with `pin: <binary> changed; rerun install`, and you rerun step 4.
+
+## After the cutover
+
+Piece 4 (Dave's) applies blocks (a) to (e) that install printed, and rewrites the docs that name `node scripts/merge-desk/...`. `settings.local.proposal.json` holds blocks (a) and (c). From then on an agent calls the launchers by absolute path, one call per command, with every title and body in single quotes (write a literal single quote as `'\''`):
+
+```bash
+/Users/davidfleming/.local/share/defaultdave-merge-desk/bin/defaultdave/agent-git push unit/<unit-id>-<slug>
+/Users/davidfleming/.local/share/defaultdave-merge-desk/bin/defaultdave/agent-git pr main '<title>' --body '<text>'
+/Users/davidfleming/.local/share/defaultdave-merge-desk/bin/defaultdave/agent-git automerge <pr>
+/Users/davidfleming/.local/share/defaultdave-merge-desk/bin/defaultdave/post-check verdict --agent review --sha <sha>
+```
+
+`command-guard` (a `PreToolUse` hook on Bash) denies any command that names the launcher directory unless the launcher is the first word and everything outside single quotes is plain words: no `$(`, backtick, `${`, double quote, `;`, `&`, `|`, redirect, newline, `~`, env prefix, `cd x && ...` or `bash -c '...'`. Run `app-token.ts` yourself; it prints a live token and has no launcher. There is no revert launcher yet: until the third ticket lands, Dave runs `scripts/merge-desk/revert.sh <n>` by hand in the main checkout.
 
 ## How an agent uses it
 
