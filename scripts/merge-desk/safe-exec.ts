@@ -102,6 +102,8 @@ export function gitEnv(options: GitEnvOptions): Record<string, string> {
     GIT_NO_REPLACE_OBJECTS: "1",
     GIT_OPTIONAL_LOCKS: "0",
     GIT_PROTOCOL_FROM_USER: "0",
+    // A partial-clone config in the repository must not turn a missing object into a fetch from its promisor remote.
+    GIT_NO_LAZY_FETCH: "1",
     GIT_CONFIG_COUNT: String(config.length),
   };
   config.forEach(([key, value], index) => {
@@ -195,7 +197,8 @@ export function gitRead(
 /**
  * Checks that `cwd` is a worktree of this repo and returns the constant common dir, never git's output.
  * The cwd is untrusted: it supplies only the branch name and commits, and only the read-only calls below
- * run in it. None touches the network, the index or hooks.
+ * run in it. Every child env carries GIT_NO_LAZY_FETCH=1, so a promisor remote in the worktree's config
+ * cannot start a fetch, and none of these calls touches the index or runs hooks.
  */
 export function locateWorktree(
   cwd: string,
@@ -348,7 +351,7 @@ function insideRunDir(runDir: string, path: string): boolean {
 
 export interface GitRunOptions {
   runDir: string;
-  /** Must be the run dir or inside it: network git never runs anywhere else. */
+  /** Must be the run dir or inside it: the only git call given the auth file never runs anywhere else. */
   cwd: string;
   authFile?: string | undefined;
   extraConfig?: ConfigPairs | undefined;

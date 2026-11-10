@@ -245,13 +245,14 @@ describe("child environments", () => {
       GIT_NO_REPLACE_OBJECTS: "1",
       GIT_OPTIONAL_LOCKS: "0",
       GIT_PROTOCOL_FROM_USER: "0",
+      GIT_NO_LAZY_FETCH: "1",
       GIT_CONFIG_COUNT: String(HARDENING_KEYS.length),
     });
     HARDENING_KEYS.forEach(([key, value], index) => {
       expect(env[`GIT_CONFIG_KEY_${String(index)}`]).toBe(key);
       expect(env[`GIT_CONFIG_VALUE_${String(index)}`]).toBe(value);
     });
-    expect(Object.keys(env)).toHaveLength(12 + 2 * HARDENING_KEYS.length);
+    expect(Object.keys(env)).toHaveLength(13 + 2 * HARDENING_KEYS.length);
   });
 
   it("appends extra config after the hardening keys, so it wins", () => {

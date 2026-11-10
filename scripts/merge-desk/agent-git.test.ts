@@ -1,4 +1,4 @@
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import {
   chmodSync,
   existsSync,
@@ -15,6 +15,7 @@ import {
 import { tmpdir, userInfo } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { localHead } from "./post-check";
 import {
   automerge,
   type Deps,
@@ -34,6 +35,7 @@ import {
   EXPECTED_COMMON_DIR,
   GH,
   GIT,
+  gitEnv,
   REPO_HTTPS_URL,
 } from "./safe-exec";
 
@@ -976,6 +978,7 @@ describe("a hostile repository and parent environment", () => {
           "GIT_CONFIG_COUNT",
           "GIT_CONFIG_GLOBAL",
           "GIT_CONFIG_NOSYSTEM",
+          "GIT_NO_LAZY_FETCH",
           "GIT_NO_REPLACE_OBJECTS",
           "GIT_OPTIONAL_LOCKS",
           "GIT_PROTOCOL_FROM_USER",
@@ -994,6 +997,7 @@ describe("a hostile repository and parent environment", () => {
         LC_ALL: "C",
         GIT_CONFIG_NOSYSTEM: "1",
         GIT_TERMINAL_PROMPT: "0",
+        GIT_NO_LAZY_FETCH: "1",
         GIT_NO_REPLACE_OBJECTS: "1",
         GIT_OPTIONAL_LOCKS: "0",
         GIT_PROTOCOL_FROM_USER: "0",
@@ -1098,5 +1102,69 @@ describe("a hostile repository and parent environment", () => {
     const fx = makeFixture();
     await run(makeDeps(fx));
     expect(readCalls(fx, "git")).toHaveLength(0);
+  });
+});
+
+describe("a partial-clone promisor remote in the worktree", () => {
+  const MISSING = "1".repeat(40);
+
+  /** The agent's setup: a promisor remote that is a file:// decoy, and a pushable branch at a missing object. */
+  function plant(fx: Fixture): string {
+    const hit = join(fx.scratch, "DECOY-READ");
+    const uploadpack = script(
+      join(fx.scratch, "traps", "uploadpack"),
+      `touch '${hit}'\nexit 1`,
+    );
+    for (const [key, value] of [
+      ["core.repositoryformatversion", "1"],
+      ["extensions.partialClone", "evil"],
+      ["remote.evil.url", `file://${fx.decoy}`],
+      ["remote.evil.promisor", "true"],
+      ["remote.evil.uploadpack", uploadpack],
+      ["protocol.file.allow", "always"],
+    ] as const)
+      git(fx.root, "config", key, value);
+    writeFileSync(join(fx.gitDir, "refs", "heads", "unit", "probe"), MISSING);
+    return hit;
+  }
+
+  const peel = ["rev-parse", "--verify", "--quiet", "--end-of-options"];
+
+  it("starts a lazy fetch in a plain env, which is what GIT_NO_LAZY_FETCH prevents", () => {
+    const fx = makeFixture();
+    mkdirSync(join(fx.gitDir, "refs", "heads", "unit"), { recursive: true });
+    const hit = plant(fx);
+    const env = { ...gitEnv({ tmpdir: "/var/empty" }) } as Record<
+      string,
+      string
+    >;
+    delete env.GIT_NO_LAZY_FETCH;
+    const control = spawnSync(
+      REAL_GIT,
+      [...peel, "refs/heads/unit/probe^{commit}"],
+      { cwd: fx.root, env: env as NodeJS.ProcessEnv, encoding: "utf8" },
+    );
+    expect(control.status).toBe(1);
+    expect(existsSync(hit)).toBe(true);
+  });
+
+  it("refuses push and runs post-check's localHead without reading the decoy", async () => {
+    const fx = makeFixture();
+    mkdirSync(join(fx.gitDir, "refs", "heads", "unit"), { recursive: true });
+    const hit = plant(fx);
+    const deps = makeDeps(fx);
+
+    await expect(push("unit/probe", deps)).rejects.toBeInstanceOf(Refused);
+    expect(engineEntries(deps)).toBeNull();
+    expect(existsSync(hit)).toBe(false);
+
+    // HEAD is the missing object too. Whether localHead reports it or throws, it must not fetch.
+    writeFileSync(join(fx.gitDir, "HEAD"), `${MISSING}\n`);
+    try {
+      localHead(fx.root, deps);
+    } catch {
+      // A refusal is as good as an answer here.
+    }
+    expect(existsSync(hit)).toBe(false);
   });
 });
