@@ -2,7 +2,7 @@
 
 Current state only. History is in `DECISIONS.md` and `delta-log.md`. Kept under 25 KB by `scripts/pm.sh check`.
 
-Updated 2026-11-11 by pm (Sonnet 5.5): the swarm ran. All five page PRs are merged (#52, #53, #54, #55, #56) and the bookkeeping PR #57 with them. GitHub repo: `defaultdave/defaultdave`, public; issues #1 to #21 are the tickets (no local copies; DECISIONS 2026-11-06), #1 to #6 closed (#7 closes once Dave confirms its criterion 5). Project board: [#20](https://github.com/users/defaultdave/projects/20), all 21 issues added; Route and Milestone fields not set up yet. Domain: `davidfleming.me` bought; Vercel project `defaultdave` live, domain attached 2026-11-08. Plan: 21 units; owner time 72 h, 2.4 weeks at 30 h/wk, accepted as a measurement.
+Updated 2026-11-11 by pm (Opus 5.5): calibration done (path 1.1 to 1.3 weeks, was 1.7 to 2.2; delta-log Calibration and Re-estimates); `plan.mjs` accepts `plan.json` again. #66 (Vercel Analytics behind the wrapper) built by one `senior`, PR #67 open as the App. Page swarm merged (#52 to #56). GitHub repo: `defaultdave/defaultdave`, public; issues #1 to #21 are the plan tickets, #66 is a split from `seo-perf` (DECISIONS 2026-11-11). Project board: [#20](https://github.com/users/defaultdave/projects/20). Domain `davidfleming.me` live on Vercel project `defaultdave`.
 
 MILESTONE: 1 Walkable (exit: Home, the Work list and the ResortPass case study live at davidfleming.me). 0 Designed reached 2026-11-06
 
@@ -24,6 +24,7 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 | `page-writing` | done | agent fan-out | 1 | #10 | #56 | | merged 2026-11-11 (fd38fdc); CI failed lint and knip on the first push, one fix commit; list date has no `<time>` element (nit) |
 | `page-music` | done | agent fan-out | 1 | #11 | #55 | | merged 2026-11-11 (2081e18); Lighthouse CLS assertion moved to `seo-perf` (DECISIONS); real embeddable URLs come with `content-music` |
 | `page-about` | done | agent fan-out | 1 | #12 | #52 | | merged 2026-11-11 (dceecfa); first page of the swarm |
+| `analytics` | in review | agent fan-out | 1 | #66 | #67 | Dave | round 1 at a95873f: review-agent (approve with nits: caret version), qa-agent (PM, browser pane), spec-compliance, a11y-audit posted green; CI green except `scope-manifest` (no `analytics` unit in `plan.json` on main, fixed by the bookkeeping PR); criteria 1 to 5 confirmed in a #66 comment, 6 is Dave's after deploy |
 | `content-work` | todo | human only | | #13 | | Dave | needs Blocked item 3 |
 | `content-writing` | todo | human only | | #14 | | Dave | needs Blocked item 5 |
 | `content-music` | todo | human only | | #15 | | Dave | needs Blocked item 2 |
@@ -47,19 +48,19 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 
 ## Next
 
-1. Launcher leftovers: the `scripts/merge-desk/README.md` rewrite landed (#61). Issue #62 covers the old-form calls still in `revert.sh` and the usage comments in `agent-git.ts` and `post-check.ts`; `scope-manifest.yml:40` keeps the old form on purpose (CI runs from the checkout). `scripts/merge-desk/` is protected, so Dave pushes and bypass-merges the PR. The sandbox-gap work (#40, #41, cutover, dry run) is done; its history is in DECISIONS.
-2. Dave: confirm #7 criterion 5, close #7; set up a forwarding address at `davidfleming.me`; bio text.
-3. Swarm done: all five page units merged. Dave-owned follow-ups: PR screenshots via `pr-images` (none of #52 to #56 carries images, and they are merged, so add them only if wanted); body Amendment sections on issues #9 and #11 (comments are posted; the launcher guard refuses the quotes in the bodies); `seo-perf` (#17) picks up the Lighthouse CI config, `Figure` sizing, CSP frame origins and sitemap routes (DECISIONS 2026-11-11), estimate to confirm before it starts. Carried suggestions, not builds: architecture-audit B2 findings on `page-work` (move filter-by-kind into `src/lib`); `linkTarget()` into `src/lib`; a featured slug that resolves to nothing is dropped silently; list dates have no `<time>` element on /articles and /musings; `plan.mjs` rejects `plan.json` (unit `preflight` kind; every unit's `estimate` needs o, m and p in days, the rounds-based ones are rejected): fix before calibrating.
-4. Review-agent size rule settled (DECISIONS 2026-11-11): tests leave the changed-line count. Dave applies the one-line edit in `vig/global/agents/review.md` (sandbox blocks the PM); until then the old rule still fires. Verdict keys: from #40 round 4 the prompt names the agent's own key (`REVIEW_VERDICT=`, `ARCH_VERDICT=`); check again on the next real `/review-pr`.
+1. PR #67 (#66): reviewed, four agent checks green. Order: merge the bookkeeping PR from `pm/analytics-calibration` (adds unit `analytics` to `plan.json`), then re-run `scope-manifest` on #67 (any PR edit re-triggers it; it runs from main), then Dave approves and merges #67, confirms events in the Vercel Analytics dashboard (criterion 6) and closes #66. Optional nit: pin `@vercel/analytics` to `2.0.1`.
+2. `seo-perf` (#17): calibrated to 0.1 / 0.2 / 0.3 days, but its scope grew (Lighthouse CI config, `Figure` sizing, CSP frame origins, sitemap routes; DECISIONS 2026-11-11) and the CSP now takes the analytics origins from PR #67. Dave confirms the estimate, then it fans out with `feed` (#18).
+3. Launcher leftovers, issue #62 (old-form calls in `revert.sh`, usage comments in `agent-git.ts` and `post-check.ts`); `scripts/merge-desk/` is protected, so Dave pushes and bypass-merges.
+4. Dave: confirm #7 criterion 5 and close #7; forwarding address at `davidfleming.me`; bio text. Milestone 1 still needs `content-work` (#13, Dave's).
+5. Carried, not builds: PR screenshots for #52 to #56 only if wanted; Amendment sections on #9 and #11 bodies; architecture-audit B2 on `page-work` (filter-by-kind into `src/lib`), `linkTarget()` into `src/lib`, featured slug dropped silently, list dates without `<time>`; Speed Insights needs its own ticket if wanted (through the same wrapper); review-agent size rule edit in `vig/global/agents/review.md` is Dave's.
+6. Session sandbox quirks (this chat): `git worktree add` and `pnpm install` need the sandbox off (the `.claude/settings*.json` write rule hits checkouts and a package in `node_modules`); `agent-git pr` needs it off too (cache `mkdtemp` under `~/Library/Caches`), and runs from the unit's worktree because it takes the current branch.
 
 ## Next chat
 
-**Before you start:** close #7 once you confirm its criterion 5; the content inputs in Blocked on Dave (bio text, forwarding address); handle #62 (Next 1) when you want it, it is not blocking. The page swarm is done (#52 to #56, bookkeeping #58); do not start it again.
+**Before you start:** merge the `pm/analytics-calibration` bookkeeping PR, re-run `scope-manifest` on #67, approve and merge #67, then check the Vercel Analytics dashboard for events.
 
 **Run:** `/pm` in a new desktop chat in `~/Workspace/defaultdave`.
 
 **Model and effort:** Sonnet, medium.
 
-**Prompt:** Read `docs/plan/STATUS.md` and the tail of `DECISIONS.md`. All five page PRs are merged. Calibration is due (the card says after the third agent-built unit merges; `shell` and four page units have): medians into `plan.json` assumptions, `calibrated` set, rerun `plan.mjs` (fix its `preflight` rejection first), a Re-estimate row. Then check what milestone 1 (Walkable) still needs: `content-work` is Dave's. Next fan-out after the pages is `seo-perf` (#17, scope grew, see DECISIONS 2026-11-11) and `feed` (#18): confirm the `seo-perf` estimate with Dave first. Don't commit.
-
-**Agent gates for the next swarm (DECISIONS 2026-11-11):** tell each `senior` to run lint, typecheck, test, build, format:check and knip from a clean `.next` before committing; two of five page units failed CI lint on `PageProps` types that only exist after a build.
+**Prompt:** Read `docs/plan/STATUS.md` and the tail of `DECISIONS.md`. Confirm PR #67 merged and #66 closed (criterion 6 is the owner's dashboard check); write its Actuals row in `delta-log.md` (rounds from the PR's check runs). Then bring Dave the `seo-perf` (#17) estimate to confirm (calibrated 0.1 / 0.2 / 0.3 days, scope grew per DECISIONS 2026-11-11, CSP origins from PR #67: script and events same origin, nothing new for production), and once he confirms, start `seo-perf` and `feed` (#18) under the standing call, each `senior` running lint, typecheck, test, build, format:check and knip from a clean `.next`. Don't commit.
