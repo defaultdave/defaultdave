@@ -29,7 +29,7 @@ export function WorkEntry({ entry }: { entry: WorkEntryData }) {
         <p className={styles.meta}>
           {entry.role}, {formatPeriod(entry.period)}
         </p>
-        <p className={styles.summary}>{entry.summary}</p>
+        <p>{entry.summary}</p>
         {entry.stack.length > 0 ? (
           <ul className={styles.tags} aria-label="Stack">
             {entry.stack.map((tag) => (

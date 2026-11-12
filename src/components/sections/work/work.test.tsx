@@ -68,6 +68,23 @@ describe("WorkList", () => {
     expect(at("Card One")).toBeLessThan(at("Card Two"));
   });
 
+  it("names each section by a heading whose id matches aria-labelledby", () => {
+    const html = renderToStaticMarkup(
+      <WorkList
+        entries={[entry(), entry({ slug: "s", kind: "case-study" })]}
+      />,
+    );
+    const sections = [
+      ...html.matchAll(/<section[^>]*aria-labelledby="([^"]*)"/g),
+    ];
+    expect(sections).toHaveLength(2);
+    const names = sections.map(([, id = ""]) => {
+      expect(id).toMatch(/^[a-z-]+$/);
+      return new RegExp(`<h2[^>]*id="${id}"[^>]*>([^<]*)</h2>`).exec(html)?.[1];
+    });
+    expect(names).toEqual(["Case studies", "Other projects"]);
+  });
+
   it("omits a group heading when the group is empty", () => {
     const html = renderToStaticMarkup(<WorkList entries={[entry()]} />);
     expect(html).not.toContain("Case studies");

@@ -4,16 +4,18 @@ import styles from "./WorkList.module.css";
 import { WorkEntry } from "./WorkEntry";
 
 function Group({
+  id,
   heading,
   entries,
 }: {
+  id: string;
   heading: string;
   entries: readonly WorkEntryData[];
 }) {
   if (entries.length === 0) return null;
   return (
-    <section className={styles.group} aria-labelledby={`work-${heading}`}>
-      <h2 id={`work-${heading}`} className={styles.heading}>
+    <section className={styles.group} aria-labelledby={id}>
+      <h2 id={id} className={styles.heading}>
         {heading}
       </h2>
       <Stack as="ul" gap={5}>
@@ -32,10 +34,12 @@ export function WorkList({ entries }: { entries: readonly WorkEntryData[] }) {
   return (
     <div className={styles.list}>
       <Group
+        id="work-case-studies"
         heading="Case studies"
         entries={entries.filter((e) => e.kind === "case-study")}
       />
       <Group
+        id="work-other-projects"
         heading="Other projects"
         entries={entries.filter((e) => e.kind === "card")}
       />
