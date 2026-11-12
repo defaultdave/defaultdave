@@ -5,9 +5,10 @@
   border-radius: var(--radius-pill);
   background: var(--color-surface);
   color: var(--color-text);
-  font-size: var(--type-small-size);
-  line-height: var(--type-small-line);
-  font-weight: 600;
+  font-family: var(--font-mono);
+  font-size: var(--type-tag-size);
+  line-height: var(--type-tag-line);
+  font-weight: 500;
   white-space: nowrap;
 }
 

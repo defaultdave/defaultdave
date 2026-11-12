@@ -4,6 +4,7 @@
   border: var(--effect-outline);
   border-radius: var(--radius-md);
   background: var(--color-surface);
+  box-shadow: var(--effect-shadow);
 }
 
 .label {
