@@ -325,6 +325,24 @@
       "notes": "One paragraph, one bio, links."
     },
     {
+      "id": "analytics",
+      "title": "Vercel Analytics behind the single analytics wrapper (ARCH-8)",
+      "kind": "build",
+      "depends_on": [
+        "shell",
+        "merge-desk"
+      ],
+      "complexity": 1,
+      "uncertainty": 1,
+      "estimate": {
+        "o": 0.1,
+        "m": 0.1,
+        "p": 0.2
+      },
+      "route": "agent fan-out",
+      "notes": "Issue #66, split from seo-perf 2026-11-11 (DECISIONS). Estimated at the calibrated 0.1 days a round, 1 / 1 / 2 rounds. Added so scope-check accepts the analytics: title and unit/analytics-wrapper branch."
+    },
+    {
       "id": "seo-perf",
       "title": "Sitemap, robots, OG images, per-page metadata, Speed Insights, bundle analyzer, Lighthouse 95",
       "capability": "Launch readiness",

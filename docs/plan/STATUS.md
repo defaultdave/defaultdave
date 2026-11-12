@@ -24,7 +24,7 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 | `page-writing` | done | agent fan-out | 1 | #10 | #56 | | merged 2026-11-11 (fd38fdc); CI failed lint and knip on the first push, one fix commit; list date has no `<time>` element (nit) |
 | `page-music` | done | agent fan-out | 1 | #11 | #55 | | merged 2026-11-11 (2081e18); Lighthouse CLS assertion moved to `seo-perf` (DECISIONS); real embeddable URLs come with `content-music` |
 | `page-about` | done | agent fan-out | 1 | #12 | #52 | | merged 2026-11-11 (dceecfa); first page of the swarm |
-| `analytics` | in review | agent fan-out | 0 | #66 | #67 | PM | split from `seo-perf`; senior built a95873f inside the 4 globs, all six gates green from a clean `.next`; script and events same origin (`/_vercel/insights/*`); review not run yet; dashboard check after deploy is Dave's |
+| `analytics` | in review | agent fan-out | 1 | #66 | #67 | Dave | round 1 at a95873f: review-agent (approve with nits: caret version), qa-agent (PM, browser pane), spec-compliance, a11y-audit posted green; CI green except `scope-manifest` (no `analytics` unit in `plan.json` on main, fixed by the bookkeeping PR); criteria 1 to 5 confirmed in a #66 comment, 6 is Dave's after deploy |
 | `content-work` | todo | human only | | #13 | | Dave | needs Blocked item 3 |
 | `content-writing` | todo | human only | | #14 | | Dave | needs Blocked item 5 |
 | `content-music` | todo | human only | | #15 | | Dave | needs Blocked item 2 |
@@ -48,7 +48,7 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 
 ## Next
 
-1. Review PR #67 (#66): `/review-pr https://github.com/defaultdave/defaultdave/pull/67`, verdicts posted as checks; then Dave approves and merges, then confirms events in the Vercel Analytics dashboard (criterion 6) and closes #66.
+1. PR #67 (#66): reviewed, four agent checks green. Order: merge the bookkeeping PR from `pm/analytics-calibration` (adds unit `analytics` to `plan.json`), then re-run `scope-manifest` on #67 (any PR edit re-triggers it; it runs from main), then Dave approves and merges #67, confirms events in the Vercel Analytics dashboard (criterion 6) and closes #66. Optional nit: pin `@vercel/analytics` to `2.0.1`.
 2. `seo-perf` (#17): calibrated to 0.1 / 0.2 / 0.3 days, but its scope grew (Lighthouse CI config, `Figure` sizing, CSP frame origins, sitemap routes; DECISIONS 2026-11-11) and the CSP now takes the analytics origins from PR #67. Dave confirms the estimate, then it fans out with `feed` (#18).
 3. Launcher leftovers, issue #62 (old-form calls in `revert.sh`, usage comments in `agent-git.ts` and `post-check.ts`); `scripts/merge-desk/` is protected, so Dave pushes and bypass-merges.
 4. Dave: confirm #7 criterion 5 and close #7; forwarding address at `davidfleming.me`; bio text. Milestone 1 still needs `content-work` (#13, Dave's).
@@ -57,10 +57,10 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 
 ## Next chat
 
-**Before you start:** nothing required; #67 needs review before you can approve it.
+**Before you start:** merge the `pm/analytics-calibration` bookkeeping PR, re-run `scope-manifest` on #67, approve and merge #67, then check the Vercel Analytics dashboard for events.
 
 **Run:** `/pm` in a new desktop chat in `~/Workspace/defaultdave`.
 
 **Model and effort:** Sonnet, medium.
 
-**Prompt:** Read `docs/plan/STATUS.md` and the tail of `DECISIONS.md`. Run `/review-pr https://github.com/defaultdave/defaultdave/pull/67` for #66 (Vercel Analytics wrapper), verdicts posted as checks through `post-check`; check criteria 1 to 5 of #66 against the diff and tick them in the issue as the App. Then bring Dave the `seo-perf` (#17) estimate to confirm (calibrated 0.1 / 0.2 / 0.3 days, scope grew per DECISIONS 2026-11-11, CSP origins from PR #67), and once he confirms, start `seo-perf` and `feed` (#18) under the standing call, each `senior` running lint, typecheck, test, build, format:check and knip from a clean `.next`. Don't commit.
+**Prompt:** Read `docs/plan/STATUS.md` and the tail of `DECISIONS.md`. Confirm PR #67 merged and #66 closed (criterion 6 is the owner's dashboard check); write its Actuals row in `delta-log.md` (rounds from the PR's check runs). Then bring Dave the `seo-perf` (#17) estimate to confirm (calibrated 0.1 / 0.2 / 0.3 days, scope grew per DECISIONS 2026-11-11, CSP origins from PR #67: script and events same origin, nothing new for production), and once he confirms, start `seo-perf` and `feed` (#18) under the standing call, each `senior` running lint, typecheck, test, build, format:check and knip from a clean `.next`. Don't commit.
