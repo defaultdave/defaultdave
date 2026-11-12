@@ -3,7 +3,7 @@ import Image from "next/image";
 import type { WorkEntry as WorkEntryData } from "../../../content/types";
 import { formatPeriod } from "../../../lib/format-period";
 import { LinkButton } from "../../primitives/LinkButton";
-import { Tag } from "../../primitives/Tag";
+import { Tag, popTone } from "../../primitives/Tag";
 import styles from "./WorkEntry.module.css";
 
 /** Cover images are laid out at this ratio whatever their file size, so no shift. */
@@ -32,9 +32,9 @@ export function WorkEntry({ entry }: { entry: WorkEntryData }) {
         <p>{entry.summary}</p>
         {entry.stack.length > 0 ? (
           <ul className={styles.tags} aria-label="Stack">
-            {entry.stack.map((tag) => (
+            {entry.stack.map((tag, i) => (
               <li key={tag}>
-                <Tag>{tag}</Tag>
+                <Tag tone={popTone(i)}>{tag}</Tag>
               </li>
             ))}
           </ul>

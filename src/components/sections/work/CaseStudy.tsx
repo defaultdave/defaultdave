@@ -6,7 +6,7 @@ import { formatPeriod } from "../../../lib/format-period";
 import { Metric } from "../../mdx/Metric";
 import { MdxBody } from "../../mdx/MdxBody";
 import { LinkButton } from "../../primitives/LinkButton";
-import { Tag } from "../../primitives/Tag";
+import { Tag, popTone } from "../../primitives/Tag";
 import styles from "./CaseStudy.module.css";
 
 const COVER = { width: 1200, height: 630 } as const;
@@ -27,9 +27,9 @@ export function CaseStudy({ entry }: { entry: WorkEntry }) {
         <p>{entry.summary}</p>
         {entry.stack.length > 0 ? (
           <ul className={styles.tags} aria-label="Stack">
-            {entry.stack.map((tag) => (
+            {entry.stack.map((tag, i) => (
               <li key={tag}>
-                <Tag>{tag}</Tag>
+                <Tag tone={popTone(i)}>{tag}</Tag>
               </li>
             ))}
           </ul>

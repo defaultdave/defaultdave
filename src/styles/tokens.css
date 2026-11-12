@@ -79,6 +79,9 @@
   --type-small-line: 1.25rem;
   --type-mono-size: 0.875rem;
   --type-mono-line: 1.375rem;
+  /* Tag labels: mono at 12px on both sizes, from the artifact's work cards. */
+  --type-tag-size: 0.75rem;
+  --type-tag-line: 1.125rem;
 
   /* Type weights and tracking, from the artifact's Playground style. */
   --type-display-weight: 800;

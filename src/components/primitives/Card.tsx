@@ -1,6 +1,6 @@
 import { LinkButton } from "./LinkButton";
 import styles from "./Card.module.css";
-import { Tag } from "./Tag";
+import { Tag, popTone } from "./Tag";
 
 const HEADINGS = { 2: "h2", 3: "h3", 4: "h4" } as const;
 
@@ -42,9 +42,9 @@ export function Card({
       <div className={styles.tags}>
         {tags?.length ? (
           <ul className={styles.tagList}>
-            {tags.map((tag) => (
+            {tags.map((tag, i) => (
               <li key={tag}>
-                <Tag>{tag}</Tag>
+                <Tag tone={popTone(i)}>{tag}</Tag>
               </li>
             ))}
           </ul>
