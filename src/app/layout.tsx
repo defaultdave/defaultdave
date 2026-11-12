@@ -35,6 +35,9 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
     url: "/",
   },
+  alternates: {
+    types: { "application/rss+xml": "/feed.xml" },
+  },
   twitter: { card: "summary", title: SITE_NAME, description: DESCRIPTION },
 };
 
