@@ -1,0 +1,1 @@
+dry run: this file must fail scope-manifest
