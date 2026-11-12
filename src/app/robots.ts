@@ -1,9 +1,8 @@
 import type { MetadataRoute } from "next";
 
-/**
- * Placeholder until the seo-perf unit: it disallows the admin and its API route
- * and leaves everything else open. seo-perf adds the sitemap pointer.
- */
+import { SITE_URL } from "../lib/metadata";
+
+/** Hides the admin and its API route from crawlers and points them at the sitemap. */
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
@@ -11,5 +10,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: ["/keystatic", "/api/keystatic"],
     },
+    sitemap: `${SITE_URL}/sitemap.xml`,
   };
 }

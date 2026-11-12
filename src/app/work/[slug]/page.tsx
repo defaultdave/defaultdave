@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { CaseStudy } from "../../../components/sections/work/CaseStudy";
+import { pageMetadata } from "../../../lib/metadata";
 import { getWork, listWork } from "../../../content";
 
 /** Only case studies get a page; a card slug is not generated and returns 404. */
@@ -24,7 +25,12 @@ async function getCaseStudy(slug: string) {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const entry = await getCaseStudy(slug);
-  return { title: entry.title, description: entry.summary };
+  return pageMetadata({
+    title: entry.title,
+    description: entry.summary,
+    path: `/work/${slug}`,
+    section: "work",
+  });
 }
 
 export default async function CaseStudyPage({ params }: Props) {
