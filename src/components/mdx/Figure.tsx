@@ -3,9 +3,9 @@ import Image from "next/image";
 import styles from "./Figure.module.css";
 
 /**
- * Box used when an entry gives no dimensions. The content schema has no width
- * or height field yet, so every Figure reserves a 16:9 box; the image sits
- * inside it with object-fit contain, so nothing shifts when it loads.
+ * Box used when an entry gives no dimensions. The Keystatic block's width and
+ * height are optional, so a Figure without them reserves a 16:9 box; the image
+ * sits inside it with object-fit contain, so nothing shifts when it loads.
  */
 const DEFAULT_WIDTH = 1600;
 const DEFAULT_HEIGHT = 900;

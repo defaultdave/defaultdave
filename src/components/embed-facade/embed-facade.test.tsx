@@ -2,7 +2,20 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import { EmbedFacade } from "./EmbedFacade";
-import { resolveEmbed } from "./hosts";
+import { HOSTS, frameOrigins, resolveEmbed } from "./hosts";
+
+describe("frameOrigins", () => {
+  it.each(Object.entries(HOSTS))(
+    "allows %s's domains and their subdomains",
+    (_host, { domains }) => {
+      const origins = frameOrigins();
+      for (const d of domains) {
+        expect(origins).toContain(`https://${d}`);
+        expect(origins).toContain(`https://*.${d}`);
+      }
+    },
+  );
+});
 
 describe("resolveEmbed", () => {
   it.each([

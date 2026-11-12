@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { getPost, listPosts } from "../../../content";
-import type { PostCollection } from "../../../content/types";
+import type { Post, PostCollection } from "../../../content/types";
 import { formatReadingTime } from "../../../lib/reading-time";
 import { PostPage } from "./PostPage";
 import { WRITING } from "./collections";
@@ -15,12 +15,7 @@ export async function postParams(collection: PostCollection) {
 }
 
 /** Page title, description and, for a post first published elsewhere, the canonical link. */
-export async function postMetadata(
-  collection: PostCollection,
-  slug: string,
-): Promise<Metadata> {
-  const post = await getPost(collection, slug);
-  if (!post) return {};
+export function postMetadata(post: Post): Metadata {
   return {
     title: post.title,
     description: post.summary,
