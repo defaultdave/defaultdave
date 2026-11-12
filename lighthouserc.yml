@@ -1,0 +1,35 @@
+# Lighthouse CI config (seo-perf, #17). Runs against the production build
+# served locally; see .github/workflows/lighthouse.yml. Needs no token and
+# uploads nothing: scores print in the job log.
+ci:
+  collect:
+    startServerCommand: pnpm build && pnpm exec next start -p 3100
+    startServerReadyPattern: Ready in
+    startServerReadyTimeout: 240000
+    url:
+      - http://localhost:3100/
+      - http://localhost:3100/work
+      # First case study. Placeholder slug from content/work/; update it when
+      # the real case study replaces the placeholder. (A JS config could read
+      # the slug from content/, but ESLint's project service cannot parse a
+      # .cjs config and the package is ESM, so the config stays YAML.)
+      - http://localhost:3100/work/placeholder-case-study
+      - http://localhost:3100/music
+    # Three runs, median-aggregated below, so a 95 is not decided by one noisy run.
+    numberOfRuns: 3
+    settings:
+      # The hosted runner has no user namespace for Chrome's sandbox.
+      chromeFlags: --no-sandbox
+  assert:
+    assertions:
+      "categories:performance":
+        [error, { minScore: 0.95, aggregationMethod: median }]
+      "categories:accessibility":
+        [error, { minScore: 0.95, aggregationMethod: median }]
+      "categories:best-practices":
+        [error, { minScore: 0.95, aggregationMethod: median }]
+      "categories:seo": [error, { minScore: 0.95, aggregationMethod: median }]
+      # Criterion 5: no layout shift on the pages with covers, figures and embeds.
+      cumulative-layout-shift:
+        [error, { maxNumericValue: 0, aggregationMethod: median }]
+  # Upload is off: no temporary-public-storage, no token, no secrets.
