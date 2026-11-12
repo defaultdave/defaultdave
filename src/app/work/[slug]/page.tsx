@@ -14,22 +14,20 @@ export async function generateStaticParams() {
     .map(({ slug }) => ({ slug }));
 }
 
+type Props = { params: Promise<{ slug: string }> };
+
 async function getCaseStudy(slug: string) {
   const entry = await getWork(slug);
   return entry?.kind === "case-study" ? entry : notFound();
 }
 
-export async function generateMetadata({
-  params,
-}: PageProps<"/work/[slug]">): Promise<Metadata> {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const entry = await getCaseStudy(slug);
   return { title: entry.title, description: entry.summary };
 }
 
-export default async function CaseStudyPage({
-  params,
-}: PageProps<"/work/[slug]">) {
+export default async function CaseStudyPage({ params }: Props) {
   const { slug } = await params;
   return <CaseStudy entry={await getCaseStudy(slug)} />;
 }
