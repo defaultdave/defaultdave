@@ -1,3 +1,7 @@
+import type { Metadata } from "next";
+
+import { getPost } from "@/content";
+import { socialMetadata } from "@/lib/metadata";
 import {
   WritingPostPage,
   postMetadata,
@@ -12,9 +16,21 @@ export function generateStaticParams() {
   return postParams("musings");
 }
 
-export async function generateMetadata({ params }: Props) {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  return postMetadata("musings", slug);
+  const post = await getPost("musings", slug);
+  if (!post) return {};
+  return {
+    ...(await postMetadata("musings", slug)),
+    ...socialMetadata({
+      title: post.title,
+      description: post.summary,
+      path: `/musings/${slug}`,
+      section: "musings",
+      type: "article",
+      publishedTime: post.publishedAt,
+    }),
+  };
 }
 
 export default async function MusingsPostPage({ params }: Props) {
