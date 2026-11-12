@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import type { ReactNode } from "react";
 
+import { Analytics } from "@/components/analytics/Analytics";
 import { Shell } from "@/components/layout/Shell";
 import "@/styles/tokens.css";
 import "./globals.css";
@@ -42,6 +43,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
       <body>
         <Shell>{children}</Shell>
+        <Analytics />
       </body>
     </html>
   );
