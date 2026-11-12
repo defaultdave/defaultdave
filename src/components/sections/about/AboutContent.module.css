@@ -1,0 +1,18 @@
+.layout {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.text {
+  display: grid;
+  gap: var(--space-6);
+  min-inline-size: 0;
+}
+
+@media (min-width: 48rem) {
+  .layout[data-has-headshot] {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    gap: var(--space-8);
+  }
+}

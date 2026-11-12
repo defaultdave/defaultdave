@@ -1,0 +1,18 @@
+.frame {
+  position: relative;
+  inline-size: 10rem;
+  aspect-ratio: 1;
+  border: var(--effect-outline);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.image {
+  object-fit: cover;
+}
+
+@media (min-width: 48rem) {
+  .frame {
+    inline-size: 14rem;
+  }
+}
