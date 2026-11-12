@@ -45,6 +45,12 @@ describe("HomeSections", () => {
     expect(html).toContain('href="/work/a"');
   });
 
+  it("labels featured work links with a descriptive, non-generic label", () => {
+    const html = render([work("a", "Alpha")]);
+    expect(html).toContain(">Read the case study</a>");
+    expect(html).not.toContain("Read more");
+  });
+
   it("omits the featured block when there is no featured work", () => {
     const html = render([]);
     expect(html).not.toContain("Featured work");

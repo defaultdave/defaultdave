@@ -37,7 +37,7 @@ export function HomeSections({
                   description={entry.summary}
                   tags={entry.stack}
                   href={`/work/${entry.slug}`}
-                  linkLabel="Read more"
+                  linkLabel="Read the case study"
                 />
               ))}
             </div>
