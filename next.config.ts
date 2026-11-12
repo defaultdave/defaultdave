@@ -1,21 +1,14 @@
 import bundleAnalyzer from "@next/bundle-analyzer";
 import type { NextConfig } from "next";
 
+import { frameOrigins } from "./src/components/embed-facade/hosts";
+
 // `pnpm analyze` sets ANALYZE=true; the normal build is untouched.
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
 });
 
 const isDev = process.env.NODE_ENV !== "production";
-
-/** Each embed host's frame origins; mirrors the domains in embed-facade/hosts.ts. */
-const EMBED_FRAME_ORIGINS = [
-  "bandcamp.com",
-  "soundcloud.com",
-  "spotify.com",
-  "youtube.com",
-  "youtube-nocookie.com",
-].flatMap((domain) => [`https://${domain}`, `https://*.${domain}`]);
 
 /**
  * SEC-10: report-only until the policy has run clean. Vercel Analytics and
@@ -30,7 +23,7 @@ const contentSecurityPolicy = [
   "img-src 'self' data: blob:",
   "font-src 'self'",
   "connect-src 'self'",
-  `frame-src ${EMBED_FRAME_ORIGINS.join(" ")}`,
+  `frame-src ${frameOrigins().join(" ")}`,
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",

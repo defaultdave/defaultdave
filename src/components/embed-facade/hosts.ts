@@ -10,9 +10,9 @@ type HostInfo = {
 
 /**
  * The only hosts an embed may come from. Mirrors the `host` options in
- * `keystatic.config.ts`; the CSP in `seo-perf` lists the same frame origins.
+ * `keystatic.config.ts`; `next.config.ts` builds the CSP frame-src from these domains.
  */
-const HOSTS: Record<EmbedHost, HostInfo> = {
+export const HOSTS: Record<EmbedHost, HostInfo> = {
   bandcamp: { label: "Bandcamp", domains: ["bandcamp.com"] },
   soundcloud: { label: "SoundCloud", domains: ["soundcloud.com"] },
   spotify: { label: "Spotify", domains: ["spotify.com"] },
@@ -21,6 +21,13 @@ const HOSTS: Record<EmbedHost, HostInfo> = {
     domains: ["youtube.com", "youtube-nocookie.com"],
   },
 };
+
+/** Every frame origin the CSP `frame-src` must allow: each domain and its subdomains. */
+export function frameOrigins(): string[] {
+  return Object.values(HOSTS).flatMap(({ domains }) =>
+    domains.flatMap((d) => [`https://${d}`, `https://*.${d}`]),
+  );
+}
 
 function isKnownHost(host: string): host is EmbedHost {
   return Object.hasOwn(HOSTS, host);

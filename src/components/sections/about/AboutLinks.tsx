@@ -1,6 +1,6 @@
 import type { Link } from "../../../content/types";
+import { linkTarget } from "../../../lib/link-target";
 import styles from "./AboutLinks.module.css";
-import { linkTarget } from "./external-link";
 
 /** The "how to reach me" list. A new-tab link gets `rel="noopener"` and a hidden notice. */
 export function AboutLinks({ links }: { links: readonly Link[] }) {

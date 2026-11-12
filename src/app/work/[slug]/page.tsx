@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { CaseStudy } from "../../../components/sections/work/CaseStudy";
+import { caseStudies } from "../../../lib/work-kind";
 import { pageMetadata } from "../../../lib/metadata";
 import { getWork, listWork } from "../../../content";
 
@@ -10,9 +11,7 @@ export const dynamicParams = false;
 
 export async function generateStaticParams() {
   const entries = await listWork();
-  return entries
-    .filter((e) => e.kind === "case-study")
-    .map(({ slug }) => ({ slug }));
+  return caseStudies(entries).map(({ slug }) => ({ slug }));
 }
 
 type Props = { params: Promise<{ slug: string }> };

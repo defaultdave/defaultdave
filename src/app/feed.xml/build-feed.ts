@@ -1,7 +1,6 @@
 import type { Post, PostCollection } from "../../content/types";
+import { SITE_URL } from "../../lib/metadata";
 import { sortPostsNewestFirst } from "../../lib/sort";
-
-const SITE_URL = "https://davidfleming.me";
 
 export type FeedPost = Post & { collection: PostCollection };
 

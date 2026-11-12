@@ -1,4 +1,5 @@
 import type { WorkEntry as WorkEntryData } from "../../../content/types";
+import { caseStudies, cards } from "../../../lib/work-kind";
 import { Stack } from "../../primitives/Stack";
 import styles from "./WorkList.module.css";
 import { WorkEntry } from "./WorkEntry";
@@ -36,12 +37,12 @@ export function WorkList({ entries }: { entries: readonly WorkEntryData[] }) {
       <Group
         id="work-case-studies"
         heading="Case studies"
-        entries={entries.filter((e) => e.kind === "case-study")}
+        entries={caseStudies(entries)}
       />
       <Group
         id="work-other-projects"
         heading="Other projects"
-        entries={entries.filter((e) => e.kind === "card")}
+        entries={cards(entries)}
       />
     </div>
   );

@@ -94,6 +94,16 @@ const mdxComponents = {
       }),
       alt: fields.text({ label: "Alt text", validation: { isRequired: true } }),
       caption: fields.text({ label: "Caption" }),
+      // Text, not integer: MDX bodies allow only plain string attributes.
+      width: fields.text({
+        label: "Width",
+        description:
+          "Optional. The image's width in pixels, like 1600. Set with height so the page reserves the right box.",
+      }),
+      height: fields.text({
+        label: "Height",
+        description: "Optional. The image's height in pixels, like 900.",
+      }),
     },
   }),
 };

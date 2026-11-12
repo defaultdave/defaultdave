@@ -5,7 +5,7 @@ import { compileMdx } from "../../../content/mdx";
 import type { About } from "../../../content/types";
 import { AboutContent } from "./AboutContent";
 import { AboutLinks } from "./AboutLinks";
-import { linkTarget } from "./external-link";
+import { linkTarget } from "../../../lib/link-target";
 
 async function about(overrides: Partial<About> = {}): Promise<About> {
   return { bio: await compileMdx("Hello **there**."), links: [], ...overrides };
