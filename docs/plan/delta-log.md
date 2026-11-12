@@ -70,7 +70,7 @@ Once, after the third agent-built unit merges (likely `shell`, `page-home`, `pag
 
 | Date | Units measured | Median rounds | Median days a round | Median owner min | Owner hours a week (so far) | New path range | New owner-time weeks |
 |---|---|---|---|---|---|---|---|
-| | | | | | | | |
+| 2026-11-11 | 6 agent-built (`shell`, `page-about`, `page-home`, `page-music`, `page-writing`, `page-work`) | 1 (shell 5, page-work 2, the rest 1) | 0.1 (actual days over review rounds; every unit 0.1 but `page-writing` 0.2) | 85 (`shell` only; the page units have no measured owner minutes) | not measured (`time-log.csv` has no rows for these units) | 1.1 to 1.3 weeks (5.9 days expected; path now `keystatic-spike -> cms -> page-work -> seo-perf -> qa-pass -> launch -> tail`) | not recomputed (`plan.mjs` no longer reports owner time) |
 
 ## Measures
 
@@ -102,6 +102,7 @@ One row per milestone, after updating `plan.json` and running the script again.
 | 2026-11-07 | 1 Walkable (scope change, not a milestone) | not recomputed | not recomputed | Added outside the plan: `merge-desk` follow-up, App-backed issue and PR write commands in `agent-git.ts` (DECISIONS 2026-11-07); `keystatic-spike` criterion 1 re-routed to a `senior` |
 | 2026-11-07 | 1 Walkable (scope change, not a milestone) | 1.7 to 2.2 (unchanged); report not rerun | 2.4 (unchanged) | `keystatic-spike` closed: GitHub mode passed, so the `cms` estimate (0.5 / 1 / 2 days) and scores stay; `plan.json` notes only. `plan.mjs` now rejects `plan.json` (unit `preflight` kind, and `rounds` estimates on `shell`, `page-*`, `seo-perf`, `feed` need days), so `plan-report.md` is as of 2026-11-06; fix before the next real re-estimate |
 | 2026-11-11 | 1 Walkable (scope change, not a milestone) | 1.7 to 2.2 (unchanged); report not rerun | 2.4 (unchanged) | AC 5 of #9 and the Lighthouse assertion of #11 deferred to `seo-perf` (#17): `seo-perf` gains a Lighthouse CI config, `Figure` image sizing, CSP frame origins and sitemap routes. `seo-perf` estimate not changed yet; Dave to confirm it before the unit starts. `plan.json` not edited (the `plan.mjs` rejection is open in STATUS) |
+| 2026-11-11 | 1 Walkable (calibration) | 1.1 to 1.3 (was 1.7 to 2.2) | not recomputed | Calibrated after six agent-built units. `plan.json` brought into the current `plan.mjs` schema first: `preflight` kind set to `build`; every `rounds` estimate converted to days at the 0.5 days a round of record, which reproduces the estimate of record (9.8 days against 9.7, rounding). Then the closed units were set to their actual days (`keystatic-spike` keeps its estimate, no Actuals row), `seo-perf` and `feed` were re-derived at the measured 0.1 days a round (`seo-perf` 0.1 / 0.2 / 0.3, `feed` 0.1 / 0.1 / 0.2), `round_days` 0.1, `calibrated` 2026-11-11, report rerun. `seo-perf` scope growth (DECISIONS 2026-11-11) is not priced in; Dave confirms its estimate before it starts. Analytics wiring left `seo-perf` for #66 (DECISIONS) |
 
 ## Read-back
 

@@ -12,10 +12,10 @@
   },
   "assumptions": {
     "join_buffer": 0.5,
-    "round_days": 0.5,
+    "round_days": 0.1,
     "owner_hours_per_week": 30,
     "focus_hours_per_day": 6,
-    "calibrated": null
+    "calibrated": "2026-11-11"
   },
   "reference_class": [
     {
@@ -29,15 +29,15 @@
       "id": "preflight",
       "title": "Accounts, domain, GitHub App, Hobby caps and secrets, from preflight.md",
       "capability": "Setup",
-      "kind": "preflight",
+      "kind": "build",
       "complexity": 1,
       "uncertainty": 2,
       "estimate": {
-        "o": 0.25,
-        "m": 0.5,
-        "p": 1
+        "o": 0.1,
+        "m": 0.1,
+        "p": 0.1
       },
-      "notes": "Dave walks preflight.md after the agent dry-runs it. Hobby caps: 100 deploys a day, 100 GB bandwidth a month, 6,000 build minutes a month, 1 concurrent build. Re-estimate 2026-11-06: split after the dry run; only the rows doable before scaffold stay (repo settings, defaultdave-agents App, domain purchase, Hobby caps, music host). Keystatic App to cms; Vercel project, Lighthouse CI and local or preview rows to scaffold; ruleset and agent access to merge-desk; analytics to seo-perf. Estimate unchanged."
+      "notes": "Dave walks preflight.md after the agent dry-runs it. Hobby caps: 100 deploys a day, 100 GB bandwidth a month, 6,000 build minutes a month, 1 concurrent build. Re-estimate 2026-11-06: split after the dry run; only the rows doable before scaffold stay (repo settings, defaultdave-agents App, domain purchase, Hobby caps, music host). Keystatic App to cms; Vercel project, Lighthouse CI and local or preview rows to scaffold; ruleset and agent access to merge-desk; analytics to seo-perf. Estimate unchanged. Calibration 2026-11-11: closed, estimate set to the actual 0.1 days (delta-log Actuals); estimate of record in delta-log. Kind changed from preflight to build 2026-11-11: plan.mjs accepts only build, spike, review, qa, launch, tail."
     },
     {
       "id": "design",
@@ -49,11 +49,11 @@
       "uncertainty": 2,
       "human_only": true,
       "estimate": {
-        "o": 0.75,
-        "m": 1.5,
-        "p": 2.5
+        "o": 0.2,
+        "m": 0.2,
+        "p": 0.2
       },
-      "notes": "Added 2026-11-06 at Dave's request after the range review. Two renderings of one design: a Figma file driven through the Figma MCP, and an interactive Claude Design artifact Dave can try options in. Dave compares, picks or merges, and signs off one source of truth for tokens. Shell and every page depend on it. Timing is measured, not promised: Dave logs start and stop times in docs/plan/time-log.csv. Amended 2026-11-06: Figma dropped; signed off on the Claude Design artifact alone (version 21)."
+      "notes": "Added 2026-11-06 at Dave's request after the range review. Two renderings of one design: a Figma file driven through the Figma MCP, and an interactive Claude Design artifact Dave can try options in. Dave compares, picks or merges, and signs off one source of truth for tokens. Shell and every page depend on it. Timing is measured, not promised: Dave logs start and stop times in docs/plan/time-log.csv. Amended 2026-11-06: Figma dropped; signed off on the Claude Design artifact alone (version 21). Calibration 2026-11-11: closed, estimate set to the actual 0.2 days (delta-log Actuals); estimate of record in delta-log."
     },
     {
       "id": "keystatic-spike",
@@ -80,11 +80,11 @@
       "complexity": 2,
       "uncertainty": 1,
       "estimate": {
-        "o": 0.25,
-        "m": 0.5,
-        "p": 1
+        "o": 0.2,
+        "m": 0.2,
+        "p": 0.2
       },
-      "notes": "Human-led: Dave decides, /senior types. Estimate is Dave's attention, not elapsed typing. Pinned human-led although off the path once the design unit became the longest opener: the toolchain and CI are the foundation every agent unit builds on.",
+      "notes": "Human-led: Dave decides, /senior types. Estimate is Dave's attention, not elapsed typing. Pinned human-led although off the path once the design unit became the longest opener: the toolchain and CI are the foundation every agent unit builds on. Calibration 2026-11-11: closed, estimate set to the actual 0.2 days (delta-log Actuals); estimate of record in delta-log.",
       "route": "human-led"
     },
     {
@@ -99,11 +99,11 @@
       "complexity": 2,
       "uncertainty": 2,
       "estimate": {
-        "o": 0.5,
-        "m": 1,
-        "p": 2
+        "o": 0.1,
+        "m": 0.1,
+        "p": 0.1
       },
-      "notes": "Added 2026-11-06: Dave wants the portfolio run like any project, on the Ramble model. Ported from ramble/scripts/merge-desk with the integration tier removed (one tier, main only). Human-led: Dave creates the App and the rulesets, /senior ports the scripts. Every agent fan-out unit depends on it. Re-estimate 2026-11-06: uses the shared defaultdave-agents App (Ramble's, renamed) instead of a new one; new criterion: tokens restricted to this repo. Estimate unchanged."
+      "notes": "Added 2026-11-06: Dave wants the portfolio run like any project, on the Ramble model. Ported from ramble/scripts/merge-desk with the integration tier removed (one tier, main only). Human-led: Dave creates the App and the rulesets, /senior ports the scripts. Every agent fan-out unit depends on it. Re-estimate 2026-11-06: uses the shared defaultdave-agents App (Ramble's, renamed) instead of a new one; new criterion: tokens restricted to this repo. Estimate unchanged. Calibration 2026-11-11: closed, estimate set to the actual 0.1 days (delta-log Actuals); estimate of record in delta-log."
     },
     {
       "id": "shell",
@@ -117,14 +117,14 @@
       ],
       "complexity": 2,
       "uncertainty": 1,
-      "rounds": {
-        "o": 1,
-        "m": 2,
-        "p": 5
-      },
       "owner_minutes": 75,
-      "notes": "Agent fan-out. Round one delivers tokens.css and the primitives matching the Figma file; Dave checks them against the design before the layout is built. Design calls were made in figma-design. Routed to agent fan-out although on the path: uncertainty 1, and the design is already settled in Figma. Amended 2026-11-06: build to the signed-off artifact and the token map in docs/designs/2026-11-06-design-comparison.md; Figma was dropped. Re-estimated 2026-11-06: Storybook added (stories for the layout components and primitives); rounds p 4 to 5, owner minutes 60 to 75.",
-      "route": "agent fan-out"
+      "notes": "Agent fan-out. Round one delivers tokens.css and the primitives matching the Figma file; Dave checks them against the design before the layout is built. Design calls were made in figma-design. Routed to agent fan-out although on the path: uncertainty 1, and the design is already settled in Figma. Amended 2026-11-06: build to the signed-off artifact and the token map in docs/designs/2026-11-06-design-comparison.md; Figma was dropped. Re-estimated 2026-11-06: Storybook added (stories for the layout components and primitives); rounds p 4 to 5, owner minutes 60 to 75. Calibration 2026-11-11: closed, estimate set to the actual 0.5 days (delta-log Actuals); estimate of record in delta-log.",
+      "route": "agent fan-out",
+      "estimate": {
+        "o": 0.5,
+        "m": 0.5,
+        "p": 0.5
+      }
     },
     {
       "id": "cms",
@@ -138,11 +138,11 @@
       "complexity": 2,
       "uncertainty": 2,
       "estimate": {
-        "o": 0.5,
-        "m": 1,
-        "p": 2
+        "o": 1.0,
+        "m": 1.0,
+        "p": 1.0
       },
-      "notes": "Human-led on the path. Keystatic schema and content-layer types are the architecture of the site. Re-estimate 2026-11-06: owns the Keystatic GitHub App and its secrets, moved from preflight. Spike 2026-11-07: GitHub mode works on next 16.4.5, estimate and scores unchanged (the open unknown is the two dynamic routes against the static goal, plus a stable slug field)."
+      "notes": "Human-led on the path. Keystatic schema and content-layer types are the architecture of the site. Re-estimate 2026-11-06: owns the Keystatic GitHub App and its secrets, moved from preflight. Spike 2026-11-07: GitHub mode works on next 16.4.5, estimate and scores unchanged (the open unknown is the two dynamic routes against the static goal, plus a stable slug field). Calibration 2026-11-11: closed, estimate set to the actual 1.0 days (delta-log Actuals); estimate of record in delta-log."
     },
     {
       "id": "page-home",
@@ -157,12 +157,13 @@
       ],
       "complexity": 1,
       "uncertainty": 1,
-      "rounds": {
-        "o": 1,
-        "m": 1,
-        "p": 2
+      "owner_minutes": 20,
+      "estimate": {
+        "o": 0.1,
+        "m": 0.1,
+        "p": 0.1
       },
-      "owner_minutes": 20
+      "notes": "Calibration 2026-11-11: closed, estimate set to the actual 0.1 days (delta-log Actuals); estimate of record in delta-log."
     },
     {
       "id": "page-work",
@@ -177,14 +178,14 @@
       ],
       "complexity": 2,
       "uncertainty": 1,
-      "rounds": {
-        "o": 1,
-        "m": 2,
-        "p": 4
-      },
       "owner_minutes": 60,
-      "notes": "Uncertainty 1 and well-trodden; on the path only as the longest of five sibling pages. Routed to agent fan-out.",
-      "route": "agent fan-out"
+      "notes": "Uncertainty 1 and well-trodden; on the path only as the longest of five sibling pages. Routed to agent fan-out. Calibration 2026-11-11: closed, estimate set to the actual 0.2 days (delta-log Actuals); estimate of record in delta-log.",
+      "route": "agent fan-out",
+      "estimate": {
+        "o": 0.2,
+        "m": 0.2,
+        "p": 0.2
+      }
     },
     {
       "id": "page-writing",
@@ -199,14 +200,14 @@
       ],
       "complexity": 2,
       "uncertainty": 1,
-      "rounds": {
-        "o": 1,
-        "m": 2,
-        "p": 4
-      },
       "owner_minutes": 45,
-      "notes": "Same as page-work: sibling page, routed to agent fan-out.",
-      "route": "agent fan-out"
+      "notes": "Same as page-work: sibling page, routed to agent fan-out. Calibration 2026-11-11: closed, estimate set to the actual 0.2 days (delta-log Actuals); estimate of record in delta-log.",
+      "route": "agent fan-out",
+      "estimate": {
+        "o": 0.2,
+        "m": 0.2,
+        "p": 0.2
+      }
     },
     {
       "id": "page-music",
@@ -221,14 +222,14 @@
       ],
       "complexity": 2,
       "uncertainty": 1,
-      "rounds": {
-        "o": 1,
-        "m": 2,
-        "p": 3
-      },
       "owner_minutes": 45,
-      "notes": "Same as page-work: sibling page, routed to agent fan-out. Embed facade is the one non-trivial component.",
-      "route": "agent fan-out"
+      "notes": "Same as page-work: sibling page, routed to agent fan-out. Embed facade is the one non-trivial component. Calibration 2026-11-11: closed, estimate set to the actual 0.1 days (delta-log Actuals); estimate of record in delta-log.",
+      "route": "agent fan-out",
+      "estimate": {
+        "o": 0.1,
+        "m": 0.1,
+        "p": 0.1
+      }
     },
     {
       "id": "page-about",
@@ -243,12 +244,13 @@
       ],
       "complexity": 1,
       "uncertainty": 1,
-      "rounds": {
-        "o": 1,
-        "m": 1,
-        "p": 2
+      "owner_minutes": 15,
+      "estimate": {
+        "o": 0.1,
+        "m": 0.1,
+        "p": 0.1
       },
-      "owner_minutes": 15
+      "notes": "Calibration 2026-11-11: closed, estimate set to the actual 0.1 days (delta-log Actuals); estimate of record in delta-log."
     },
     {
       "id": "content-work",
@@ -337,14 +339,14 @@
       ],
       "complexity": 1,
       "uncertainty": 1,
-      "rounds": {
-        "o": 1,
-        "m": 2,
-        "p": 3
-      },
       "owner_minutes": 30,
-      "notes": "Mechanical once pages exist; routed to agent fan-out though it sits on the path.",
-      "route": "agent fan-out"
+      "notes": "Mechanical once pages exist; routed to agent fan-out though it sits on the path. Calibration 2026-11-11: rounds converted at the measured median 0.1 days a round.",
+      "route": "agent fan-out",
+      "estimate": {
+        "o": 0.1,
+        "m": 0.2,
+        "p": 0.3
+      }
     },
     {
       "id": "feed",
@@ -357,12 +359,13 @@
       ],
       "complexity": 1,
       "uncertainty": 1,
-      "rounds": {
-        "o": 1,
-        "m": 1,
-        "p": 2
+      "owner_minutes": 15,
+      "estimate": {
+        "o": 0.1,
+        "m": 0.1,
+        "p": 0.2
       },
-      "owner_minutes": 15
+      "notes": "Calibration 2026-11-11: rounds converted at the measured median 0.1 days a round."
     },
     {
       "id": "qa-pass",
