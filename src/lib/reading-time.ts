@@ -1,5 +1,5 @@
 /** Words per minute for silent reading of prose. */
-export const WORDS_PER_MINUTE = 200;
+const WORDS_PER_MINUTE = 200;
 
 const FRONTMATTER = /^---\r?\n[\s\S]*?\r?\n---\r?\n?/;
 const CODE_FENCE = /```[\s\S]*?```/g;
