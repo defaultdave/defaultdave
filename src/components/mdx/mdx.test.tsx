@@ -44,3 +44,34 @@ describe("MDX pipeline", () => {
     await expect(compileMdx(source)).rejects.toThrow();
   });
 });
+
+describe("Figure", () => {
+  const frame = (html: string) => html.match(/aspect-ratio:([^;"]+)/)?.[1];
+
+  it.each([
+    ["no dimensions", "", "1600 / 900", "1600", "900"],
+    [
+      "string dimensions",
+      ' width="800" height="400"',
+      "800 / 400",
+      "800",
+      "400",
+    ],
+    [
+      "invalid dimensions",
+      ' width="wide" height="-2"',
+      "1600 / 900",
+      "1600",
+      "900",
+    ],
+  ])(
+    "renders next/image with a reserved box for %s",
+    async (_n, attrs, ratio, w, h) => {
+      const html = await render(`<Figure src="/a.png" alt="A"${attrs} />`);
+      expect(frame(html)).toBe(ratio);
+      expect(html).toContain(`width="${w}"`);
+      expect(html).toContain(`height="${h}"`);
+      expect(html).toContain('alt="A"');
+    },
+  );
+});
