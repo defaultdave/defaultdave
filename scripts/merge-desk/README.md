@@ -39,7 +39,7 @@ Each step needs Dave's `gh` login; the App cannot change settings. Nothing here 
 
    Read it back: `gh api repos/defaultdave/defaultdave/rulesets`. It requires a PR, one approval dismissed on push, no force push or deletion, and the checks above. The only bypass actor is the repository admin role (`actor_id` 5) in mode `always`, so Dave can still push to `main` and merge any PR.
 
-4. **Install the pinned launchers first** (the Install section below). The settings change that lets agents use them is the piece 4 cutover, not this step; until then agents keep running `node scripts/merge-desk/...` from the working tree.
+4. **Install the pinned launchers first** (the Install section below). The settings change that lets agents use them is the piece 4 cutover, not this step; the cutover is done (2026-11-11), so agents call the launchers by absolute path.
 
 5. **This unit's PR** merges by Dave's bypass, since the rule it sets up does not exist until it lands: `gh pr merge <n> --admin --squash --delete-branch`.
 
@@ -79,7 +79,7 @@ It lists the commits that touched `scripts/merge-desk/` since the installed pin 
 
 ## After the cutover
 
-Piece 4 (Dave's) applies blocks (a) to (e) that install printed, and rewrites the docs that name `node scripts/merge-desk/...`. `settings.local.proposal.json` holds blocks (a) and (c). From then on an agent calls the launchers by absolute path, one call per command, with every title and body in single quotes (write a literal single quote as `'\''`):
+Piece 4 (done 2026-11-11) applied blocks (a) to (e) that install printed and rewrote the docs that named `node scripts/merge-desk/...`. `settings.local.proposal.json` holds blocks (a) and (c). From then on an agent calls the launchers by absolute path, one call per command, with every title and body in single quotes (write a literal single quote as `'\''`):
 
 ```bash
 /Users/davidfleming/.local/share/defaultdave-merge-desk/bin/defaultdave/agent-git push unit/<unit-id>-<slug>
@@ -93,17 +93,17 @@ Piece 4 (Dave's) applies blocks (a) to (e) that install printed, and rewrites th
 ## How an agent uses it
 
 ```bash
-node scripts/merge-desk/agent-git.ts push unit/<unit-id>-<slug>
-node scripts/merge-desk/agent-git.ts pr main '<unit-id>: <title>' --body '<text>'
-node scripts/merge-desk/agent-git.ts review <pr>      # while the approval window is open
-node scripts/merge-desk/agent-git.ts automerge <pr>
-node scripts/merge-desk/agent-git.ts issue-comment <issue> --body '<text>'   # comment on an issue as the App
-node scripts/merge-desk/agent-git.ts issue-body <issue> --body '<text>'      # replace an issue body (tick criteria, add an Amendment)
-node scripts/merge-desk/agent-git.ts pr-body <pr> --body '<text>'            # replace a PR body
+/Users/davidfleming/.local/share/defaultdave-merge-desk/bin/defaultdave/agent-git push unit/<unit-id>-<slug>
+/Users/davidfleming/.local/share/defaultdave-merge-desk/bin/defaultdave/agent-git pr main '<unit-id>: <title>' --body '<text>'
+/Users/davidfleming/.local/share/defaultdave-merge-desk/bin/defaultdave/agent-git review <pr>      # while the approval window is open
+/Users/davidfleming/.local/share/defaultdave-merge-desk/bin/defaultdave/agent-git automerge <pr>
+/Users/davidfleming/.local/share/defaultdave-merge-desk/bin/defaultdave/agent-git issue-comment <issue> --body '<text>'   # comment on an issue as the App
+/Users/davidfleming/.local/share/defaultdave-merge-desk/bin/defaultdave/agent-git issue-body <issue> --body '<text>'      # replace an issue body (tick criteria, add an Amendment)
+/Users/davidfleming/.local/share/defaultdave-merge-desk/bin/defaultdave/agent-git pr-body <pr> --body '<text>'            # replace a PR body
 # after /review-pr <pr-url> writes .team-verdicts/*.md, for each agent:
-node scripts/merge-desk/post-check.ts verdict --agent review --sha '<sha>'
+/Users/davidfleming/.local/share/defaultdave-merge-desk/bin/defaultdave/post-check verdict --agent review --sha '<sha>'
 # a PM bookkeeping PR instead:
-node scripts/merge-desk/post-check.ts bookkeeping --pr <n> --sha '<sha>'
+/Users/davidfleming/.local/share/defaultdave-merge-desk/bin/defaultdave/post-check bookkeeping --pr <n> --sha '<sha>'
 ```
 
 Body arguments for `pr`, `issue-comment`, `issue-body` and `pr-body`:
