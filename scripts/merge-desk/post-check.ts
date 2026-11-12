@@ -1,7 +1,7 @@
 // Posts completed check runs as the defaultdave-agents App (ADR 0001 rules 5 and 6). There is no by-hand
 // "post green": a check comes from a /review-pr verdict file, or from bookkeeping mode.
-//   node scripts/merge-desk/post-check.ts verdict --agent <review|qa|spec-compliance|a11y-audit|architecture-audit|perf-check> --sha <head sha> [--dir .team-verdicts]
-//   node scripts/merge-desk/post-check.ts bookkeeping --pr <number> --sha <head sha>
+//   /Users/davidfleming/.local/share/defaultdave-merge-desk/bin/defaultdave/post-check verdict --agent <review|qa|spec-compliance|a11y-audit|architecture-audit|perf-check> --sha <head sha> [--dir .team-verdicts]
+//   /Users/davidfleming/.local/share/defaultdave-merge-desk/bin/defaultdave/post-check bookkeeping --pr <number> --sha <head sha>
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseArgs } from "node:util";

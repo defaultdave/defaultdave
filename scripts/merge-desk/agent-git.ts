@@ -1,11 +1,11 @@
 // The agents' only route to GitHub (ADR 0001). Every call uses the App token, never Dave's login.
-//   node scripts/merge-desk/agent-git.ts push <branch>
-//   node scripts/merge-desk/agent-git.ts pr <base> <title> --body '<text>'
-//   node scripts/merge-desk/agent-git.ts automerge <pr number or branch>
-//   node scripts/merge-desk/agent-git.ts review <pr number or branch>
-//   node scripts/merge-desk/agent-git.ts issue-comment <issue number> --body '<text>'
-//   node scripts/merge-desk/agent-git.ts issue-body <issue number> --body '<text>'   (replaces the body)
-//   node scripts/merge-desk/agent-git.ts pr-body <pr number or branch> --body '<text>'   (replaces the body)
+//   /Users/davidfleming/.local/share/defaultdave-merge-desk/bin/defaultdave/agent-git push <branch>
+//   /Users/davidfleming/.local/share/defaultdave-merge-desk/bin/defaultdave/agent-git pr <base> <title> --body '<text>'
+//   /Users/davidfleming/.local/share/defaultdave-merge-desk/bin/defaultdave/agent-git automerge <pr number or branch>
+//   /Users/davidfleming/.local/share/defaultdave-merge-desk/bin/defaultdave/agent-git review <pr number or branch>
+//   /Users/davidfleming/.local/share/defaultdave-merge-desk/bin/defaultdave/agent-git issue-comment <issue number> --body '<text>'
+//   /Users/davidfleming/.local/share/defaultdave-merge-desk/bin/defaultdave/agent-git issue-body <issue number> --body '<text>'   (replaces the body)
+//   /Users/davidfleming/.local/share/defaultdave-merge-desk/bin/defaultdave/agent-git pr-body <pr number or branch> --body '<text>'   (replaces the body)
 // Every git and gh child starts through ./safe-exec.ts: fixed binary, environment built from nothing, token in
 // a file under the engine root and never in env or argv.
 import { mkdirSync, writeFileSync } from "node:fs";
