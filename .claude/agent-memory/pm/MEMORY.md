@@ -7,3 +7,4 @@ One line per fact; detail in linked files beside this one. Written for a reader 
 - Agent units start only after the scaffold's CI gates exist and `preflight.md` is fully ticked.
 - Reference class: Ramble closed 36 units at 29% of likely; expect build units to finish early and the writing and design units to set the date.
 - [PR images](pr-images.md) — visual PRs need images; before and after for changes to existing UI
+- Agent GitHub writes go through the absolute-path launchers `agent-git` and `post-check` (one call per command, single-quoted bodies); `command-guard` denies `;`, `$(`, double quotes, env prefixes and `bash -c` around them. Verified by live probes and the launcher dry run, 2026-11-11.
