@@ -2,7 +2,7 @@
 
 Current state only. History is in `DECISIONS.md` and `delta-log.md`. Kept under 25 KB by `scripts/pm.sh check`.
 
-Updated 2026-11-12 by pm (Opus 5.5): swarm 2 closed. `feed` (#69), `seo-perf` (#70, #72, #75, plus #76 for the Lighthouse SEO miss on `/`), #62 (#71) and `cleanup` (#77) merged; Lighthouse CI green on main; #17 and #73 closed. Every agent unit that can run is done; what remains is the owner's content and the owner-led tail. GitHub repo: `defaultdave/defaultdave`, public; issues #1 to #21 are the plan tickets. Project board: [#20](https://github.com/users/defaultdave/projects/20). Domain `davidfleming.me` live on Vercel project `defaultdave`.
+Updated 2026-11-12 by pm (Opus 5.5): `content-work` case study in review as PR #80; design fix for metric cards and work tags in PR #81, with a design audit against the artifact to follow. Earlier: swarm 2 closed. `feed` (#69), `seo-perf` (#70, #72, #75, plus #76 for the Lighthouse SEO miss on `/`), #62 (#71) and `cleanup` (#77) merged; Lighthouse CI green on main; #17 and #73 closed. Every agent unit that can run is done; what remains is the owner's content and the owner-led tail. GitHub repo: `defaultdave/defaultdave`, public; issues #1 to #21 are the plan tickets. Project board: [#20](https://github.com/users/defaultdave/projects/20). Domain `davidfleming.me` live on Vercel project `defaultdave`.
 
 MILESTONE: 1 Walkable (exit: Home, the Work list and the ResortPass case study live at davidfleming.me). 0 Designed reached 2026-11-06
 
@@ -26,7 +26,7 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 | `page-about` | done | agent fan-out | 1 | #12 | #52 | | merged 2026-11-11 (dceecfa); first page of the swarm |
 | `analytics` | done | agent fan-out | 1 | #66 | #67 | | merged 2026-11-11 (40b81e1); #66 closed; Actuals row written; nit open: pin `@vercel/analytics` exactly (piece B pins Speed Insights) |
 | `cleanup` | done | agent fan-out | 1 | #73 | #77 | | merged 2026-11-12 (f1ed3d7); #73 closed; Actuals row written |
-| `content-work` | todo | human only | | #13 | | Dave | needs Blocked item 3 |
+| `content-work` | in review | human only | | #13 | #80 | Dave | case study at `content/work/marketplace-checkout/index.mdx`, replacing the placeholder (Amendment on #13); PR #80 (`Refs #13`); project cards (criterion 2) still to do |
 | `content-writing` | todo | human only | | #14 | | Dave | needs Blocked item 5 |
 | `content-music` | todo | human only | | #15 | | Dave | needs Blocked item 2 |
 | `content-home-about` | todo | human only | | #16 | | Dave | needs Blocked item 4 |
@@ -49,7 +49,7 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 
 ## Next
 
-1. Milestone 1 needs `content-work` (#13, Dave's): the ResortPass case study, anonymized. `lighthouserc.yml` tests `/work/placeholder-case-study`; point it at the real slug when the case study replaces the placeholder.
+1. Milestone 1 needs `content-work` (#13, Dave's). The anonymized case study draft is in `content/work/marketplace-checkout/index.mdx`; Home, `lighthouserc.yml` and `src/content/seed.test.ts` already point at it, and all gates pass. Dave edits it for voice and NDA, then the cards for the other projects (criterion 2), then reads every entry on the preview URL.
 2. `lighthouse` stays advisory, not required (DECISIONS 2026-11-12); revisit at `launch`.
 3. Dave: confirm #7 criterion 5 (Keystatic App secrets only in the Vercel env store and local `.env`) and close #7; put the forwarding address in the footer; workshop the bio text (`content-home-about`, #16). `content-writing` (#14) and `content-music` (#15) are unblocked.
 4. Small follow-ups, not filed: card links could carry the card title in their accessible name; re-run the W3C feed validator on the live `/feed.xml`; the CSP is report-only with no report endpoint, so read violations in the browser console (on `/keystatic` especially) before the tail enforces it. Carried from before: PR screenshots for #52 to #56 only if wanted; Amendment sections on #9 and #11; review-agent size rule edit in `vig/global/agents/review.md` is Dave's.
@@ -58,10 +58,10 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 
 ## Next chat
 
-**Before you start:** have the ResortPass case study material at hand if starting `content-work`.
+**Before you start:** edit `content/work/marketplace-checkout/index.mdx` for voice and NDA; pick which side projects get cards beyond gallery-perf, vig/dev-team, xair, robo-advisor and Harp-Diem.
 
 **Run:** `/pm` in a new desktop chat in `~/Workspace/defaultdave`.
 
 **Model and effort:** Sonnet, medium.
 
-**Prompt:** Read `docs/plan/STATUS.md` and the tail of `DECISIONS.md`. Every agent unit that can run is merged and Lighthouse CI is green on main. Help the owner start `content-work` (#13): the anonymized ResortPass case study, NDA-safe, drafted for the owner to edit; when it lands, point `lighthouserc.yml` at the real slug. Keep `STATUS.md` current. Don't commit.
+**Prompt:** Read `docs/plan/STATUS.md` and the tail of `DECISIONS.md`. Every agent unit that can run is merged and Lighthouse CI is green on main. Continue `content-work` (#13): the case study draft is in `content/work/marketplace-checkout/index.mdx` (read the Amendment on #13). Draft the project cards for criterion 2 in `content/work/<slug>/index.mdx` with kind card, from each repo's README and the owner's picks, ResortPass staying order 1; run the gates; open the PR with `Closes #13` only once the owner has read every entry on the preview URL, otherwise `Refs #13`. Keep `STATUS.md` current. Don't commit.
