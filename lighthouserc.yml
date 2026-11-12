@@ -9,11 +9,10 @@ ci:
     url:
       - http://localhost:3100/
       - http://localhost:3100/work
-      # First case study. Placeholder slug from content/work/; update it when
-      # the real case study replaces the placeholder. (A JS config could read
-      # the slug from content/, but ESLint's project service cannot parse a
+      # First case study, from content/work/; update it if the slug changes.
+      # (A JS config could read the slug from content/, but ESLint's project service cannot parse a
       # .cjs config and the package is ESM, so the config stays YAML.)
-      - http://localhost:3100/work/placeholder-case-study
+      - http://localhost:3100/work/marketplace-checkout
       - http://localhost:3100/music
     # Three runs, median-aggregated below, so a 95 is not decided by one noisy run.
     numberOfRuns: 3

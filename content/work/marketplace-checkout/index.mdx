@@ -1,0 +1,84 @@
+---
+slug: marketplace-checkout
+title: Rebuilding checkout for a booking marketplace
+kind: case-study
+summary: I rebuilt the checkout page for a day-pass booking marketplace on Next.js App Router with Stripe Payment Element. Sole owner from architecture to full rollout, launched with no rollbacks and no hotfixes.
+role: Senior frontend engineer, contract; sole owner of the checkout rebuild
+period:
+  from: 2026-05
+  to: 2026-08
+stack:
+  - Next.js App Router
+  - React
+  - TypeScript
+  - Stripe Payment Element
+  - Zod
+  - Storybook
+  - Jest and jest-axe
+featured: true
+order: 1
+cover:
+  src: ""
+  alt: ""
+metrics:
+  - label: Rollbacks and hotfixes after launch
+    value: "0"
+    note: Ramped from 5% to 100% of traffic over two weeks
+  - label: PR merge-through rate
+    value: 36% to 74%
+    note: After splitting the epic into small slices behind feature flags
+  - label: Rendered DOM nodes
+    value: ~7,800 to under 500
+    note: New page against the legacy page, Lighthouse lab run on public production pages
+  - label: Lighthouse accessibility
+    value: 87 to 96
+    note: Same lab run; backed by a jest-axe pattern in the test suite
+---
+
+## How I got there
+
+I interviewed with the company, and they brought me in on contract to help get several major initiatives over the line. The checkout rebuild was one of them, and it became mine.
+
+## The problem
+
+Checkout was the last step of the booking funnel and the only one still on the legacy Next.js Pages Router. The cart and product pages had already moved to App Router. In a hybrid Next.js app, moving between the two routers forces a full document load, so every customer paid for one on the highest-intent step in the funnel.
+
+The old page was also hard to change. It carried modals that added friction, a client-side cookie mirroring a server hold timer, and a payment layer the team wanted to replace with Stripe Payment Element.
+
+## The hard part
+
+The payments integration was the easy half. The orchestration was the work. A checkout has a cart that changes under you, a hold timer the server owns and that can expire mid-session, saved cards, express wallets, and a mobile flow that is structurally a different page.
+
+The hardest constraint was the cart. The backend owned line-item state, so the page could not update it optimistically. Quantity changes, guest-type cascades and removals all had to wait on a server that owned the answer, and some line items were linked by rules the backend data did not describe cleanly. I had to lock interactions while a change was in flight without making the page feel frozen.
+
+## What I built
+
+- **An orchestrator and an explicit place-order state machine.** This was the core, and it took three passes to get right. Every async edge (cart mutation, hold expiry, payment confirmation, wallet sheets) became a named state instead of a combination of booleans.
+- **A typed server-action layer** with Zod schemas as the seam between the page and the backend.
+- **A walking skeleton first.** Layout shell and design tokens before any behavior, with the route behind a flag from day one so it could live in production unfinished.
+- **The sections:** order summary, contact details, a payment section with saved cards, an express wallet lane (Apple Pay, Google Pay, Link) placed first, coupons, a hold-timer banner, a conflict dialog for clearing the cart, a confirmation page, and a mobile two-step flow with the step held in the URL.
+- **Design-system primitives instead of one-off components.** Toggle, ToggleGroup, RadioGroup and a number stepper went into the shared library with Storybook stories and Figma Code Connect.
+- **A jest-axe accessibility testing pattern**, set up in checkout and then available to the rest of the codebase.
+
+## Judgment calls
+
+- **Moved the hold timer's source of truth to the server.** I dropped the client cookie and read expiry from the backend, so the countdown could not drift from reality.
+- **Removed two modals** from the legacy flow: a leave-checkout confirmation and a same-day booking warning. The new flow did not need either.
+- **Split delivery into slices that could land on their own.** The payment section alone went out as five PRs. My merge-through rate went from 36% to 74% while my weekly PR count went down: fewer, smaller, mergeable changes.
+- **Built the phone-number field myself** rather than pulling in a third-party component. QA's only meaningful findings in three rounds were in that field, so it cost me a round, and the rest of the page was clean after it.
+
+## Launch
+
+The new checkout launched on a Monday and ramped from 5% to 50% of traffic in two days. It held at 50% for the rest of the week while a few priority fast-follows landed, mostly around fees. Two weeks after launch it went to 100%. There were no rollbacks and no hotfixes. I owned it through the full rollout.
+
+Conversion came out flat to slightly up. This was never a conversion play, and it cost nothing there. The performance win was architectural: with checkout on App Router, the hard navigation between cart and payment is gone.
+
+<Callout tone="note">
+
+The DOM and accessibility figures come from a Lighthouse comparison I ran after the contract ended, against both public production pages. The legacy page could not be loaded with a cart, so it was measured nearly empty. The new page was measured fully populated and still came out ahead, which makes these numbers conservative. They are lab numbers, not field data.
+
+</Callout>
+
+## What I would carry forward
+
+Name every state before writing the first handler. Ship a skeleton behind a flag on day one. Make each change small enough that review is a formality. And when the backend owns the truth, design the waiting so the user never has to notice it.
