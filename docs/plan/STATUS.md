@@ -38,7 +38,7 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 
 1. ~~Attach domain~~ done 2026-11-08.
 2. `content-music` unblocked: Bandcamp `davidfleming.bandcamp.com` (DECISIONS 2026-11-08).
-3. ResortPass naming: Dave is reviewing what the case study names; anonymized until he confirms (password-lock is the fallback).
+3. ~~ResortPass naming~~ decided 2026-11-11: stays anonymized (DECISIONS); `content-work` is unblocked on this.
 4. About: headshot supplied; still need the bio text, or confirm text-only.
 5. `content-writing` unblocked: three LinkedIn pulse URLs (DECISIONS 2026-11-08).
 6. Footer email: Dave wants an address at `davidfleming.me` (forwarding alias; set up before launch).
@@ -48,13 +48,13 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 ## Next
 
 1. Launcher leftovers: the `scripts/merge-desk/README.md` rewrite landed (#61). Issue #62 covers the old-form calls still in `revert.sh` and the usage comments in `agent-git.ts` and `post-check.ts`; `scope-manifest.yml:40` keeps the old form on purpose (CI runs from the checkout). `scripts/merge-desk/` is protected, so Dave pushes and bypass-merges the PR. The sandbox-gap work (#40, #41, cutover, dry run) is done; its history is in DECISIONS.
-2. Dave: confirm #7 criterion 5, close #7; set up a forwarding address at `davidfleming.me`; bio text; ResortPass naming call.
+2. Dave: confirm #7 criterion 5, close #7; set up a forwarding address at `davidfleming.me`; bio text.
 3. Swarm done: all five page units merged. Dave-owned follow-ups: PR screenshots via `pr-images` (none of #52 to #56 carries images, and they are merged, so add them only if wanted); body Amendment sections on issues #9 and #11 (comments are posted; the launcher guard refuses the quotes in the bodies); `seo-perf` (#17) picks up the Lighthouse CI config, `Figure` sizing, CSP frame origins and sitemap routes (DECISIONS 2026-11-11), estimate to confirm before it starts. Carried suggestions, not builds: architecture-audit B2 findings on `page-work` (move filter-by-kind into `src/lib`); `linkTarget()` into `src/lib`; a featured slug that resolves to nothing is dropped silently; list dates have no `<time>` element on /articles and /musings; `plan.mjs` rejects `plan.json` (unit `preflight` kind; every unit's `estimate` needs o, m and p in days, the rounds-based ones are rejected): fix before calibrating.
 4. Review-agent size rule settled (DECISIONS 2026-11-11): tests leave the changed-line count. Dave applies the one-line edit in `vig/global/agents/review.md` (sandbox blocks the PM); until then the old rule still fires. Verdict keys: from #40 round 4 the prompt names the agent's own key (`REVIEW_VERDICT=`, `ARCH_VERDICT=`); check again on the next real `/review-pr`.
 
 ## Next chat
 
-**Before you start:** close #7 once you confirm its criterion 5; the content inputs in Blocked on Dave (bio text, ResortPass naming, forwarding address); handle #62 (Next 1) when you want it, it is not blocking. The page swarm is done (#52 to #56, bookkeeping #58); do not start it again.
+**Before you start:** close #7 once you confirm its criterion 5; the content inputs in Blocked on Dave (bio text, forwarding address); handle #62 (Next 1) when you want it, it is not blocking. The page swarm is done (#52 to #56, bookkeeping #58); do not start it again.
 
 **Run:** `/pm` in a new desktop chat in `~/Workspace/defaultdave`.
 
