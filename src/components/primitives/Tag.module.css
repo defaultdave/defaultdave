@@ -1,6 +1,10 @@
+/* The design's pill: 3px by 10px inside a 2px border, 28px tall with the 18px line. */
 .tag {
+  --tag-pad-y: 0.1875rem;
+  --tag-pad-x: 0.625rem;
+
   display: inline-block;
-  padding: 0 var(--space-3);
+  padding: var(--tag-pad-y) var(--tag-pad-x);
   border: var(--effect-outline);
   border-radius: var(--radius-pill);
   background: var(--color-surface);
@@ -12,8 +16,8 @@
   white-space: nowrap;
 }
 
+/* Ink text on every pop; the border keeps the theme colour so it shows in dark mode. */
 .tag:not([data-tone="neutral"]) {
-  border-color: var(--color-ink);
   color: var(--color-ink);
 }
 
