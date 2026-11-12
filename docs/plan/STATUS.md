@@ -43,22 +43,22 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 3. ~~ResortPass naming~~ decided 2026-11-11: stays anonymized (DECISIONS); `content-work` is unblocked on this.
 4. About: headshot supplied; still need the bio text, or confirm text-only.
 5. `content-writing` unblocked: three LinkedIn pulse URLs (DECISIONS 2026-11-08).
-6. Footer email: Dave wants an address at `davidfleming.me` (forwarding alias; set up before launch).
+6. ~~Footer email~~ forwarding at `davidfleming.me` working (Dave, 2026-11-12); the footer still needs the address.
 
 7. Security, pre-existing (Dave: fix it now, 2026-11-08): the merge-desk allow rules and sandbox exclusions in `.claude/settings.local.json` match cwd-relative script paths that agents can edit or shadow, so an agent can run its own code outside the sandbox with no prompt (found 2026-11-07, verdict `app-writes/.team-verdicts/review-workflow-r2.md`). Decided 2026-11-07: the shared-engine RFC (PR #31) lands before the swarm; until then no unattended agent runs.
 
 ## Next
 
 1. Milestone 1 needs `content-work` (#13, Dave's): the ResortPass case study, anonymized. `lighthouserc.yml` tests `/work/placeholder-case-study`; point it at the real slug when the case study replaces the placeholder.
-2. Dave, settings: add the `lighthouse` check to the `main` ruleset if it should block merges.
-3. Dave: confirm #7 criterion 5 and close #7; forwarding address at `davidfleming.me`; bio text (`content-home-about`, #16). `content-writing` (#14) and `content-music` (#15) are unblocked.
+2. `lighthouse` stays advisory, not required (DECISIONS 2026-11-12); revisit at `launch`.
+3. Dave: confirm #7 criterion 5 (Keystatic App secrets only in the Vercel env store and local `.env`) and close #7; put the forwarding address in the footer; workshop the bio text (`content-home-about`, #16). `content-writing` (#14) and `content-music` (#15) are unblocked.
 4. Small follow-ups, not filed: card links could carry the card title in their accessible name; re-run the W3C feed validator on the live `/feed.xml`; the CSP is report-only with no report endpoint, so read violations in the browser console (on `/keystatic` especially) before the tail enforces it. Carried from before: PR screenshots for #52 to #56 only if wanted; Amendment sections on #9 and #11; review-agent size rule edit in `vig/global/agents/review.md` is Dave's.
 5. Merged worktrees to remove when convenient: `feed`, `seo-perf-meta`, `seo-perf-perf`, `seo-perf-lighthouse`, `launcher-refs`, `cleanup`, `page-home-link-text`.
 6. Session sandbox quirks: `git worktree add`, `pnpm install` and `agent-git` need the sandbox off; in a worktree installed outside the sandbox, `pnpm add` fails on a store mismatch, so the owner runs dependency adds; `gh` cannot read its config in the sandbox (read public issues with `curl` to api.github.com); a command that names the launcher path anywhere but first word is denied by `command-guard`; a new branch from `origin/main` needs `--no-track` (the sandbox cannot write `.git/config`).
 
 ## Next chat
 
-**Before you start:** decide whether `lighthouse` becomes a required check; have the ResortPass case study material at hand if starting `content-work`.
+**Before you start:** have the ResortPass case study material at hand if starting `content-work`.
 
 **Run:** `/pm` in a new desktop chat in `~/Workspace/defaultdave`.
 
