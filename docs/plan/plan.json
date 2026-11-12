@@ -343,6 +343,23 @@
       "notes": "Issue #66, split from seo-perf 2026-11-11 (DECISIONS). Estimated at the calibrated 0.1 days a round, 1 / 1 / 2 rounds. Added so scope-check accepts the analytics: title and unit/analytics-wrapper branch."
     },
     {
+      "id": "cleanup",
+      "title": "Review follow-ups: route logic into src/lib, site URL constant, CSP origins from hosts, Figure dimensions",
+      "kind": "build",
+      "depends_on": [
+        "seo-perf"
+      ],
+      "complexity": 1,
+      "uncertainty": 1,
+      "estimate": {
+        "o": 0.1,
+        "m": 0.2,
+        "p": 0.3
+      },
+      "route": "agent fan-out",
+      "notes": "Scope addition 2026-11-12 (DECISIONS): bundles the carried review follow-ups from page-work, feed and seo-perf A and B. Estimated at the calibrated 0.1 days a round, 1 / 2 / 3 rounds. Off the critical path."
+    },
+    {
       "id": "seo-perf",
       "title": "Sitemap, robots, OG images, per-page metadata, Speed Insights, bundle analyzer, Lighthouse 95",
       "capability": "Launch readiness",

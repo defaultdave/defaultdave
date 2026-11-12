@@ -2,7 +2,7 @@
 
 Current state only. History is in `DECISIONS.md` and `delta-log.md`. Kept under 25 KB by `scripts/pm.sh check`.
 
-Updated 2026-11-11 by pm (Opus 5.5): calibration done (path 1.1 to 1.3 weeks, was 1.7 to 2.2; delta-log Calibration and Re-estimates); `plan.mjs` accepts `plan.json` again. #66 (Vercel Analytics behind the wrapper) built by one `senior`, PR #67 open as the App. Page swarm merged (#52 to #56). GitHub repo: `defaultdave/defaultdave`, public; issues #1 to #21 are the plan tickets, #66 is a split from `seo-perf` (DECISIONS 2026-11-11). Project board: [#20](https://github.com/users/defaultdave/projects/20). Domain `davidfleming.me` live on Vercel project `defaultdave`.
+Updated 2026-11-12 by pm (Opus 5.5): swarm 2 landed: `feed` (#69), `seo-perf` A (#70) and B (#72) merged, #62 merged (#71, bypass). #17 closed by accident (a PR body said it does not close #17) and needs reopening; piece C (Lighthouse CI) building on `unit/seo-perf-lighthouse`. New unit `cleanup` (DECISIONS 2026-11-12). GitHub repo: `defaultdave/defaultdave`, public; issues #1 to #21 are the plan tickets, #66 is a split from `seo-perf`. Project board: [#20](https://github.com/users/defaultdave/projects/20). Domain `davidfleming.me` live on Vercel project `defaultdave`.
 
 MILESTONE: 1 Walkable (exit: Home, the Work list and the ResortPass case study live at davidfleming.me). 0 Designed reached 2026-11-06
 
@@ -24,13 +24,14 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 | `page-writing` | done | agent fan-out | 1 | #10 | #56 | | merged 2026-11-11 (fd38fdc); CI failed lint and knip on the first push, one fix commit; list date has no `<time>` element (nit) |
 | `page-music` | done | agent fan-out | 1 | #11 | #55 | | merged 2026-11-11 (2081e18); Lighthouse CLS assertion moved to `seo-perf` (DECISIONS); real embeddable URLs come with `content-music` |
 | `page-about` | done | agent fan-out | 1 | #12 | #52 | | merged 2026-11-11 (dceecfa); first page of the swarm |
-| `analytics` | in review | agent fan-out | 1 | #66 | #67 | Dave | round 1 at a95873f: review-agent (approve with nits: caret version), qa-agent (PM, browser pane), spec-compliance, a11y-audit posted green; CI green except `scope-manifest` (no `analytics` unit in `plan.json` on main, fixed by the bookkeeping PR); criteria 1 to 5 confirmed in a #66 comment, 6 is Dave's after deploy |
+| `analytics` | done | agent fan-out | 1 | #66 | #67 | | merged 2026-11-11 (40b81e1); #66 closed; Actuals row written; nit open: pin `@vercel/analytics` exactly (piece B pins Speed Insights) |
+| `cleanup` | todo | agent fan-out | | (to file) | | Dave | scope addition 2026-11-12; issue draft in the PM scratchpad; starts when its issue exists and the bookkeeping PR adding the unit to `plan.json` merges |
 | `content-work` | todo | human only | | #13 | | Dave | needs Blocked item 3 |
 | `content-writing` | todo | human only | | #14 | | Dave | needs Blocked item 5 |
 | `content-music` | todo | human only | | #15 | | Dave | needs Blocked item 2 |
 | `content-home-about` | todo | human only | | #16 | | Dave | needs Blocked item 4 |
-| `seo-perf` | todo | agent fan-out | | #17 | | | after the five pages |
-| `feed` | todo | agent fan-out | | #18 | | | first to cut if the appetite bites |
+| `seo-perf` | in progress | agent fan-out | 1 | #17 | #70, #72 | PM | A merged 2026-11-12 (b45d3e2, OG images in Inter, architecture-audit advisory red); B merged (02e63b1, first-load JS 185.1 kB under the 190 kB budget); C Lighthouse CI building on `unit/seo-perf-lighthouse` (worktree `seo-perf-lighthouse`), Dave pushes (workflow file). #17 needs reopening. One Actuals row when C closes |
+| `feed` | done | agent fan-out | 1 | #18 | #69 | | merged 2026-11-12 (7c1c85a); #18 closed; Actuals row written; criteria confirmed in a #18 comment; nit: re-run the W3C validator on the live feed after deploy |
 | `qa-pass` | todo | human-led | | #19 | | | |
 | `launch` | todo | human-led | | #20 | | | |
 | `tail` | todo | human-led | | #21 | | | |
@@ -48,19 +49,19 @@ State: todo, in progress, in review, done, cut, parked. Round counts review roun
 
 ## Next
 
-1. PR #67 (#66): reviewed, four agent checks green. Order: merge the bookkeeping PR from `pm/analytics-calibration` (adds unit `analytics` to `plan.json`), then re-run `scope-manifest` on #67 (any PR edit re-triggers it; it runs from main), then Dave approves and merges #67, confirms events in the Vercel Analytics dashboard (criterion 6) and closes #66. Optional nit: pin `@vercel/analytics` to `2.0.1`.
-2. `seo-perf` (#17): calibrated to 0.1 / 0.2 / 0.3 days, but its scope grew (Lighthouse CI config, `Figure` sizing, CSP frame origins, sitemap routes; DECISIONS 2026-11-11) and the CSP now takes the analytics origins from PR #67. Dave confirms the estimate, then it fans out with `feed` (#18).
-3. Launcher leftovers, issue #62 (old-form calls in `revert.sh`, usage comments in `agent-git.ts` and `post-check.ts`); `scripts/merge-desk/` is protected, so Dave pushes and bypass-merges.
+1. Dave: reopen #17, file the `cleanup` issue, commit this bookkeeping; the PM pushes it and opens the PR as the App. Then piece C (Lighthouse CI) goes to Dave to push, and `cleanup` starts.
+2. After A and B merge: piece C (`seo-perf-lighthouse`, `.github/workflows/lighthouse.yml` and `lighthouserc.*`) built locally; Dave pushes and merges it (workflow files are his).
+3. `cleanup` unit covers the carried review follow-ups (DECISIONS 2026-11-12).
 4. Dave: confirm #7 criterion 5 and close #7; forwarding address at `davidfleming.me`; bio text. Milestone 1 still needs `content-work` (#13, Dave's).
-5. Carried, not builds: PR screenshots for #52 to #56 only if wanted; Amendment sections on #9 and #11 bodies; architecture-audit B2 on `page-work` (filter-by-kind into `src/lib`), `linkTarget()` into `src/lib`, featured slug dropped silently, list dates without `<time>`; Speed Insights needs its own ticket if wanted (through the same wrapper); review-agent size rule edit in `vig/global/agents/review.md` is Dave's.
-6. Session sandbox quirks (this chat): `git worktree add` and `pnpm install` need the sandbox off (the `.claude/settings*.json` write rule hits checkouts and a package in `node_modules`); `agent-git pr` needs it off too (cache `mkdtemp` under `~/Library/Caches`), and runs from the unit's worktree because it takes the current branch.
+5. Carried, not builds: PR screenshots for #52 to #56 only if wanted; Amendment sections on #9 and #11 bodies; architecture-audit B2 on `page-work` (filter-by-kind into `src/lib`), `linkTarget()` into `src/lib`, featured slug dropped silently, list dates without `<time>`; review-agent size rule edit in `vig/global/agents/review.md` is Dave's.
+6. Session sandbox quirks: `git worktree add`, `pnpm install` and `agent-git pr` need the sandbox off; `gh` cannot read its config in the sandbox (read public issues with `curl` to api.github.com); a command that names the launcher path anywhere but first word is denied by `command-guard`.
 
 ## Next chat
 
-**Before you start:** merge the `pm/analytics-calibration` bookkeeping PR, re-run `scope-manifest` on #67, approve and merge #67, then check the Vercel Analytics dashboard for events.
+**Before you start:** if not done: reopen #17, file the `cleanup` issue, merge the bookkeeping PR; push piece C from the `seo-perf-lighthouse` worktree.
 
 **Run:** `/pm` in a new desktop chat in `~/Workspace/defaultdave`.
 
 **Model and effort:** Sonnet, medium.
 
-**Prompt:** Read `docs/plan/STATUS.md` and the tail of `DECISIONS.md`. Confirm PR #67 merged and #66 closed (criterion 6 is the owner's dashboard check); write its Actuals row in `delta-log.md` (rounds from the PR's check runs). Then bring Dave the `seo-perf` (#17) estimate to confirm (calibrated 0.1 / 0.2 / 0.3 days, scope grew per DECISIONS 2026-11-11, CSP origins from PR #67: script and events same origin, nothing new for production), and once he confirms, start `seo-perf` and `feed` (#18) under the standing call, each `senior` running lint, typecheck, test, build, format:check and knip from a clean `.next`. Don't commit.
+**Prompt:** Read `docs/plan/STATUS.md`, the tail of `DECISIONS.md` and the Amendment comments on #17. Swarm 2 is merged except piece C (Lighthouse CI, `unit/seo-perf-lighthouse`, workflow file the owner pushes). When C merges, write one `seo-perf` Actuals row (rounds from PRs #70 and #72 check runs plus C) and close #17. Start `cleanup` under the standing call once its issue exists and `plan.json` on main has the unit: one `senior` in its own worktree, gates from a clean `.next`, PR as the App, review, verdicts posted. Don't commit.
