@@ -1,0 +1,168 @@
+---
+slug: crux-performance-history
+title: Your site already has six months of performance history. Go get it.
+summary: How I measured performance work on a codebase I was new to, with a free Google API for the baseline and an AI-run audit to find the work. Phone LCP fell 832ms in six weeks, and a 28-day reporting lag turned into the attribution signal.
+publishedAt: 2026-11-14
+updatedAt: null
+canonicalUrl: null
+---
+
+Phone LCP on a site I had just joined had been flat for ten weeks. Then all five phone metrics turned in the same week, desktop LCP, FCP, and TTFB turned with them, and the phone numbers kept falling. Six weeks after the last flat reading, mobile LCP was down 832ms and layout shift had gone from 0.16 to 0.01. When I started I had no RUM dashboard, no performance budget, and not one week of history. I had a free Google API and built an AI-run audit.
+
+This is how I measured performance work on a codebase I was new to, where the work went, what shipped, and how a 28-day lag turned into the attribution signal.
+
+## The problem: no baseline
+
+I joined a consumer travel marketplace as a contract frontend engineer. Next.js and React on the front, a Rails API behind it, high-traffic marketing, search, and detail pages. There was no RUM on the surfaces I owned. Lighthouse scores existed, but a lab score on a laptop tells you about the laptop. The question on day one is "what does this site feel like to someone on a phone right now," and there was no answer.
+
+You cannot prove an improvement without a before. Most teams solve this by wiring up a RUM vendor and waiting a month. You do not have to wait.
+
+## CrUX: the baseline you already have
+
+Chrome collects real-user Core Web Vitals from opted-in users and publishes them per origin and per URL through the Chrome UX Report (CrUX). The History API returns 25 weekly periods, about six months, for phone and desktop, at p75, for LCP, INP, CLS, FCP, and TTFB. The API key is free.
+
+```bash
+curl -s "https://chromeuxreport.googleapis.com/v1/records:queryHistoryRecord?key=$CRUX_KEY" \
+  -H 'Content-Type: application/json' \
+  -d '{"origin":"https://example.com","formFactor":"PHONE"}' \
+  > crux-origin-phone.json
+```
+
+Swap `origin` for `url` to get a single page. Run it for every high-traffic route you might touch. Commit the JSON.
+
+What it is not:
+
+- **Instant.** Each weekly point is the p75 of the trailing 28 days. A change you ship today is fully visible four weeks later.
+- **Everyone.** Chrome only, opted-in users only. It is a sample, but it is the sample Google ranks you on.
+- **Complete.** Per-URL data needs enough traffic. Quiet pages return nothing. Origin level works for any site with real traffic.
+- **Permanent.** Data older than about six months is gone. Export it on day one and keep exporting.
+
+I pulled the origin on phone and desktop, and twelve URLs on phone. Seven surfaces came back with enough history to use: the origin, four search results pages, the homepage, and the legacy checkout. That JSON is the before.
+
+## The audit
+
+I did not run the audit by hand. I ran a site-wide audit with Claude (Fable) inside a workflow I built for it, then implemented what it found.
+
+I turned the findings into tickets, one change each, with the route, the metric, and an estimated saving in the ticket. That discipline paid off later: 40 `perf` PRs between April 30 and June 3, most of them small enough to review in minutes.
+
+The measurement kept running alongside the fixes. A weekly skill re-pulled CrUX and compared week over week. Lighthouse CI baselines went into the pipeline for the search results page and the homepage, with a bundle-size gate and a shared-chunks budget, so a regression failed a build instead of surfacing in field data a month later. PRs also went through a fan-out of small review agents, one of them a specialist that looked for React and TypeScript performance anti-patterns before a human did.
+
+That is my concrete answer to "what did AI actually buy you." It bought a site-wide audit one engineer could act on alone, and measurement that kept going after the fixes landed.
+
+## Where the time went
+
+The field data made the priority call before the audit started. In late April the homepage was already at 1.3s phone LCP. The four search results pages sat between 2.4s and 2.9s, and they carried CLS of 0.29 to 0.35 while the homepage and the legacy checkout were already at zero.
+
+So the homepage got almost nothing. Its LCP moved 42ms between mid-May and late June because it did not need to move. The search results pages got most of the work, and every one of them dropped 39 to 53 percent over the same six weeks.
+
+<Figure
+  src="/articles/crux-performance-history/03-per-surface-lcp.png"
+  alt="Bar chart of phone LCP at p75 for six surfaces, week of May 16 against week of June 27, 2026. Four search results pages dropped 39 to 53 percent, legacy checkout dropped 34 percent, and the homepage dropped 3 percent, from 1,285 ms to 1,243 ms."
+  width="2400"
+  height="1400"
+/>
+
+Good judgment in performance work shows up as absence. The work did not go to pages that were fine.
+
+## The fixes
+
+Most of the 40 PRs were unglamorous. They fall into families.
+
+**Images.** Hero images preloaded with `fetchPriority="high"` and `decoding="async"`. Below-fold card images forced lazy. A `srcset` trimmed so the preload matched what the browser actually picked, because a preload that misses the cache is worse than none. Card image quality dropped from 80 to 60, an estimated 151KB per page.
+
+**Scripts.** Non-critical trackers deferred, and third-party scripts on the search results pages loaded through `next/script` with `lazyOnload`. A 250KB auth dialog dependency deferred behind `next/dynamic`. Browserslist targets updated to drop polyfills nobody needed. `structuredClone` replacing `JSON.parse(JSON.stringify())`.
+
+**Server.** A `no-store` header removed so back navigation hit bfcache. A page loader moved to parallel fetches and dropped its geocoding call, which removed a blocking server round-trip from that page.
+
+**Layout shift.** `font-display`, fixed-size star ratings, a memoized card, a subheader icon that reflowed under scroll lock. Fonts converted from TTF to woff2, an estimated 84KB.
+
+**Rendering.** A re-render cascade in the search context stopped with a stable-identity ref. A React Compiler coverage report with an opt-out ratchet, so coverage could not quietly regress.
+
+The savings quoted here are the estimates written in each PR at the time. CrUX reports one aggregate, so the field data cannot assign a number to a single fix.
+
+### The gallery pass
+
+The photo gallery on the detail page was a new feature a teammate had just shipped. I paired on a performance pass over it. Six small changes, reviewed and merged together as one PR:
+
+- desktop hero LCP priority fixed, bento thumbnails preloaded
+- `fetchPriority="low"` on lazy below-fold grid tiles
+- grid eager-loads suppressed while the lightbox is open
+- adjacent lightbox slides prefetched, so next and previous are instant
+- static map payload shrunk and its fetch deprioritized
+- a font preload dropped on routes that never use it
+
+None of these is clever. Together they made a busy page load in the order a person looks at it.
+
+## The demo: before and after
+
+I rebuilt the gallery pattern as a small demo so the fixes read as diffs instead of descriptions. `before/` is a plain HTML gallery page with the problems planted. `after/` is the same page with the fixes. One script serves each and runs Lighthouse locally.
+
+Lab numbers, mobile emulation with real DevTools throttling, median of three runs:
+
+| Metric                   | Before    | After   |
+| ------------------------ | --------- | ------- |
+| Performance score        | 54        | 100     |
+| Largest Contentful Paint | 17.8 s    | 1.5 s   |
+| First Contentful Paint   | 15.0 s    | 1.5 s   |
+| Speed Index              | 16.2 s    | 1.5 s   |
+| Cumulative Layout Shift  | 0.061     | 0       |
+| Total byte weight        | 3,002 KiB | 185 KiB |
+| Requests                 | 22        | 15      |
+
+Desktop scores 100 on both. A fast connection profile hides every issue except the layout shift, which is its own lesson: if you only audit on desktop you will ship the before page and feel fine.
+
+Seven planted problems, seven small diffs: a lazy-loaded hero with no priority, twelve eager 3000px tiles with no dimensions, a lightbox that loads all twelve full-size images on open, a 3000px map, two synchronous date-library scripts in the head to format twelve captions, a promo bar injected after load with no reserved space, and a preloaded font weight the page never uses.
+
+The demo also carries a generalized version of the audit workflow as a Claude Code skill: pull CrUX for an origin, run Lighthouse, rank the findings, write the report.
+
+## Reading the result
+
+<Figure
+  src="/articles/crux-performance-history/01-phone-lcp-weekly.png"
+  alt="Line chart of origin-level phone LCP at p75 by week, March 14 to August 29, 2026. Flat near 2,100 ms for ten weeks, then falling through and past a shaded band marking about 40 performance PRs to a floor of 1,196 ms in the week ending June 27, labeled 24 days after the last perf PR, then drifting up to 1,591 ms. The whole line sits under the 2,500 ms Good threshold."
+  width="2400"
+  height="1350"
+/>
+
+Ten flat weeks. Phone LCP moved 79ms across all of them, which is noise. Then the week ending May 23 all five phone metrics fell together, and desktop LCP, FCP, and TTFB turned the same week. By June 27, six weeks after the last flat reading, phone LCP was down 832ms, from 2,028ms to 1,196ms.
+
+<Figure
+  src="/articles/crux-performance-history/02-phone-five-metrics.png"
+  alt="Five small line charts of phone LCP, FCP, TTFB, INP and CLS at p75 by week, March 14 to August 29, 2026, each on its own scale, with the PR window of May 2 to June 6 shaded. All five turn down in the same week. LCP, FCP, TTFB and INP bottom out in the week ending June 27 at 1,196 ms, 1,024 ms, 677 ms and 189 ms. CLS is 0.01 that week, climbs again in July, and reaches 0.00 in August."
+  width="2400"
+  height="1520"
+/>
+
+Five phone metrics in one week, and three desktop metrics in the same week. Traffic mix does not move LCP, FCP, TTFB, INP, and CLS in lockstep. A simultaneous turn like that is the signature of a program. On phone, LCP, FCP, TTFB, and INP then hit their floor together on June 27, with CLS at 0.01. Desktop LCP kept falling for another month, to a floor on July 25. That is seven weeks after my last perf PR, longer than one CrUX window explains, so I do not claim the tail of the desktop line.
+
+The part I find most useful is the lag. The last `perf` PR merged on June 3. The floor in the phone data landed in the week ending June 27, 24 days later, and the next point is 6ms off it. CrUX reports a trailing 28-day window, so a program that stops shipping keeps showing improvement for about four more weeks and then flattens. The line bottomed out one CrUX window after the shipping stopped. That fingerprint is hard to fake and hard to get by coincidence. It is what a burst of work looks like entering and leaving a trailing average.
+
+Then it drifted back. I moved onto a checkout rebuild in June and nobody continued the performance work. Phone LCP climbed from 1,196ms at the floor to 1,591ms by the end of August. Still 23% better than April, but not the peak. Performance regresses when nobody owns it, and the trailing window means you find out a month late unless CI is watching.
+
+**Caveats I keep in the piece.** Correlation, not sole authorship. Other people shipped during the window, some of it with my help. The regression that started in mid-July is site-wide and mobile-specific, and I cannot attribute it. Search results CLS was still 0.18 to 0.26 at the June floor. It fell to 0.01 or lower in August on the three pages that still had data, after my perf PRs had stopped.
+
+## Guardrails
+
+The fast way to a better LCP is to trade against the user: defer the content, lazy-load the thing they came for, let the layout settle later. The field data shows those trades were not made. Origin-level phone CLS fell with LCP, from 0.16 to 0.01, in the same six weeks LCP dropped 832ms.
+
+<Figure
+  src="/articles/crux-performance-history/04-phone-cls-weekly.png"
+  alt="Two charts of origin-level phone CLS by week, March 14 to August 29, 2026. The p75 line stands at 0.17 before the performance PRs, falls to 0.01 in late June, climbs back to 0.12 in July, above the 0.10 Good threshold, then reaches 0.00 by August 29. The share of page loads with good CLS rises from 67 percent to 84 percent."
+  width="2400"
+  height="1560"
+/>
+
+The CLS line is not one clean drop, and I would rather show that than smooth it. It gave some back in July, after the performance work stopped, and briefly crossed back over the Good line. A later fix to the search results template took it to zero by late August, and the share of page loads with good CLS ended at 84%, the best value in the whole six months. Two waves. Neither one bought speed with shift.
+
+The demo has the small version of this, and it taught me something while I built it. The `before/` page has a map image with no dimensions and a promo bar injected 800ms after load with no reserved space. Lighthouse attributes every bit of its measured shift to the map. Under mobile throttling the promo bar lands before anything has painted, so the lab run never sees it move. On a fast connection it is the first thing a person sees jump. That gap is the whole argument for field data: a lab run is one machine on one profile, and layout shift hides in the profile you did not test. The `after/` page gives the map its dimensions and reserves the promo slot in HTML. Same banner, same timing, zero shift. Two small changes, and they are the whole principle: nothing you do for a metric gets to cost the person reading the page.
+
+## Takeaways
+
+1. **Pull CrUX before you touch anything.** Origin and every route you might change, phone and desktop. Commit the JSON.
+2. **Rank by field data, not by Lighthouse score.** The score tells you about a lab machine. p75 tells you about people.
+3. **One fix per PR, with the estimated saving in it.** Forty PRs, most of them small, were reviewable. Four big ones would not have been.
+4. **Expect the result about four weeks after the last change.** Plan your reporting around the lag, and do not call it early.
+5. **Put the baseline in CI.** Lighthouse CI on your heaviest routes, a bundle-size gate. Otherwise the gains leak.
+6. **Export CrUX every month.** It ages out. Six months from now the before is gone.
+
+If you are doing this kind of work, or trying to prove you did, I would like to compare notes.
