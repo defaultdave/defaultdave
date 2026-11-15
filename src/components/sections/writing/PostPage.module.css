@@ -32,6 +32,18 @@
   line-height: var(--type-small-line);
 }
 
+.origin {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--type-small-size);
+  line-height: var(--type-small-line);
+}
+
+.origin a {
+  color: var(--color-accent);
+  text-underline-offset: 0.2em;
+}
+
 .elsewhere {
   display: flex;
   flex-direction: column;

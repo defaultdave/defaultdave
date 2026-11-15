@@ -21,13 +21,13 @@ export async function WritingListPage({
       summary: post.summary,
       date: formatDate(post.publishedAt),
       isoDate: post.publishedAt,
-      ...(post.canonical
-        ? {}
-        : {
+      ...(post.body
+        ? {
             readingTime: formatReadingTime(
               await readPostSource(collection, post.slug),
             ),
-          }),
+          }
+        : {}),
     })),
   );
   return (

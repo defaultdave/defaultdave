@@ -137,7 +137,7 @@ export function createContent(root: string = process.cwd()) {
               },
             }
           : {}),
-        body: await compileBody(e.body),
+        ...optional("body", await compileOptionalBody(e.body)),
       };
     });
   }

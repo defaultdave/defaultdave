@@ -9,7 +9,7 @@ export type PostListItem = {
   date: string;
   /** Machine-readable form of `date`. */
   isoDate: string;
-  /** Omitted when the post lives elsewhere and its body here is not the article. */
+  /** Omitted when the post has no body here. */
   readingTime?: string;
 };
 
