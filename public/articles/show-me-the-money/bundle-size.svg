@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 128" width="600" height="128" role="img" aria-label="Bundle Size (KB gzip, lower is better)">
+  <rect width="600" height="128" fill="white"/>
+  <rect x="400" y="3" width="10" height="10" fill="#3b82f6" rx="2"/>
+  <text x="414" y="12" font-size="10" fill="#374151">Zod</text>
+  <rect x="460" y="3" width="10" height="10" fill="#8b5cf6" rx="2"/>
+  <text x="474" y="12" font-size="10" fill="#374151">Valibot</text>
+  <line x1="0" y1="6" x2="600" y2="6" stroke="#e5e7eb" stroke-width="1"/>
+  <g>
+    <text x="152" y="24" font-size="11" fill="#374151" text-anchor="end" dominant-baseline="middle">Zod (full)</text>
+    <rect x="160" y="10" width="420" height="28" fill="#f1f5f9" rx="3"/>
+    <rect x="160" y="10" width="365.21739130434787" height="28" fill="#3b82f6" rx="3"/>
+    <text x="519.2173913043479" y="24" font-size="11" fill="white" dominant-baseline="middle" text-anchor="end">17.7 KB</text>
+    <line x1="0" y1="42" x2="600" y2="42" stroke="#e5e7eb" stroke-width="1"/>
+  </g>
+  <g>
+    <text x="152" y="60" font-size="11" fill="#374151" text-anchor="end" dominant-baseline="middle">@zod/mini</text>
+    <rect x="160" y="46" width="420" height="28" fill="#f1f5f9" rx="3"/>
+    <rect x="160" y="46" width="80.47162859248343" height="28" fill="#3b82f6" rx="3"/>
+    <text x="246.47162859248343" y="60" font-size="11" fill="#374151" dominant-baseline="middle" text-anchor="start">3.9 KB</text>
+    <line x1="0" y1="78" x2="600" y2="78" stroke="#e5e7eb" stroke-width="1"/>
+  </g>
+  <g>
+    <text x="152" y="96" font-size="11" fill="#374151" text-anchor="end" dominant-baseline="middle">Valibot</text>
+    <rect x="160" y="82" width="420" height="28" fill="#f1f5f9" rx="3"/>
+    <rect x="160" y="82" width="123.80250552689759" height="28" fill="#8b5cf6" rx="3"/>
+    <text x="289.80250552689756" y="96" font-size="11" fill="#374151" dominant-baseline="middle" text-anchor="start">6 KB (1.37 KB tree-shaken)</text>
+  </g>
+  <line x1="0" y1="114" x2="600" y2="114" stroke="#e5e7eb" stroke-width="1"/>
+</svg>

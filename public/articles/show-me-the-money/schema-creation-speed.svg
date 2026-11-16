@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 650 144" width="650" height="144" role="img" aria-label="Schema Creation Speed (ops/sec, higher is better)">
+  <rect width="650" height="144" fill="white"/>
+  <rect x="460" y="3" width="10" height="10" fill="#3b82f6" rx="2"/>
+  <text x="474" y="12" font-size="10" fill="#374151">Zod</text>
+  <rect x="520" y="3" width="10" height="10" fill="#8b5cf6" rx="2"/>
+  <text x="534" y="12" font-size="10" fill="#374151">Valibot</text>
+  <line x1="0" y1="0" x2="650" y2="0" stroke="#e5e7eb" stroke-width="1"/>
+  <g>
+    <text x="172" y="31" font-size="11" fill="#374151" text-anchor="end" dominant-baseline="middle">Simple schema</text>
+    <rect x="180" y="10" width="400" height="18" fill="#f1f5f9" rx="3"/>
+    <rect x="180" y="10" width="25.117517536071986" height="18" fill="#3b82f6" rx="3"/>
+    <text x="210.117517536072" y="19" font-size="10" fill="#374151" dominant-baseline="middle" text-anchor="start">23K ops/sec</text>
+    <rect x="180" y="32" width="400" height="18" fill="#f1f5f9" rx="3"/>
+    <rect x="180" y="32" width="347.82608695652175" height="18" fill="#8b5cf6" rx="3"/>
+    <text x="522.8260869565217" y="41" font-size="10" fill="white" dominant-baseline="middle" text-anchor="end">320K ops/sec</text>
+    <text x="645" y="31" font-size="10" fill="#8b5cf6" text-anchor="end" dominant-baseline="middle" font-weight="bold">13.85x</text>
+    <line x1="0" y1="60" x2="650" y2="60" stroke="#e5e7eb" stroke-width="1"/>
+  </g>
+  <g>
+    <text x="172" y="93" font-size="11" fill="#374151" text-anchor="end" dominant-baseline="middle">Complex schema (nested + arrays)</text>
+    <rect x="180" y="72" width="400" height="18" fill="#f1f5f9" rx="3"/>
+    <rect x="180" y="72" width="7.007769998161358" height="18" fill="#3b82f6" rx="3"/>
+    <text x="192.00776999816136" y="81" font-size="10" fill="#374151" dominant-baseline="middle" text-anchor="start">6K ops/sec</text>
+    <rect x="180" y="94" width="400" height="18" fill="#f1f5f9" rx="3"/>
+    <rect x="180" y="94" width="131.68323868558653" height="18" fill="#8b5cf6" rx="3"/>
+    <text x="316.6832386855865" y="103" font-size="10" fill="#374151" dominant-baseline="middle" text-anchor="start">121K ops/sec</text>
+    <text x="645" y="93" font-size="10" fill="#8b5cf6" text-anchor="end" dominant-baseline="middle" font-weight="bold">18.79x</text>
+  </g>
+  <line x1="0" y1="122" x2="650" y2="122" stroke="#e5e7eb" stroke-width="1"/>
+</svg>
