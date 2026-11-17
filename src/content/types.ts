@@ -33,7 +33,8 @@ export type Post = {
   updatedAt?: string;
   /** Set when first published elsewhere. */
   canonical?: { url: string; host: string };
-  body: MDXContent;
+  /** Absent when the entry has no body, as for a piece listed by summary only. */
+  body?: MDXContent;
 };
 
 export type PostCollection = "articles" | "musings";

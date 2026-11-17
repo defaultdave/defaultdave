@@ -16,16 +16,26 @@ const item = (over: Partial<PostListItem> = {}): PostListItem => ({
   ...over,
 });
 
+const summaryOnly = (over: Partial<Post> = {}): Post => ({
+  slug: "a",
+  title: "Alpha",
+  summary: "About alpha.",
+  publishedAt: "2026-01-05",
+  ...over,
+});
+
 async function post(over: Partial<Post> = {}): Promise<Post> {
-  return {
-    slug: "a",
-    title: "Alpha",
-    summary: "About alpha.",
-    publishedAt: "2026-01-05",
-    body: await compileMdx("Body text here."),
-    ...over,
-  };
+  return summaryOnly({ body: await compileMdx("Body text here."), ...over });
 }
+
+const summaryPage = (over: Partial<Post> = {}) =>
+  renderToStaticMarkup(
+    <PostPage
+      post={summaryOnly(over)}
+      backPath="/articles"
+      backLabel="Articles"
+    />,
+  );
 
 const page = async (over: Partial<Post> = {}, readingTime?: string) =>
   renderToStaticMarkup(
@@ -86,14 +96,34 @@ describe("PostPage", () => {
     expect(html).not.toContain("Read on");
   });
 
-  it("renders summary and a Read on link for a canonical post, not the body", async () => {
-    const html = await page({
+  it("renders summary and a Read on link for a canonical post without a body", () => {
+    const html = summaryPage({
       canonical: { url: "https://example.com/a", host: "example.com" },
     });
     expect(html).toContain("About alpha.");
     expect(html).toContain('href="https://example.com/a"');
     expect(html).toContain("Read on example.com");
-    expect(html).not.toContain("Body text here.");
+    expect(html).not.toContain("First published on");
+  });
+
+  it("renders the body and names the original for a canonical post with a body", async () => {
+    const html = await page(
+      { canonical: { url: "https://example.com/a", host: "example.com" } },
+      "1 min read",
+    );
+    expect(html).toContain("Body text here.");
+    expect(html).toContain(
+      'First published on <a href="https://example.com/a">example.com</a>',
+    );
+    expect(html).toContain("1 min read");
+    expect(html).not.toContain("Read on");
+    expect(html).not.toContain("About alpha.");
+  });
+
+  it("renders the summary alone for a post with neither body nor canonical", () => {
+    const html = summaryPage();
+    expect(html).toContain("About alpha.");
+    expect(html).not.toContain("Read on");
   });
 
   it("shows the updated date when present", async () => {

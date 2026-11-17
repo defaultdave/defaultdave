@@ -35,9 +35,9 @@ export async function WritingPostPage({
 }) {
   const post = await getPost(collection, slug);
   if (!post) notFound();
-  const readingTime = post.canonical
-    ? undefined
-    : formatReadingTime(await readPostSource(collection, slug));
+  const readingTime = post.body
+    ? formatReadingTime(await readPostSource(collection, slug))
+    : undefined;
   return (
     <PostPage
       post={post}

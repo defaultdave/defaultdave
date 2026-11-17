@@ -1,0 +1,134 @@
+---
+slug: tuscany-rule
+title: My attempts to get AI to write less and show its sources
+summary: 'I tested my AI writing rule against "Be concise." and others: 12 rules, 489 answers, one blind judge. On length, two words matched my seven lines. What changed the output was putting the answer first and citing pages the model actually opened.'
+publishedAt: 2026-11-02
+updatedAt: 2026-11-03
+canonicalUrl: https://www.linkedin.com/pulse/my-attempts-get-ai-write-less-show-its-sources-david-fleming-ngm0c
+---
+
+_I tested my AI writing rule against "Be concise." and others: 12 rules, 489 answers, one blind judge. On length, two words matched my seven lines. What changed the output was putting the answer first and citing pages the model actually opened._
+
+You look up a recipe and get the story of a trip to Tuscany. I wrote a writing rule for AI to fix that: seven lines, carefully argued, with budgets and a name. Pieces of it ended up in my own agent instructions. I'd tried it on my own work and liked what I saw, but I'd never measured it or compared it with anything else.
+
+So I measured it. Same model, same 25 prompts, and the only thing that changed was the instruction:
+
+- **No rule:** 340 words (median)
+- **Google's technical-writing rules, distilled:** 283
+- **"Be concise.":** 194
+- **Anthropic's own conciseness instruction:** 189
+- **My rule:** 175
+
+On length, my seven-line spec does what two words do. So does every other conciseness rule I tried. If your CLAUDE.md has a paragraph telling the model to keep it short, it's doing about what "Be concise." does.
+
+The two things that did change the output weren't about length at all.
+
+## What I was trying to fix
+
+AI output has the shape of that recipe page: a line restating your question, a preamble about what it's going to do, the answer somewhere in the middle, and a summary of what it just said.
+
+There's a reason for it. Reward models learn that longer answers score higher. In a 2023 study of verbosity bias, GPT-4 acting as a judge preferred longer answers more than humans did, and once the length gap was big enough it almost always picked the longer one ([Saito et al., arXiv 2310.10076](https://arxiv.org/abs/2310.10076)). A 2026 benchmark of 76 assistants ranked GPT-3.5-Turbo, a 2023 model, the least wordy of all, ahead of GPT-5 and Gemini 3 Pro ([YapBench](https://arxiv.org/abs/2601.00624)).
+
+So I wrote the rule. I called it the Tuscany Rule: get to the recipe. Answer first. One idea per sentence, 15 to 20 words on average. No preamble. Every claim carries a number or a citation. Lists only for parallel items. Length must be earned. No closing summary.
+
+## How I tested it
+
+I built a small harness around Claude Code's headless mode and ran 489 answers over five runs:
+
+- **One model answering:** Sonnet 5.5, with nothing in its context but the instruction under test. No project files, no memory, no tools unless a run gave every arm the same tools.
+- **12 instructions plus a no-rule baseline:** "Be concise.", Google's tech-writing rules, Anthropic's published samples, three versions of mine, and a few one-liners.
+- **Real prompts:** 13 asks pulled from my own Claude Code history, screened for anything private. I added generated ones for the work AI actually writes for me: commit messages, PR descriptions, status updates, debugging and end-of-task reports. Six research questions came last.
+- **Keys written blind:** the agents that wrote the generated prompts and the answer keys never saw any of the rules. I froze each set before the first run.
+- **A blind judge on a different model:** Opus 5.5 graded every answer against its key. It checked which facts were present, where the answer first appears, and whether the answer made a known mistake. It never saw which rule produced the answer, and it was told to ignore length and style.
+- **Citations checked:** does the link load, is it an official source, did the model actually open it, and does the page say what the sentence claims.
+
+The limits are at the end. The biggest: one model, and an AI judge.
+
+## Concise rules converge
+
+Every concise instruction landed in the same place. They all wrote 13 to 15 words per sentence, so my 15-to-20-word budget did nothing measurable. And they all paid the same price for being short: 76% to 81% of the key facts, against 83% for no rule. That's the cost of brevity, whoever writes the rule.
+
+## Where the answer goes is what changes
+
+This is where my rule did something the others didn't:
+
+- **Answer in the first sentence:** my rule did it in 19 of 25 answers, and 17 of 25 in a second sample. Every other instruction managed 7 to 13.
+- **"Be concise." was the worst at it:** 8 of 25. Shorter isn't the same as answer-first.
+- **Widest on the writing that matters most:** on commits, PR descriptions and status updates, my rule put the answer first in 7 of 12, with nothing before it. The others buried it 16 to 31 words in.
+
+Anthropic seems to agree, in one place. Its prompting guide tells the model to "lead with the outcome" in progress updates during agent work, but not in answers ([Anthropic docs](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5)). Its formatting advice goes the other way: flowing prose, few lists ([Anthropic docs](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices)). I tested that one too. It was the second-longest instruction (322 words) and used no lists in 20 of 25 answers.
+
+## "Cite your sources" doesn't make the model check anything
+
+The second thing that mattered was citations. I gave every instruction the same web search and fetch tools:
+
+- **Instructions with no lookup rule** used the tools in 1 or 2 answers out of 25, and never opened a page.
+- **"Be concise. Cite your sources."** produced links, but 44% came from memory and the rest straight from search results. It also ran 26% longer than Anthropic's concise instruction.
+- **One changed line,** "link the primary source you opened", got links in 8 of 13 knowledge answers. Every one was a page the model had opened, and 92% were official docs or the maintainers' own pages. Where it didn't look something up, it said so ("treat it as unverified") instead of making up a link.
+
+The word doing the work is "opened". It sends the model to the docs, and you can check it afterward. Without it, the model cited csstriggers.com, a third-party page with no dates or browser versions on it, in two separate runs.
+
+## So I split the rule in two
+
+Looking at the results, I realised I'd been asking one rule to do two different jobs.
+
+Day to day, I want the model to change as little as possible: fewer tokens, less rework. But when it reports a decision or finishes a task, I want the judgement up top and the data in bullets. When I ask it to dig into something, I want the opposite trade. Spend the tokens, check the facts, and give me enough to make my own call.
+
+**Rule 1, day to day** (decisions, status, end-of-task reports):
+
+```
+Get to the recipe.
+
+Use this when you report a decision, a status, or the result of finished work. Everywhere else, write as you normally would.
+
+1. Judgement first. Sentence one is the decision, verdict or result.
+2. Then the data, as bullets. One fact per bullet, carrying the number, name or line that backs it.
+3. Show the evidence this work already produced: the file and line, test output, log line, ticket, or page you opened. Don't look anything up just to cite it.
+4. If something wasn't checked, say so in its bullet.
+5. No preamble. No closing summary.
+6. Stop when the reader has what they need to act.
+```
+
+- **Judgement first** in 10 of 16 reports, against 4 to 9 for the others.
+- **All the facts:** 90%, equal to no rule. The concise rules dropped to 82% to 86%. It isn't the shortest (234 words), and it doesn't try to be: the verdict comes first, so you can stop reading once you have it.
+- **Real evidence:** the most pointers back into the material it was given, 27 file-and-line and ticket references, every one real.
+- **One catch:** it still trims ordinary answers by about a quarter and opens them answer-first. If you want it fully out of the way, install it only where reports get written instead of as a global instruction.
+
+**Rule 2, research** (only when you ask for it):
+
+```
+Research brief. Write for someone who has to make a decision. They may read only the top, so make the top enough to decide; put the support below for when they want it.
+
+1. Start with the summary, in under 80 words: the answer or recommendation, the condition it depends on ("do X if Y; otherwise Z"), and the first concrete step. End it with one line: "Confidence: high, medium or low", and the main reason in a few words.
+2. Then the detail, in sections the reader can skip: the evidence for, the evidence against, and where sources disagree. Each point adds something the summary doesn't say; never restate the summary.
+3. Use industry-standard, reliable sources: official docs, specs, standards bodies, the maintainer's own words. Cite each one inline, linked, with its date when the page shows one.
+4. Question secondary sources. Check them against a primary source before relying on them; if you can't, say the claim rests on a secondary source.
+5. Separate what you checked from what you inferred. Mark anything you couldn't open as unverified, in the detail, not the summary.
+6. Keep the research bounded: open no more than five sources. If the question needs more, say what is still open and suggest a focused follow-up instead of going deeper.
+7. No preamble. No padding. Aim for under 400 words in all.
+```
+
+The first version failed in an instructive way. I asked for "your confidence and the reason for it" in the summary, and the confidence line ate the summary. It filled up with caveats about sources and dropped the condition the decision depended on. "Don't ship it without a fallback" came with no fallback. The summary carried the decision on its own in only 7 of 14 answers.
+
+Version 2 caps the summary, requires the condition and the first step, and moves the caveats down:
+
+- **Summary decides alone:** 10 of 14, up from 6 and 7.
+- **Shorter:** 409 words, down from 529 to 604.
+- **Checked:** 96% of its links were pages it opened, and all 10 citations I spot-checked supported their sentence.
+- **Fewer unchecked claims:** about 0.5 per 100 words, against 1.73 for no rule with the same tools.
+- **Balance held:** both sides of a contested point in 7 of 11, the same as the first version in the same run.
+
+## What I'd do with this
+
+- **Stop tuning length.** "Be concise." gets you most of the way there. Spend your instruction on where the answer goes.
+- **Put "judgement first" in anything that reports:** status updates, PR descriptions, end-of-task summaries.
+- **For research, write "the source you opened", not "cite your sources",** and bound the depth with a number, not an adverb.
+- **Test your own rules.**
+
+## Limits
+
+- **One model under test.** Anthropic's own docs say Opus 5 runs longer by default, so the gaps may look different there.
+- **Mostly one answer per prompt.** The answer-first result held across two samples, but counts move by a few between runs.
+- **The judge is an AI.** Blind, on a different model, and told to ignore length, but still an AI. No people have skim-tested these answers yet.
+- **A small, personal prompt set:** 13 real asks, mostly frontend and web performance.
+- **Research keys were checked against the docs on one day.** Versions move.

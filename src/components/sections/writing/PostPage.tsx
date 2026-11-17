@@ -11,14 +11,14 @@ type PostPageProps = {
   /** Where the back link goes, such as "/articles". */
   backPath: string;
   backLabel: string;
-  /** Omitted for a post that lives elsewhere. */
+  /** Omitted for a post with no body here. */
   readingTime?: string;
 };
 
 /**
  * The post template shared by /articles/[slug] and /musings/[slug]. A post
- * first published elsewhere shows its summary and a link out; any other post
- * shows its body.
+ * with a body shows it, under a line naming the original when it was first
+ * published elsewhere. A post without a body shows its summary and a link out.
  */
 export function PostPage({
   post,
@@ -49,18 +49,25 @@ export function PostPage({
           ) : null}
           {readingTime ? ` · ${readingTime}` : null}
         </p>
+        {canonical && post.body ? (
+          <p className={styles.origin}>
+            First published on <a href={canonical.url}>{canonical.host}</a>
+          </p>
+        ) : null}
       </header>
-      {canonical ? (
+      {post.body ? (
+        <MdxBody body={post.body} />
+      ) : (
         <div className={styles.elsewhere}>
           <p className={styles.summary}>{post.summary}</p>
-          <div>
-            <LinkButton href={canonical.url}>
-              Read on {canonical.host}
-            </LinkButton>
-          </div>
+          {canonical ? (
+            <div>
+              <LinkButton href={canonical.url}>
+                Read on {canonical.host}
+              </LinkButton>
+            </div>
+          ) : null}
         </div>
-      ) : (
-        <MdxBody body={post.body} />
       )}
     </article>
   );

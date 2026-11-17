@@ -63,13 +63,19 @@ describe("content layer, valid tree", () => {
 
   it("listPosts is newest first and derives the canonical host", async () => {
     const posts = await valid.listPosts("articles");
-    expect(posts.map((p) => p.slug)).toEqual(["new", "old"]);
+    expect(posts.map((p) => p.slug)).toEqual(["new", "linked", "old"]);
     expect(posts[0]?.canonical).toEqual({
       url: "https://dev.example.org/post",
       host: "dev.example.org",
     });
-    expect(posts[1]).not.toHaveProperty("canonical");
-    expect(posts[1]).not.toHaveProperty("updatedAt");
+    expect(posts[2]).not.toHaveProperty("canonical");
+    expect(posts[2]).not.toHaveProperty("updatedAt");
+  });
+
+  it("a post has a body only when its entry has one", async () => {
+    const posts = await valid.listPosts("articles");
+    expect(posts[0]?.body).toBeTypeOf("function");
+    expect(posts[1]).not.toHaveProperty("body");
   });
 
   it("musings share the post shape", async () => {

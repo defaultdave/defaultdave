@@ -2,15 +2,12 @@ import { describe, expect, it } from "vitest";
 
 import { buildFeed, escapeXml, toRfc822, type FeedPost } from "./build-feed";
 
-const body = (() => null) as unknown as FeedPost["body"];
-
 function post(over: Partial<FeedPost> & Pick<FeedPost, "slug">): FeedPost {
   return {
     collection: "articles",
     title: "A title",
     summary: "A summary.",
     publishedAt: "2026-01-01",
-    body,
     ...over,
   };
 }

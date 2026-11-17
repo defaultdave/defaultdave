@@ -1,0 +1,76 @@
+---
+slug: multi-agent-ai-dev-workflow
+title: Notes on Building a Multi-Agent AI Dev Workflow
+summary: How one /senior slash command grew, over two months, into a development workflow of specialized AI agents, and the four-layer quality gate system I built after agents kept skipping their instructions.
+publishedAt: 2026-03-02
+updatedAt: null
+canonicalUrl: https://www.linkedin.com/pulse/notes-building-multi-agent-ai-dev-workflow-david-fleming-t3xoe
+---
+
+AI has gone from a mild fascination to an everyday tool, but engineers still hit the same barriers: limitations, reliability, trust.
+
+In late November 2025, the company I worked at got Claude Code access, along with the push of other AI systems to be used, so I sat down to see what it could do.
+
+Using AI in the terminal was new to me, and I wasn’t sure what it could do. I pointed it at a repository on my machine and asked it to summarize the codebase and watched it go. It created a summary of the codebase that was easy to understand and aligned with external documentation.
+
+Then I wanted to see if it would come to the same conclusion I had on a recent problem. After describing the basic change we wanted to make, it found some other related code. It took a little coaxing to find the right files, but not much, and its suggestions on making an improvement were right on.
+
+I understood agents as saved prompts, so I asked Claude how to make them, and quickly wrote a slash command called /senior that was a pretty basic software engineering specific agent. I then fed it our company’s code standards and asked if any of these instructions would help. It gave me feedback that yes, this added what it normally would check.
+
+Wanting to put it to work, I knew the perfect ticket to point it at, a well-written, simple task a fellow Senior Engineer had made and was sitting in our backlog.
+
+It read the acceptance criteria, wrote the implementation, added tests, committed to a feature branch, and wrote the PR description. I only added a note that this was 100% AI created and manually verified.
+
+I presented to our team, being honest about the process, that this could be a whole new way to look at our work, to have agents work before, during, and after humans are involved. For me, AI stopped being a coding assistant or a smart auto-complete. I started thinking about it as a development team.
+
+## From a script to a system
+
+That first command was a single agent doing a single task with a little direction. But it raised a question: What if I built a full development workflow around AI agents, with the same standards I'd expect from real engineering culture?
+
+Over the next 2 months, I built exactly that.
+
+I started with a mirror of the day to day roles that I relied on to get code shipped. Dedicated agents to tackle specific tasks.
+
+- Tech PM for triage
+- Designer for UX/UI design (ASCII layout) and feedback on user’s experience
+- Senior engineer for TDD implementation
+- Reviewer for code quality
+- QA for test coverage and running the actual build.
+
+(Currently there are 11 for specific use cases, along with several commands)
+
+These specific roles taught me a lot, what started with trying to keep AI from solving everything all at once, became a way to track and analyze what was happening, if they were following instructions.
+
+The number of times I had to stop the Tech PM from writing code was getting frustrating. I would stop the agent and ask, “Why are you writing code?”
+
+AI agents and human developers should follow the same standards and leave the same digital footprint. When a junior developer opens a pull request, they should see exactly how the work was done.
+
+I am used to Kanban boards, so I wanted my dev team to use that. It was also a good way to verify what agents were working on when I moved to running multiple teams at once. 5-column project board, issue-linked branches, automated PR creation.
+
+## Process Beats Prompts
+
+AI-generated code has a trust problem. Models have a sycophancy problem: “Excellent work, this looks great!” Steve Yegge nailed the friction agents required: "a lot of manual steering and course-correction, and you sometimes have to push them to finish."
+
+Most developers I know are using AI one issue at a time, one prompt at a time. The topic of trusting the work often came up, noted as the reason why they never pushed further into it. Was it worth the time burn just to have agents make stuff up?
+
+I had the same apprehension, but I wanted to push it, find what worked, what broke, how to make it better.
+
+Adjusting the prompts wasn’t cutting it, the agents would skip instructions even if you said they are mandatory.
+
+What it has resulted in is a 4-layer quality gate system:
+
+1. Agent self-check: typecheck, lint, and tests must pass before an agent can hand off work.
+2. Team lead gate: catches scope drift and integration issues before anything gets committed.
+3. Automated review + QA: independent agents check code quality, test coverage, and run the actual build including Playwright end-to-end tests.
+4. Human PR review: architecture decisions and business logic still need a person.
+
+Notably the only planned layer check was the human PR review. Each of these was created out of necessity, from conversations with the AI team about why agent instructions kept being ignored. I also ran a seniority agent review while drafting this article. It created 8 new P0/P1 issues.
+
+## What’s next?
+
+- Improving Observability: dashboard updates, metrics, automatic learning including dividing “agents need to know this” vs “nice notes to have around”.
+- Benchmark project: Small Todo list app that can be reset, issues re-created, and can observe the differences.
+- Agent reporting of skipped prompts (this seems to be the ongoing issue, they make decisions to skip items even when noted as being mandatory).
+- Leverage local models for more token savings.
+
+If you’re building something similar, or thinking about it, I’d like to compare notes.
