@@ -7,10 +7,47 @@ import { parseTokens, type TokenMap } from "./parse-tokens";
 
 const css = readFileSync(join(import.meta.dirname, "tokens.css"), "utf8");
 const { light, dark } = parseTokens(css);
-const themes = { light, dark: { ...light, ...dark } } satisfies Record<
-  string,
-  TokenMap
->;
+/*
+ * Bg, text, links, visited and mark are CSS system colours, so tokens.css holds
+ * keywords, not hex. These are what Chromium draws for each scheme (the values
+ * on the Tokens artboard); the contrast maths needs a hex.
+ */
+const SYSTEM_COLOURS = {
+  light: {
+    Canvas: "#ffffff",
+    CanvasText: "#000000",
+    LinkText: "#0000ee",
+    VisitedText: "#551a8b",
+    Mark: "#ffff00",
+    MarkText: "#000000",
+  },
+  dark: {
+    Canvas: "#121212",
+    CanvasText: "#ffffff",
+    LinkText: "#9e9eff",
+    VisitedText: "#d0adf0",
+    Mark: "#ffff00",
+    MarkText: "#000000",
+  },
+} as const satisfies Record<string, Record<string, string>>;
+
+function resolved(
+  scheme: keyof typeof SYSTEM_COLOURS,
+  tokens: TokenMap,
+): TokenMap {
+  const system: Record<string, string> = SYSTEM_COLOURS[scheme];
+  return Object.fromEntries(
+    Object.entries(tokens).map(([name, value]) => [
+      name,
+      system[value] ?? value,
+    ]),
+  );
+}
+
+const themes = {
+  light: resolved("light", light),
+  dark: resolved("dark", { ...light, ...dark }),
+} satisfies Record<string, TokenMap>;
 
 function channel(value: number): number {
   const c = value / 255;
@@ -42,23 +79,16 @@ function colour(theme: TokenMap, token: string): string {
 // [foreground, background]
 const textPairs = [
   ["text", "bg"],
-  ["text", "surface"],
   ["muted", "bg"],
-  ["muted", "surface"],
   ["accent", "bg"],
-  ["accent", "surface"],
-  ["on-accent", "accent"],
-  ["ink", "pop-1"],
-  ["ink", "pop-2"],
-  ["ink", "pop-3"],
-  ["ink", "pop-4"],
+  ["visited", "bg"],
+  ["text", "button"],
+  ["mark-text", "mark"],
 ] as const;
 
 const uiPairs = [
   ["border", "bg"],
-  ["border", "surface"],
   ["focus", "bg"],
-  ["focus", "surface"],
 ] as const;
 
 describe.each(Object.entries(themes))("%s palette", (_name, theme) => {
@@ -83,9 +113,9 @@ describe.each(Object.entries(themes))("%s palette", (_name, theme) => {
 
 describe("token parsing", () => {
   it("finds both palettes in tokens.css", () => {
-    expect(light["--color-bg"]).toBeDefined();
-    expect(dark["--color-bg"]).toBeDefined();
-    expect(dark["--color-bg"]).not.toBe(light["--color-bg"]);
+    expect(light["--color-bg"]).toBe("Canvas");
+    expect(dark["--color-muted"]).toBeDefined();
+    expect(dark["--color-muted"]).not.toBe(light["--color-muted"]);
   });
 
   it("computes the WCAG ratio (black on white is 21:1)", () => {

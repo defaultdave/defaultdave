@@ -8,18 +8,19 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-const surfaceColours = [
+const colours = [
   "bg",
-  "surface",
   "text",
   "muted",
-  "border",
   "accent",
+  "visited",
+  "border",
+  "rule",
   "focus",
-  "on-accent",
-  "ink",
+  "mark",
+  "mark-text",
+  "button",
 ] as const;
-const pops = ["pop-1", "pop-2", "pop-3", "pop-4"] as const;
 const typeSteps = [
   ["display", "Display sample heading"],
   ["h1", "H1 sample heading"],
@@ -30,21 +31,27 @@ const typeSteps = [
   ["mono", "const lcp = 1.8;"],
 ] as const;
 const spaces = ["1", "2", "3", "4", "5", "6", "7", "8", "9"] as const;
-const radii = ["sm", "md", "pill"] as const;
 
-const sansFont = "var(--font-inter), system-ui, sans-serif";
+const sansFont = "var(--font-sans)";
 const monoFont = "var(--font-mono)";
+const fonts = [
+  [
+    "--font-sans",
+    "var(--font-sans)",
+    "The quick brown fox jumps over the lazy dog",
+  ],
+  ["--font-mono", "var(--font-mono)", "const lcp = 1.8;"],
+  ["--font-whimsy", "var(--font-whimsy)", "Musings, in italic serif"],
+] as const;
 
 const fill = (token: string): CSSProperties => ({
   background: `var(--color-${token})`,
 });
 
-function Swatch({ token, inkText }: { token: string; inkText?: boolean }) {
+function Swatch({ token }: { token: string }) {
   return (
     <div className={styles.swatch}>
-      <div className={styles.chip} style={fill(token)}>
-        {inkText ? <span className={styles.ink}>Aa ink text</span> : null}
-      </div>
+      <div className={styles.chip} style={fill(token)} />
       <span className={styles.name}>--color-{token}</span>
     </div>
   );
@@ -58,13 +65,27 @@ export default function TokensPage() {
       <section className={styles.section}>
         <h2>Colour</h2>
         <div className={styles.grid}>
-          {surfaceColours.map((t) => (
+          {colours.map((t) => (
             <Swatch key={t} token={t} />
           ))}
-          {pops.map((t) => (
-            <Swatch key={t} token={t} inkText />
-          ))}
         </div>
+      </section>
+
+      <section className={styles.section}>
+        <h2>Fonts</h2>
+        {fonts.map(([name, family, sample]) => (
+          <div key={name} className={styles.row}>
+            <span className={styles.name}>{name}</span>
+            <span
+              style={{
+                fontFamily: family,
+                fontStyle: name === "--font-whimsy" ? "italic" : "normal",
+              }}
+            >
+              {sample}
+            </span>
+          </div>
+        ))}
       </section>
 
       <section className={styles.section}>
@@ -98,33 +119,6 @@ export default function TokensPage() {
             />
           </div>
         ))}
-      </section>
-
-      <section className={styles.section}>
-        <h2>Radii</h2>
-        <div className={styles.boxes}>
-          {radii.map((r) => (
-            <div
-              key={r}
-              className={styles.box}
-              style={{ borderRadius: `var(--radius-${r})` }}
-            >
-              <span className={styles.name}>--radius-{r}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className={styles.section}>
-        <h2>Effects</h2>
-        <div className={styles.boxes}>
-          <div className={styles.box}>
-            <span className={styles.name}>--effect-outline</span>
-          </div>
-          <div className={[styles.box, styles.shadow].join(" ")}>
-            <span className={styles.name}>--effect-shadow</span>
-          </div>
-        </div>
       </section>
     </div>
   );

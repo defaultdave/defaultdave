@@ -13,7 +13,11 @@ export function Nav({ pathname }: { pathname: string | null }) {
             {/* A UrlObject skips typedRoutes, which only knows routes that exist so far. */}
             <Link
               href={{ pathname: href }}
-              className={styles.link}
+              className={
+                href === "/musings"
+                  ? [styles.link, styles.musings].join(" ")
+                  : styles.link
+              }
               aria-current={isCurrent(pathname, href) ? "page" : undefined}
             >
               {label}

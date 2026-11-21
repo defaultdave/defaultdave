@@ -1,13 +1,15 @@
 .shell {
-  /* Page gutter that also centres content once the viewport passes 72rem. */
-  --shell-gutter: max(var(--layout-page-x), calc((100% - 72rem) / 2));
-
+  /* One centred column: 760px of content plus the side padding. */
+  box-sizing: content-box;
   display: flex;
   flex-direction: column;
   min-block-size: 100dvh;
+  max-inline-size: var(--layout-column);
+  margin-inline: auto;
+  padding-inline: var(--layout-page-x);
 }
 
 .main {
   flex: 1;
-  padding: var(--space-7) var(--shell-gutter) var(--space-9);
+  padding-block: var(--space-7) 0;
 }

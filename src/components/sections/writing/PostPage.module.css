@@ -6,15 +6,13 @@
 
 .back {
   align-self: flex-start;
-  color: var(--color-accent);
-  text-underline-offset: 0.2em;
 }
 
 .header {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  max-inline-size: var(--layout-measure);
+  max-inline-size: var(--layout-column);
 }
 
 .title {
@@ -39,16 +37,11 @@
   line-height: var(--type-small-line);
 }
 
-.origin a {
-  color: var(--color-accent);
-  text-underline-offset: 0.2em;
-}
-
 .elsewhere {
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
-  max-inline-size: var(--layout-measure);
+  max-inline-size: var(--layout-column);
 }
 
 .summary {

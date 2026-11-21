@@ -1,37 +1,23 @@
+/* Primary: a native-looking button. Secondary: a plain link, as in the cards. */
 .button {
-  display: inline-flex;
-  align-items: center;
-  min-block-size: 2.75rem;
-  padding: 0 var(--space-5);
-  border: var(--effect-outline);
-  border-radius: var(--radius-pill);
-  font-size: var(--type-body-size);
-  font-weight: 600;
-  line-height: 1;
-  text-decoration: none;
-  transition: transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: inline-block;
 }
 
 .primary {
-  background: var(--color-accent);
-  color: var(--color-on-accent);
+  min-block-size: 2rem;
+  padding: 6px var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  background: var(--color-button);
+  color: var(--color-text);
+  font-size: var(--type-small-size);
+  text-decoration: none;
+}
+
+.primary:hover {
+  filter: brightness(0.95);
 }
 
 .secondary {
-  background: var(--color-surface);
-  color: var(--color-text);
-}
-
-.button:hover {
-  transform: translateY(-2px) scale(1.04);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .button {
-    transition: none;
-  }
-
-  .button:hover {
-    transform: none;
-  }
+  text-decoration: underline;
 }

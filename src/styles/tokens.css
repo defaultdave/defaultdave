@@ -1,47 +1,42 @@
 /*
- * Design tokens for davidfleming.me. Source of truth for colour, type, spacing,
- * radii and effects. Names map one to one from the signed-off design artifact
- * (docs/designs/2026-11-06-design-comparison.md, "Token names"); a slash in a
- * Figma-style name becomes a dash here.
+ * Design tokens for davidfleming.me. Source of truth for colour, type, spacing
+ * and layout. Names follow the Tokens artboard of the DefaultDave redesign: the
+ * site looks like browser defaults, so bg, text, links, visited and mark are
+ * CSS system colours, and the OS light or dark setting picks the rest.
  *
  * Light values live in :root, dark values in the prefers-color-scheme block.
- * There is no toggle. Values are the signed-off direction: Playground style,
- * foam palette, Inter, compact density.
+ * There is no toggle. /music remaps these names on :root:has([data-room="bar"])
+ * from its own stylesheet, so the names here are a contract with that page.
  */
 
 :root {
   color-scheme: light dark;
 
-  /* Colour: light */
-  --color-bg: #fff7ee;
-  --color-surface: #ffffff;
-  --color-text: #18181b;
-  --color-muted: #57575f;
-  --color-border: #18181b;
-  --color-accent: #3949c9;
-  --color-focus: #2b3fd6;
-  --color-on-accent: #ffffff;
+  /*
+   * System colours: the browser draws its own default for the active scheme
+   * (Canvas white or #121212, LinkText #0000ee or #9e9eff, and so on).
+   */
+  --color-bg: Canvas;
+  --color-text: CanvasText;
+  --color-accent: LinkText;
+  --color-visited: VisitedText;
+  --color-mark: Mark;
+  --color-mark-text: MarkText;
+
+  /* Hex because GrayText is #808080 in some engines, 3.95:1 on white. */
+  --color-muted: #6d6d6d;
+  --color-border: #767676;
+  --color-rule: #c0c0c0;
+  --color-focus: #005fcc;
+  --color-button: #efefef;
 
   /*
-   * Ink is intentionally the same in both themes: it is the text colour on
-   * the pops, which do not change between themes, so it must not either.
+   * Deprecated aliases. EmbedFacade.module.css (piece B, /music) still reads
+   * these; piece B removes them with that file's rewrite.
    */
-  --color-ink: #18181b;
-
-  /* Pops are the same in both schemes. */
-  --color-pop-1: #ff6fb5;
-  --color-pop-2: #3cc8b4;
-  --color-pop-3: #ff8a3d;
-  --color-pop-4: #5bb8ff;
-
-  /* Effects */
-  --effect-outline: 2px solid var(--color-border);
-  --effect-shadow: 5px 5px 0 var(--color-ink);
-
-  /* Radii */
-  --radius-sm: 4px;
-  --radius-md: 14px;
-  --radius-pill: 999px;
+  --color-surface: Canvas;
+  --effect-outline: 1px solid var(--color-border);
+  --radius-md: 0;
 
   /* Spacing: compact scale */
   --space-1: 4px;
@@ -54,43 +49,43 @@
   --space-8: 40px;
   --space-9: 64px;
 
-  /* Layout */
-  --layout-measure: 60ch;
-  --layout-page-x: 80px;
+  /* Layout: one content column, 20px side padding (16px on phones). */
+  --layout-column: 760px;
+  --layout-page-x: 20px;
 
-  /*
-   * Font families. --font-inter and --font-jetbrains-mono are set on <html>
-   * by next/font in src/app/layout.tsx.
-   */
-  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+  /* Font families: the system stacks. No webfont is requested outside /music. */
+  --font-sans:
+    system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  /* Musings nav item and Musings title only. */
+  --font-whimsy: ui-serif, "New York", Georgia, serif;
 
-  /* Type scale: desktop (640px and up). Size and line height in rem (16px = 1rem). */
-  --type-display-size: 3.5rem;
-  --type-display-line: 3.875rem;
-  --type-h1-size: 2.5rem;
-  --type-h1-line: 3rem;
-  --type-h2-size: 1.75rem;
-  --type-h2-line: 2.25rem;
-  --type-h3-size: 1.25rem;
-  --type-h3-line: 1.75rem;
-  --type-body-size: 1.0625rem;
-  --type-body-line: 1.75rem;
+  /* Type scale: the browser's own. Size and line height in rem (16px = 1rem). */
+  --type-display-size: 4rem;
+  --type-display-line: 4.4rem;
+  --type-h1-size: 2rem;
+  --type-h1-line: 2.5rem;
+  --type-h2-size: 1.5rem;
+  --type-h2-line: 1.95rem;
+  --type-h3-size: 1.17rem;
+  --type-h3-line: 1.58rem;
+  --type-body-size: 1rem;
+  --type-body-line: 1.5rem;
   --type-small-size: 0.875rem;
-  --type-small-line: 1.25rem;
-  --type-mono-size: 0.875rem;
-  --type-mono-line: 1.375rem;
-  /* Tag labels: mono at 12px on both sizes, from the artifact's work cards. */
+  --type-small-line: 1.3125rem;
+  --type-mono-size: 0.8125rem;
+  --type-mono-line: 1.25rem;
   --type-tag-size: 0.75rem;
   --type-tag-line: 1.125rem;
 
-  /* Type weights and tracking, from the artifact's Playground style. */
-  --type-display-weight: 800;
-  --type-display-tracking: -0.03em;
-  --type-h1-weight: 800;
-  --type-h1-tracking: -0.03em;
-  --type-h2-weight: 600;
-  --type-h2-tracking: -0.015em;
-  --type-h3-weight: 600;
+  /* Weights and tracking: browser defaults, bold headings, no tracking. */
+  --type-display-weight: 400;
+  --type-display-tracking: 0;
+  --type-h1-weight: 700;
+  --type-h1-tracking: 0;
+  --type-h2-weight: 700;
+  --type-h2-tracking: 0;
+  --type-h3-weight: 700;
   --type-h3-tracking: 0;
   --type-body-weight: 400;
   --type-body-tracking: 0;
@@ -100,39 +95,25 @@
   --type-mono-tracking: 0;
 }
 
+/* Only the hex tokens change in dark; the system colours follow color-scheme. */
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-bg: #1a1718;
-    --color-surface: #262123;
-    --color-text: #f4efea;
-    --color-muted: #b3aaa4;
-    --color-border: #8a8084;
-    --color-accent: #93a2ff;
-    --color-focus: #b4c0ff;
-    --color-on-accent: #111113;
-
-    --effect-shadow: 5px 5px 0 #3cc8b4;
+    --color-muted: #a8a8a8;
+    --color-border: #858585;
+    --color-rule: #3b3b3b;
+    --color-focus: #7cacf8;
+    --color-button: #6b6b6b;
   }
 }
 
-/* Type scale: mobile, below 640px. Only the sizes change. */
+/* Type scale: phones, below 640px. Only the sizes change. */
 @media (width < 640px) {
   :root {
-    --layout-page-x: 20px;
+    --layout-page-x: 16px;
 
-    --type-display-size: 2.375rem;
-    --type-display-line: 2.75rem;
-    --type-h1-size: 1.875rem;
+    --type-display-size: 2.5rem;
+    --type-display-line: 2.875rem;
+    --type-h1-size: 1.75rem;
     --type-h1-line: 2.25rem;
-    --type-h2-size: 1.4375rem;
-    --type-h2-line: 1.875rem;
-    --type-h3-size: 1.1875rem;
-    --type-h3-line: 1.625rem;
-    --type-body-size: 1.0625rem;
-    --type-body-line: 1.75rem;
-    --type-small-size: 0.875rem;
-    --type-small-line: 1.25rem;
-    --type-mono-size: 0.8125rem;
-    --type-mono-line: 1.25rem;
   }
 }

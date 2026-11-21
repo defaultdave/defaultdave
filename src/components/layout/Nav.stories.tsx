@@ -20,3 +20,7 @@ export const Mobile: Story = {
 export const CurrentItem: Story = {
   args: { pathname: "/work/checkout-rebuild" },
 };
+
+export const CurrentMusings: Story = {
+  args: { pathname: "/musings" },
+};
