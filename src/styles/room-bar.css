@@ -1,0 +1,82 @@
+/*
+ * The bar room: /music is always dark, whatever the OS setting, header and
+ * footer included. The music page imports this file and marks its root with
+ * data-room="bar". CSS a page imports can outlive the page after a client
+ * navigation, so every rule here sits under :root:has([data-room="bar"]) and
+ * does nothing on any other route. No script switches it.
+ *
+ * Palette and contrast (text 4.5:1, borders 3:1, on #0c0907 and on #1a1310):
+ *   text    #f3e6d3  16.1 / 14.9
+ *   muted   #b8a48c   8.3 / 7.6
+ *   accent  #e8b86a  10.9 / 10.0   link colour (the design's accent-text)
+ *   mark    #d4892a   7.0 / 6.5    highlight and play button fill
+ *   border  #8a5a1f   3.4 / 3.1
+ *   rule    #3a2a1f   decorative lines only
+ *   oxblood #6e1f1f   corner glow only
+ */
+
+:root:has([data-room="bar"]) {
+  color-scheme: dark;
+
+  --color-bg: #0c0907;
+  --color-surface: #1a1310;
+  --color-text: #f3e6d3;
+  --color-muted: #b8a48c;
+  --color-accent: #e8b86a;
+  --color-visited: #d9b88f;
+  --color-border: #8a5a1f;
+  --color-rule: #3a2a1f;
+  --color-focus: #f3e6d3;
+  --color-mark: #d4892a;
+  --color-mark-text: #0c0907;
+  --color-button: #d4892a;
+  --color-on-accent: #0c0907;
+}
+
+/* The lamp glow (amber, top left) and the oxblood corner glow (bottom right). */
+:root:has([data-room="bar"]) body {
+  background:
+    radial-gradient(
+      ellipse 60% 40% at 18% -5%,
+      rgb(212 137 42 / 30%),
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 55% 45% at 100% 100%,
+      rgb(110 31 31 / 45%),
+      transparent 70%
+    ),
+    var(--color-bg);
+}
+
+@media (width < 640px) {
+  :root:has([data-room="bar"]) body {
+    background:
+      radial-gradient(
+        ellipse 90% 30% at 20% -5%,
+        rgb(212 137 42 / 32%),
+        transparent 70%
+      ),
+      radial-gradient(
+        ellipse 90% 35% at 100% 100%,
+        rgb(110 31 31 / 45%),
+        transparent 70%
+      ),
+      var(--color-bg);
+  }
+}
+
+/* Links keep a quiet underline until hovered, as in the design. */
+:root:has([data-room="bar"]) a {
+  text-decoration-color: var(--color-border);
+  text-underline-offset: 3px;
+}
+
+:root:has([data-room="bar"]) a:hover {
+  text-decoration-color: currentcolor;
+}
+
+/* The shared footer's "Except this room." line is hidden everywhere else. */
+:root:has([data-room="bar"]) [data-room-only="bar"] {
+  display: inline;
+}

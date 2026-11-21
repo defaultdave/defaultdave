@@ -54,7 +54,9 @@ describe("EmbedFacade", () => {
     const html = renderToStaticMarkup(<EmbedFacade {...props} aspect="1:1" />);
     expect(html).toContain("<button");
     expect(html).toContain('type="button"');
-    expect(html).toMatch(/Play (<!-- -->)?Night Drive/);
+    expect(html).toMatch(
+      /Load the (<!-- -->)?Bandcamp(<!-- -->)? player for (<!-- -->)?Night Drive/,
+    );
     expect(html).not.toContain("<iframe");
     expect(html).not.toContain("bandcamp.com");
   });

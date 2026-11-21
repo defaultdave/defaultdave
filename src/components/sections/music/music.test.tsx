@@ -15,7 +15,7 @@ const release = (over: Partial<Release> = {}): Release => ({
 });
 
 describe("ReleaseList", () => {
-  it("renders each release with title, year, host badge and a play button", () => {
+  it("renders each release with title, year and a play button named for it", () => {
     const html = renderToStaticMarkup(
       <ReleaseList
         releases={[
@@ -32,8 +32,8 @@ describe("ReleaseList", () => {
     );
     expect(html).toContain(">Night Drive</h2>");
     expect(html).toContain("2025");
-    expect(html).toContain(">Bandcamp</span>");
-    expect(html).toContain(">Spotify</span>");
+    expect(html).toMatch(/Load the (<!-- -->)?Bandcamp(<!-- -->)? player for/);
+    expect(html).toMatch(/Load the (<!-- -->)?Spotify(<!-- -->)? player for/);
     expect(html.match(/<button/g)).toHaveLength(2);
     expect(html).not.toContain("<iframe");
   });
