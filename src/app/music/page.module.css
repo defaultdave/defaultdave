@@ -1,8 +1,164 @@
 .page {
-  max-width: 48rem;
+  max-width: 60rem;
   margin: 0 auto;
-  padding: var(--space-8) var(--layout-page-x);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-7);
+  padding: var(--space-8) 0 0;
+}
+
+.intro {
+  margin-block-end: var(--space-9);
+}
+
+.eyebrow {
+  margin: 0 0 var(--space-2);
+  color: var(--color-accent);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 0;
+  color: var(--color-text);
+  font-family: var(--music-font-display), ui-serif, Georgia, serif;
+  font-size: clamp(5.5rem, 15vw, 11rem);
+  line-height: 0.95;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  text-shadow:
+    0 0 28px rgb(212 137 42 / 45%),
+    0 0 2px rgb(243 230 211 / 40%);
+}
+
+.rule {
+  margin-block-start: var(--space-7);
+  border-block-start: 3px double var(--color-border);
+}
+
+/*
+ * Smoke: decorative and CSS only. The layers sit inside a fixed, clipped,
+ * click-through box behind the page, so drifting never moves or resizes
+ * anything. Only transform is animated.
+ */
+.smoke {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.puff {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    rgb(232 218 200 / 11%),
+    rgb(232 218 200 / 4%) 55%,
+    transparent
+  );
+  filter: blur(28px);
+  will-change: transform;
+}
+
+.puff:nth-child(1) {
+  inline-size: 900px;
+  block-size: 300px;
+  inset-inline-start: -200px;
+  inset-block-start: 180px;
+  animation: drift-a 46s ease-in-out infinite alternate;
+}
+
+.puff:nth-child(2) {
+  inline-size: 700px;
+  block-size: 260px;
+  inset-inline-end: -180px;
+  inset-block-start: 520px;
+  animation: drift-b 38s ease-in-out infinite alternate;
+}
+
+.puff:nth-child(3) {
+  inline-size: 1000px;
+  block-size: 340px;
+  inset-inline-start: 10%;
+  inset-block-start: 980px;
+  animation: drift-a 54s ease-in-out infinite alternate-reverse;
+}
+
+.puff:nth-child(4) {
+  inline-size: 520px;
+  block-size: 220px;
+  inset-inline-start: 45%;
+  inset-block-start: 40px;
+  animation: drift-b 42s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes drift-a {
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+
+  to {
+    transform: translate(220px, -60px) scale(1.15);
+  }
+}
+
+@keyframes drift-b {
+  from {
+    transform: translate(0, 0) scale(1.1);
+  }
+
+  to {
+    transform: translate(-240px, 40px) scale(0.95);
+  }
+}
+
+@media (width < 640px) {
+  .page {
+    padding-block-start: var(--space-7);
+  }
+
+  .intro {
+    margin-block-end: var(--space-8);
+  }
+
+  .eyebrow {
+    font-size: 0.75rem;
+  }
+
+  .rule {
+    margin-block-start: var(--space-6);
+  }
+
+  .puff:nth-child(1) {
+    inline-size: 520px;
+    block-size: 220px;
+    inset-inline-start: -180px;
+    inset-block-start: 200px;
+  }
+
+  .puff:nth-child(2) {
+    inline-size: 460px;
+    block-size: 200px;
+    inset-inline-end: -200px;
+    inset-block-start: 640px;
+  }
+
+  .puff:nth-child(3) {
+    inline-size: 560px;
+    block-size: 240px;
+    inset-inline-start: -120px;
+    inset-block-start: 1100px;
+  }
+
+  .puff:nth-child(4) {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .puff:nth-child(n) {
+    animation: none;
+  }
 }

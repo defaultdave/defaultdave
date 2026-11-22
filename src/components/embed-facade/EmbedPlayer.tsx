@@ -44,10 +44,19 @@ export function EmbedPlayer({ title, hostLabel, src }: EmbedPlayerProps) {
         setPlaying(true);
       }}
     >
-      <span aria-hidden="true" className={styles.icon}>
-        &#9654;
+      <span aria-hidden="true" className={styles.disc}>
+        <svg width="22" height="22" viewBox="0 0 22 22">
+          <path d="M6 3 L19 11 L6 19 Z" fill="currentColor" />
+        </svg>
       </span>
-      Play {title}
+      <span className={styles.label}>
+        <span className={styles.name}>
+          Load the {hostLabel} player for {title}
+        </span>
+        <span className={styles.hint}>
+          Loads from {hostLabel} when you press play.
+        </span>
+      </span>
     </button>
   );
 }
