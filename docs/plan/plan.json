@@ -436,6 +436,23 @@
       "notes": "Scope addition 2026-11-21 (DECISIONS). Estimated at the calibrated 0.1 days a round, 2 / 3 / 5 rounds; may split into pieces with disjoint globs under one unit, as seo-perf did. qa-pass now depends on it."
     },
     {
+      "id": "music-motion",
+      "title": "A moving photo behind the Music room, with a pause control and a photo credit",
+      "kind": "build",
+      "route": "agent fan-out",
+      "complexity": 2,
+      "uncertainty": 1,
+      "depends_on": [
+        "restyle"
+      ],
+      "estimate": {
+        "o": 0.2,
+        "m": 0.3,
+        "p": 0.5
+      },
+      "notes": "Scope addition 2026-11-22 (DECISIONS). Estimated at the calibrated 0.1 days a round, 2 / 3 / 5 rounds. The look was picked in the music lab. qa-pass now depends on it."
+    },
+    {
       "id": "qa-pass",
       "title": "Cross-page QA: axe, Lighthouse CI, Playwright smoke, content proofread",
       "kind": "qa",
@@ -446,7 +463,8 @@
         "content-writing",
         "content-music",
         "content-home-about",
-        "restyle"
+        "restyle",
+        "music-motion"
       ],
       "complexity": 1,
       "uncertainty": 2,
