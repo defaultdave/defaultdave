@@ -2,6 +2,8 @@
 
 import { useSyncExternalStore } from "react";
 
+import { requestedPathLabel } from "./requested-path";
+
 const subscribe = () => () => {};
 const clientPath = () => window.location.pathname;
 // The prerendered 404 does not know which URL was asked for.
@@ -14,10 +16,11 @@ const serverPath = () => null;
  */
 export function RequestedPath() {
   const path = useSyncExternalStore(subscribe, clientPath, serverPath);
-  if (path === null || path === "" || path === "/_not-found") return null;
+  const label = requestedPathLabel(path);
+  if (label === null) return null;
   return (
     <p>
-      Nothing lives at <strong>davidfleming.me{path}</strong>.
+      Nothing lives at <strong>{label}</strong>.
     </p>
   );
 }

@@ -31,12 +31,10 @@
   --color-button: #efefef;
 
   /*
-   * Deprecated aliases. EmbedFacade.module.css (piece B, /music) still reads
-   * these; piece B removes them with that file's rewrite.
+   * Kept for EmbedFacade.module.css and the /music styles, which read it.
+   * Resolves to the browser's own canvas colour.
    */
   --color-surface: Canvas;
-  --effect-outline: 1px solid var(--color-border);
-  --radius-md: 0;
 
   /* Spacing: compact scale */
   --space-1: 4px;
