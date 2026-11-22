@@ -1,0 +1,65 @@
+.page {
+  max-inline-size: 560px;
+  padding-block-start: var(--space-8);
+}
+
+.icon {
+  display: block;
+  margin-block-end: 28px;
+  color: var(--color-muted);
+}
+
+.gear {
+  transform-origin: 46px 58px;
+  animation: spin 6s linear infinite;
+}
+
+.heading {
+  margin: 0 0 var(--space-4);
+  font-size: var(--type-h2-size);
+  line-height: var(--type-h2-line);
+}
+
+.page p {
+  margin: 0 0 var(--space-2);
+}
+
+.page p.code {
+  margin-block-end: var(--space-6);
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.details {
+  margin-block-start: var(--space-7);
+  color: var(--color-muted);
+  font-size: var(--type-small-size);
+}
+
+.details summary {
+  cursor: pointer;
+}
+
+.details p {
+  margin: var(--space-2) 0 0;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gear {
+    animation: none;
+  }
+}

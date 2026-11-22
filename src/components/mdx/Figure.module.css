@@ -5,8 +5,7 @@
 .frame {
   max-inline-size: 100%;
   overflow: hidden;
-  border: var(--effect-outline);
-  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
 }
 
 .image {

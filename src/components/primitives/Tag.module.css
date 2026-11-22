@@ -1,35 +1,11 @@
-/* The design's pill: 3px by 10px inside a 2px border, 28px tall with the 18px line. */
+/* Plain monospace label with a 1px border. Tone is ignored: the redesign has no pop colours. */
 .tag {
-  --tag-pad-y: 0.1875rem;
-  --tag-pad-x: 0.625rem;
-
   display: inline-block;
-  padding: var(--tag-pad-y) var(--tag-pad-x);
-  border: var(--effect-outline);
-  border-radius: var(--radius-pill);
-  background: var(--color-surface);
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border);
   color: var(--color-text);
   font-family: var(--font-mono);
   font-size: var(--type-tag-size);
   line-height: var(--type-tag-line);
-  font-weight: 500;
   white-space: nowrap;
-}
-
-/* Ink text on every pop; the border keeps the theme colour so it shows in dark mode. */
-.tag:not([data-tone="neutral"]) {
-  color: var(--color-ink);
-}
-
-.tag[data-tone="pop-1"] {
-  background: var(--color-pop-1);
-}
-.tag[data-tone="pop-2"] {
-  background: var(--color-pop-2);
-}
-.tag[data-tone="pop-3"] {
-  background: var(--color-pop-3);
-}
-.tag[data-tone="pop-4"] {
-  background: var(--color-pop-4);
 }

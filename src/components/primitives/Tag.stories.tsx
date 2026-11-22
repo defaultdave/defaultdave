@@ -12,8 +12,3 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Neutral: Story = {};
-
-export const Pop1: Story = { args: { tone: "pop-1" } };
-export const Pop2: Story = { args: { tone: "pop-2" } };
-export const Pop3: Story = { args: { tone: "pop-3" } };
-export const Pop4: Story = { args: { tone: "pop-4" } };

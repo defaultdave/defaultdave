@@ -27,7 +27,30 @@ describe("parseTokens", () => {
   it("still parses the real tokens.css", () => {
     const css = readFileSync(join(__dirname, "tokens.css"), "utf8");
     const { light, dark } = parseTokens(css);
-    expect(light["--effect-outline"]).toBeDefined();
+    for (const name of [
+      "--color-bg",
+      "--color-text",
+      "--color-muted",
+      "--color-accent",
+      "--color-visited",
+      "--color-border",
+      "--color-rule",
+      "--color-focus",
+      "--color-mark",
+      "--color-mark-text",
+      "--color-button",
+      "--font-whimsy",
+    ]) {
+      expect(light[name], name).toBeDefined();
+    }
+    for (const name of [
+      "--color-pop-1",
+      "--color-ink",
+      "--effect-shadow",
+      "--radius-pill",
+    ]) {
+      expect(light[name], name).toBeUndefined();
+    }
     expect(Object.keys(dark).length).toBeGreaterThan(0);
   });
 });

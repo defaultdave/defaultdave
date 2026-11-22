@@ -2,10 +2,7 @@
   display: grid;
   gap: var(--space-5);
   padding: var(--space-5);
-  border: var(--effect-outline);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-  box-shadow: var(--effect-shadow);
+  border: 1px solid var(--color-border);
 }
 
 .cover {
@@ -14,8 +11,7 @@
   block-size: auto;
   aspect-ratio: 1200 / 630;
   object-fit: cover;
-  border: var(--effect-outline);
-  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
 }
 
 .body {

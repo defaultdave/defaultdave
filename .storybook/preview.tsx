@@ -17,16 +17,10 @@ function block(selector: string, tokens: TokenMap): string {
   const body = Object.entries(tokens)
     .map(([name, value]) => `${name}: ${value};`)
     .join(" ");
-  // --effect-outline is in the parsed map too, so its var(--color-border) resolves against the panel.
   return `${selector} { ${body} }`;
 }
 
-// next/font sets these on <html> in the app; Storybook falls back to system fonts.
-const fontCss =
-  ":root { --font-inter: system-ui; --font-jetbrains-mono: ui-monospace; }";
-
 const themeCss = [
-  fontCss,
   block('[data-theme="light"]', light),
   block('[data-theme="dark"]', { ...light, ...dark }),
 ].join("\n");

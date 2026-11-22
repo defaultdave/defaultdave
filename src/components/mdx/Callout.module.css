@@ -1,8 +1,6 @@
 .callout {
   padding: var(--space-4) var(--space-5);
-  border: var(--effect-outline);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
+  border: 1px solid var(--color-border);
 }
 
 .callout > :first-child {
@@ -14,9 +12,9 @@
 }
 
 .note {
-  border-inline-start: 8px solid var(--color-pop-4);
+  border-inline-start: 4px solid var(--color-border);
 }
 
 .warning {
-  border-inline-start: 8px solid var(--color-pop-3);
+  border-inline-start: 4px solid var(--color-text);
 }

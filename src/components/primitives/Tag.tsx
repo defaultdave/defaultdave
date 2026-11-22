@@ -6,7 +6,7 @@ const POPS = ["pop-1", "pop-2", "pop-3", "pop-4"] as const;
 
 type TagProps = {
   children: ReactNode;
-  /** `neutral` is an outline on the surface; a pop fills with that colour and ink text. */
+  /** Accepted for existing callers and ignored: the redesign has no pop colours. */
   tone?: "neutral" | (typeof POPS)[number];
 };
 
