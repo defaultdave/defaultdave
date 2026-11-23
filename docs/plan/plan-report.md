@@ -33,7 +33,8 @@ Recorded 2026-11-06. Durations are working days; a week is 5.
 | `redesign` | build | 2 | 2 | none | 0.2 / 0.3 / 0.6 | 0.3 | 0.0 | 0.3 | 2.5 | no | human only |
 | `restyle` | build | 2 | 1 | redesign | 0.2 / 0.3 / 0.5 | 0.3 | 0.3 | 0.6 | 2.5 | no | agent fan-out |
 | `music-motion` | build | 2 | 1 | restyle | 0.2 / 0.3 / 0.5 | 0.3 | 0.6 | 1.0 | 2.5 | no | agent fan-out |
-| `qa-pass` | qa | 1 | 2 | seo-perf, feed, content-work, content-writing, content-music, content-home-about, restyle, music-motion | 0.5 / 0.75 / 1.5 | 0.8 + 0.5 | 3.4 | 4.8 | 0.0 | yes | human-led |
+| `share-cards` | build | 1 | 1 | restyle | 0.1 / 0.2 / 0.3 | 0.2 | 0.6 | 0.8 | 2.6 | no | agent fan-out |
+| `qa-pass` | qa | 1 | 2 | seo-perf, feed, content-work, content-writing, content-music, content-home-about, restyle, music-motion, share-cards | 0.5 / 0.75 / 1.5 | 0.8 + 0.5 | 3.4 | 4.8 | 0.0 | yes | human-led |
 | `launch` | launch | 1 | 1 | qa-pass | 0.25 / 0.5 / 1 | 0.5 | 4.8 | 5.3 | 0.0 | yes | human-led |
 | `tail` | tail | 1 | 1 | launch | 0.25 / 0.5 / 1 | 0.5 | 5.3 | 5.9 | 0.0 | yes | human-led |
 
@@ -67,6 +68,7 @@ A join buffer of 0.5 days is added to each unit with two or more dependencies.
 | `redesign` | 2.5 | human only |
 | `restyle` | 2.5 | agent fan-out |
 | `music-motion` | 2.5 | agent fan-out |
+| `share-cards` | 2.6 | agent fan-out |
 
 ## Execution model
 
@@ -74,7 +76,7 @@ A join buffer of 0.5 days is added to each unit with two or more dependencies.
 | --- | --- | --- |
 | human only | `design`, `keystatic-spike`, `content-work`, `content-writing`, `content-music`, `content-home-about`, `redesign` | 3.5 |
 | human-led | `preflight`, `scaffold`, `merge-desk`, `cms`, `qa-pass`, `launch`, `tail` | 4.8 |
-| agent fan-out | `shell`, `page-home`, `page-work`, `page-writing`, `page-music`, `page-about`, `analytics`, `cleanup`, `seo-perf`, `feed`, `restyle`, `music-motion` | 7.0 |
+| agent fan-out | `shell`, `page-home`, `page-work`, `page-writing`, `page-music`, `page-about`, `analytics`, `cleanup`, `seo-perf`, `feed`, `restyle`, `music-motion`, `share-cards` | 7.2 |
 
 - `scaffold` is declared human-led; its scores and path position give agent fan-out.
 - `page-work` is declared agent fan-out; its scores and path position give human-led.
@@ -85,7 +87,7 @@ A join buffer of 0.5 days is added to each unit with two or more dependencies.
 
 | Staffing | Duration | What binds it |
 | --- | --- | --- |
-| 1 engineer, no fan-out | 3.1 weeks (15.3 days) | Everything runs serially |
+| 1 engineer, no fan-out | 3.1 weeks (15.5 days) | Everything runs serially |
 | 2 engineers | 1.7 weeks (8.6 days) | Engineer capacity |
 | 3 engineers | 1.4 weeks (7.0 days) | Engineer capacity |
 | 4 engineers | 1.3 weeks (6.4 days) | Engineer capacity |
@@ -96,12 +98,12 @@ Fan-out rows are left out: `assumptions.agent_review_fraction` is not set.
 
 ## Cross-check
 
-Serial total: 15.3 days over 26 units, 0.6 days per unit.
-- Ramble demo marketplace, Oct 20 to Nov 4 2026: the 36 units with a recorded actual (summed likely estimate 68.75 days): 0.5 days per unit predicts 14.2 days. This plan is 1.08 times that.
+Serial total: 15.5 days over 27 units, 0.6 days per unit.
+- Ramble demo marketplace, Oct 20 to Nov 4 2026: the 36 units with a recorded actual (summed likely estimate 68.75 days): 0.5 days per unit predicts 14.7 days. This plan is 1.05 times that.
 
 ## The sentence
 
-> Critical path is Prove Keystatic GitHub mode on the current Next.js App Router release, Keystatic config, collections and singletons, typed content layer, MDX pipeline, Work list and case-study template with metrics and figures, Sitemap, robots, OG images, per-page metadata, Speed Insights, bundle analyzer, Lighthouse 95, Cross-page QA: axe, Lighthouse CI, Playwright smoke, content proofread, Domain live on production, link into resume and LinkedIn, analytics verified and Remove placeholders and scaffolding, enforce CSP, file would-likes as issues, delta read-back: about 1.2 weeks, range 1.1 to 1.3. Accounts, domain, GitHub App, Hobby caps and secrets, from preflight.md, Design: a Figma file and a Claude Design artifact of the same tokens, components and six layouts, compared, Next.js app with strict TS, lint, format, Knip, Vitest, Playwright smoke, CI and Vercel link, Agent identity and merge desk: GitHub App, rulesets with required checks, agent-git, post-check, scope-manifest, revert, Layout, nav, footer, tokens, primitives, metadata defaults, a11y skeleton, Home page from the home singleton and featured work, Music releases list with click-to-load embed facade, About page from the about singleton, ResortPass case study, anonymized; cards for gallery perf, vig, side projects, Tuscany Rule port, CrUX article final pass, published pieces with canonical URLs, Release list with embed links and notes, Positioning paragraph, bio, headshot, contact links, Vercel Analytics behind the single analytics wrapper (ARCH-8), Review follow-ups: route logic into src/lib, site URL constant, CSP origins from hosts, Figure dimensions, RSS feed for Articles and Musings (would-like; first to cut), Redesign: the DefaultDave direction (system defaults, playful accents, a whiskey-bar Music page) as a Claude Design artifact, signed off, Restyle to the redesign: tokens to system defaults, wordmark, footer line, Musings accents, 404 page, Music bar theme and A moving photo behind the Music room, with a pause control and a photo credit are off it. One engineer with no fan-out is 3.1 weeks serial.
+> Critical path is Prove Keystatic GitHub mode on the current Next.js App Router release, Keystatic config, collections and singletons, typed content layer, MDX pipeline, Work list and case-study template with metrics and figures, Sitemap, robots, OG images, per-page metadata, Speed Insights, bundle analyzer, Lighthouse 95, Cross-page QA: axe, Lighthouse CI, Playwright smoke, content proofread, Domain live on production, link into resume and LinkedIn, analytics verified and Remove placeholders and scaffolding, enforce CSP, file would-likes as issues, delta read-back: about 1.2 weeks, range 1.1 to 1.3. Accounts, domain, GitHub App, Hobby caps and secrets, from preflight.md, Design: a Figma file and a Claude Design artifact of the same tokens, components and six layouts, compared, Next.js app with strict TS, lint, format, Knip, Vitest, Playwright smoke, CI and Vercel link, Agent identity and merge desk: GitHub App, rulesets with required checks, agent-git, post-check, scope-manifest, revert, Layout, nav, footer, tokens, primitives, metadata defaults, a11y skeleton, Home page from the home singleton and featured work, Music releases list with click-to-load embed facade, About page from the about singleton, ResortPass case study, anonymized; cards for gallery perf, vig, side projects, Tuscany Rule port, CrUX article final pass, published pieces with canonical URLs, Release list with embed links and notes, Positioning paragraph, bio, headshot, contact links, Vercel Analytics behind the single analytics wrapper (ARCH-8), Review follow-ups: route logic into src/lib, site URL constant, CSP origins from hosts, Figure dimensions, RSS feed for Articles and Musings (would-like; first to cut), Redesign: the DefaultDave direction (system defaults, playful accents, a whiskey-bar Music page) as a Claude Design artifact, signed off, Restyle to the redesign: tokens to system defaults, wordmark, footer line, Musings accents, 404 page, Music bar theme, A moving photo behind the Music room, with a pause control and a photo credit and Share cards (OG images) in the redesign's look, rendered by a committed script are off it. One engineer with no fan-out is 3.1 weeks serial.
 
 ## Graph
 
@@ -130,6 +132,7 @@ graph LR
   u_redesign["Redesign: the DefaultDave direction (system defaults, playful accents, a whiskey-bar Music page) as a Claude Design artifact, signed off"]
   u_restyle["Restyle to the redesign: tokens to system defaults, wordmark, footer line, Musings accents, 404 page, Music bar theme"]
   u_music_motion["A moving photo behind the Music room, with a pause control and a photo credit"]
+  u_share_cards["Share cards (OG images) in the redesign's look, rendered by a committed script"]
   u_qa_pass["Cross-page QA: axe, Lighthouse CI, Playwright smoke, content proofread"]
   u_launch["Domain live on production, link into resume and LinkedIn, analytics verified"]
   u_tail["Remove placeholders and scaffolding, enforce CSP, file would-likes as issues, delta read-back"]
@@ -178,6 +181,7 @@ graph LR
   u_merge_desk --> u_feed
   u_redesign --> u_restyle
   u_restyle --> u_music_motion
+  u_restyle --> u_share_cards
   u_seo_perf --> u_qa_pass
   u_feed --> u_qa_pass
   u_content_work --> u_qa_pass
@@ -186,10 +190,11 @@ graph LR
   u_content_home_about --> u_qa_pass
   u_restyle --> u_qa_pass
   u_music_motion --> u_qa_pass
+  u_share_cards --> u_qa_pass
   u_qa_pass --> u_launch
   u_launch --> u_tail
   classDef critical fill:#c4622d,stroke:#c4622d,color:#ffffff
   classDef fanout fill:#2d6a6b,stroke:#2d6a6b,color:#ffffff
   class u_keystatic_spike,u_cms,u_page_work,u_page_writing,u_seo_perf,u_qa_pass,u_launch,u_tail critical
-  class u_shell,u_page_home,u_page_work,u_page_writing,u_page_music,u_page_about,u_analytics,u_cleanup,u_seo_perf,u_feed,u_restyle,u_music_motion fanout
+  class u_shell,u_page_home,u_page_work,u_page_writing,u_page_music,u_page_about,u_analytics,u_cleanup,u_seo_perf,u_feed,u_restyle,u_music_motion,u_share_cards fanout
 ```

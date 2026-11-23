@@ -453,6 +453,23 @@
       "notes": "Scope addition 2026-11-22 (DECISIONS). Estimated at the calibrated 0.1 days a round, 2 / 3 / 5 rounds. The look was picked in the music lab. qa-pass now depends on it. Amended 2026-11-22: carries the /music font layout-shift fix (DECISIONS); estimate unchanged. Second amendment the same day: client font preload and darker foot accepted (DECISIONS); estimate unchanged."
     },
     {
+      "id": "share-cards",
+      "title": "Share cards (OG images) in the redesign's look, rendered by a committed script",
+      "kind": "build",
+      "route": "agent fan-out",
+      "complexity": 1,
+      "uncertainty": 1,
+      "depends_on": [
+        "restyle"
+      ],
+      "estimate": {
+        "o": 0.1,
+        "m": 0.2,
+        "p": 0.3
+      },
+      "notes": "Scope addition 2026-11-23 (DECISIONS). Estimated at the calibrated 0.1 days a round, 1 / 2 / 3 rounds. Direction A picked in the share-cards lab. qa-pass now depends on it."
+    },
+    {
       "id": "qa-pass",
       "title": "Cross-page QA: axe, Lighthouse CI, Playwright smoke, content proofread",
       "kind": "qa",
@@ -464,7 +481,8 @@
         "content-music",
         "content-home-about",
         "restyle",
-        "music-motion"
+        "music-motion",
+        "share-cards"
       ],
       "complexity": 1,
       "uncertainty": 2,
