@@ -1,3 +1,6 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+
 import { describe, expect, it } from "vitest";
 
 import { pageMetadata, socialMetadata } from "./metadata";
@@ -8,6 +11,27 @@ const base = {
   path: "/work/aurora",
   section: "work",
 } as const;
+
+const SECTIONS = [
+  "home",
+  "work",
+  "articles",
+  "musings",
+  "music",
+  "about",
+] as const;
+
+/** Reads the width and height from a PNG's IHDR chunk, so a constant cannot fake them. */
+function pngHeader(file: string) {
+  const bytes = readFileSync(join(process.cwd(), "public", file));
+  const signature = bytes.subarray(0, 8).toString("hex");
+  return {
+    signature,
+    width: bytes.readUInt32BE(16),
+    height: bytes.readUInt32BE(20),
+    size: bytes.length,
+  };
+}
 
 describe("pageMetadata", () => {
   it("carries title, description and a self canonical", () => {
@@ -42,8 +66,8 @@ describe("socialMetadata", () => {
     });
   });
 
-  it.each(["home", "work", "articles", "musings", "music", "about"] as const)(
-    "points %s at its static 1200x630 image",
+  it.each(SECTIONS)(
+    "points %s at a real PNG that is 1200x630 and under 300 KB",
     (section) => {
       const { openGraph, twitter } = socialMetadata({ ...base, section });
       expect(openGraph?.images).toEqual([
@@ -56,6 +80,11 @@ describe("socialMetadata", () => {
       expect(twitter?.images).toEqual([
         expect.objectContaining({ url: `/og/${section}.png` }),
       ]);
+
+      const header = pngHeader(`og/${section}.png`);
+      expect(header.signature).toBe("89504e470d0a1a0a");
+      expect(header).toMatchObject({ width: 1200, height: 630 });
+      expect(header.size).toBeLessThan(300_000);
     },
   );
 
