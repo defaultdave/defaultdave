@@ -116,6 +116,7 @@ One row per milestone, after updating `plan.json` and running the script again.
 | 2026-11-22 | 1 Walkable (scope change, not a milestone) | 1.1 to 1.3 (unchanged); report rerun | not recomputed | Unit `music-motion` (agent fan-out, 0.2 / 0.3 / 0.5 days, after `restyle`) added to `plan.json` (DECISIONS 2026-11-22); `qa-pass` gains it as a dependency. Off the critical path; serial total 15.3 days (was 15.0) |
 | 2026-11-22 | 1 Walkable (scope change, not a milestone) | 1.1 to 1.3 (unchanged) | not recomputed | `music-motion` (#102) amended: three criteria for the `/music` font layout shift and `public/fonts/**` in its globs (DECISIONS 2026-11-22). Estimate kept at 0.2 / 0.3 / 0.5 days; only its notes change in `plan.json`, so the report is not rerun |
 | 2026-11-22 | 1 Walkable (scope change, not a milestone) | 1.1 to 1.3 (unchanged) | not recomputed | `music-motion` (#102) second amendment: client component allowed for the font preload only, darker foot of the page, lamp and vignette listed (DECISIONS 2026-11-22). Estimate and globs unchanged; only its notes change in `plan.json`, so the report is not rerun |
+| 2026-11-23 | 1 Walkable (scope change, not a milestone) | 1.1 to 1.3 (unchanged); report rerun | not recomputed | Unit `share-cards` (agent fan-out, 0.1 / 0.2 / 0.3 days, after `restyle`) added to `plan.json` (DECISIONS 2026-11-23); `qa-pass` gains it as a dependency. Off the critical path; serial total 15.5 days (was 15.3) |
 
 ## Read-back
 
