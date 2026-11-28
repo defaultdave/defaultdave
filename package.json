@@ -23,7 +23,7 @@
     "build-storybook": "storybook build --disable-telemetry -o node_modules/.cache/storybook-static"
   },
   "dependencies": {
-    "@keystatic/core": "0.6.9",
+    "@keystatic/core": "0.6.10",
     "@keystatic/next": "5.0.5",
     "@mdx-js/mdx": "3.1.1",
     "@vercel/analytics": "^2.0.1",
@@ -38,7 +38,7 @@
     "@axe-core/playwright": "4.14.0",
     "@next/bundle-analyzer": "16.4.6",
     "@playwright/test": "1.65.1",
-    "@storybook/nextjs-vite": "10.6.7",
+    "@storybook/nextjs-vite": "10.6.8",
     "@types/mdast": "4.0.4",
     "@types/mdx": "2.0.14",
     "@types/node": "26.6.6",
@@ -47,12 +47,12 @@
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "9.39.5",
     "eslint-config-next": "16.4.6",
-    "knip": "6.45.1",
+    "knip": "6.47.0",
     "prettier": "3.10.1",
-    "storybook": "10.6.7",
+    "storybook": "10.6.8",
     "typescript": "6.0.3",
-    "typescript-eslint": "8.72.2",
-    "vitest": "5.1.0"
+    "typescript-eslint": "8.73.0",
+    "vitest": "5.1.1"
   },
   "pnpm": {
     "overrides": {
